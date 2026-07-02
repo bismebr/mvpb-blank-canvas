@@ -157,7 +157,23 @@ async function handleSubscriptionUpsert(
   const plan = mapStripePriceToPlan(priceId, env);
   const bismeStatus = mapStripeStatus(subscription.status);
 
-  if (!bismeStatus) {
+  // A partir de versões novas da API Stripe, current_period_* pode vir apenas
+  // no item da subscription. Buscamos com fallback: top-level → item por priceId → primeiro item.
+  type WithPeriod = { current_period_start?: number | null; current_period_end?: number | null };
+  const items = subscription.items?.data ?? [];
+  const matchedItem =
+    (priceId ? items.find((it) => it.price?.id === priceId) : undefined) ?? items[0] ?? null;
+  const subLevel = subscription as unknown as WithPeriod;
+  const itemLevel = (matchedItem ?? {}) as unknown as WithPeriod;
+  const cpsRaw = subLevel.current_period_start ?? itemLevel.current_period_start ?? null;
+  const cpeRaw = subLevel.current_period_end ?? itemLevel.current_period_end ?? null;
+  const periodSource = subLevel.current_period_start
+    ? "top-level"
+    : itemLevel.current_period_start
+      ? "item"
+      : "none";
+
+
     console.warn("[stripe-webhook] status Stripe não mapeado", subscription.status);
     return { ignored: true, reason: "unmapped_status" };
   }
