@@ -174,6 +174,7 @@ async function handleSubscriptionUpsert(
       : "none";
 
 
+  if (!bismeStatus) {
     console.warn("[stripe-webhook] status Stripe não mapeado", subscription.status);
     return { ignored: true, reason: "unmapped_status" };
   }
@@ -184,9 +185,17 @@ async function handleSubscriptionUpsert(
     return { ignored: true, reason: "unknown_price" };
   }
 
-  const currentPeriodStart = toIso((subscription as unknown as { current_period_start?: number }).current_period_start);
-  const currentPeriodEnd = toIso((subscription as unknown as { current_period_end?: number }).current_period_end);
+  const currentPeriodStart = toIso(cpsRaw);
+  const currentPeriodEnd = toIso(cpeRaw);
   const cancelAtPeriodEnd = subscription.cancel_at_period_end ?? false;
+
+  console.log("[stripe-webhook] subscription upsert", {
+    subscription_id: subscription.id,
+    price_id: priceId,
+    period_source: periodSource,
+    current_period_start: currentPeriodStart,
+    current_period_end: currentPeriodEnd,
+  });
 
   const update: SubscriptionUpdate = {
     status: bismeStatus,
@@ -200,6 +209,7 @@ async function handleSubscriptionUpsert(
   if (plan) update.plan = plan;
   if (currentPeriodStart) update.current_period_start = currentPeriodStart;
   if (currentPeriodEnd) update.current_period_end = currentPeriodEnd;
+
 
   if (bismeStatus === "active") {
     update.canceled_at = null;
