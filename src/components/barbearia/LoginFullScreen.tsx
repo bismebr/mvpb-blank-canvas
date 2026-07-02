@@ -183,6 +183,25 @@ export function LoginFullScreen({
     }
   }
 
+  async function handleRecovery() {
+    setErro(null);
+    const emailTrim = email.trim().toLowerCase();
+    if (!emailTrim || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) {
+      setErro("Informe um e-mail válido.");
+      return;
+    }
+    setRecoveryLoading(true);
+    try {
+      await supabase.auth.resetPasswordForEmail(emailTrim, {
+        redirectTo: `${window.location.origin}/cliente/redefinir-senha`,
+      });
+    } catch {
+      // não revelar existência do e-mail
+    }
+    setRecoveryLoading(false);
+    setRecoverySent(true);
+  }
+
 
   return (
     <div className="sreli-login-overlay" onClick={(e) => e.stopPropagation()}>
