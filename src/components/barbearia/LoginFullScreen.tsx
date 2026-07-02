@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 
 
-type Mode = "login" | "cadastro";
+type Mode = "login" | "cadastro" | "esqueci";
 
 const NOME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
 const EMAIL_REGEX = /^[^\s@]+@(gmail\.com|hotmail\.com|outlook\.com)$/i;
@@ -38,6 +38,8 @@ export function LoginFullScreen({
   const [loadingCadastro, setLoadingCadastro] = useState(false);
   const [whatsappTouched, setWhatsappTouched] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
+  const [recoveryLoading, setRecoveryLoading] = useState(false);
+  const [recoverySent, setRecoverySent] = useState(false);
 
   // reset on open
   useEffect(() => {
