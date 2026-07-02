@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { COLORS, FONT, PageHeader } from "./ui";
 import { supabase } from "@/integrations/supabase/client";
 import { createStripeCheckoutSession } from "@/lib/stripe.functions";
+import { syncStripeSubscription } from "@/lib/stripe-sync.functions";
 import {
   getDaysLeft,
   isPaidActive,
