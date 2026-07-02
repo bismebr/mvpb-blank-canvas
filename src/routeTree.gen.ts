@@ -23,6 +23,7 @@ import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmpresarioOnboardingRouteImport } from './routes/empresario.onboarding'
 import { Route as EmpresarioLoginRouteImport } from './routes/empresario.login'
+import { Route as EmpresarioEsqueciSenhaRouteImport } from './routes/empresario.esqueci-senha'
 import { Route as EmpresarioCadastroRouteImport } from './routes/empresario.cadastro'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 
@@ -96,6 +97,11 @@ const EmpresarioLoginRoute = EmpresarioLoginRouteImport.update({
   path: '/empresario/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmpresarioEsqueciSenhaRoute = EmpresarioEsqueciSenhaRouteImport.update({
+  id: '/empresario/esqueci-senha',
+  path: '/empresario/esqueci-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmpresarioCadastroRoute = EmpresarioCadastroRouteImport.update({
   id: '/empresario/cadastro',
   path: '/empresario/cadastro',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/termos-de-servico': typeof TermosDeServicoRoute
   '/venda': typeof VendaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
+  '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
   '/empresario/onboarding': typeof EmpresarioOnboardingRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/termos-de-servico': typeof TermosDeServicoRoute
   '/venda': typeof VendaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
+  '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
   '/empresario/onboarding': typeof EmpresarioOnboardingRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/termos-de-servico': typeof TermosDeServicoRoute
   '/venda': typeof VendaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
+  '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
   '/empresario/onboarding': typeof EmpresarioOnboardingRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/termos-de-servico'
     | '/venda'
     | '/empresario/cadastro'
+    | '/empresario/esqueci-senha'
     | '/empresario/login'
     | '/empresario/onboarding'
     | '/api/public/stripe/webhook'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/termos-de-servico'
     | '/venda'
     | '/empresario/cadastro'
+    | '/empresario/esqueci-senha'
     | '/empresario/login'
     | '/empresario/onboarding'
     | '/api/public/stripe/webhook'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/termos-de-servico'
     | '/venda'
     | '/empresario/cadastro'
+    | '/empresario/esqueci-senha'
     | '/empresario/login'
     | '/empresario/onboarding'
     | '/api/public/stripe/webhook'
@@ -233,6 +245,7 @@ export interface RootRouteChildren {
   TermosDeServicoRoute: typeof TermosDeServicoRoute
   VendaRoute: typeof VendaRoute
   EmpresarioCadastroRoute: typeof EmpresarioCadastroRoute
+  EmpresarioEsqueciSenhaRoute: typeof EmpresarioEsqueciSenhaRoute
   EmpresarioLoginRoute: typeof EmpresarioLoginRoute
   EmpresarioOnboardingRoute: typeof EmpresarioOnboardingRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
@@ -338,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmpresarioLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/empresario/esqueci-senha': {
+      id: '/empresario/esqueci-senha'
+      path: '/empresario/esqueci-senha'
+      fullPath: '/empresario/esqueci-senha'
+      preLoaderRoute: typeof EmpresarioEsqueciSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/empresario/cadastro': {
       id: '/empresario/cadastro'
       path: '/empresario/cadastro'
@@ -369,6 +389,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermosDeServicoRoute: TermosDeServicoRoute,
   VendaRoute: VendaRoute,
   EmpresarioCadastroRoute: EmpresarioCadastroRoute,
+  EmpresarioEsqueciSenhaRoute: EmpresarioEsqueciSenhaRoute,
   EmpresarioLoginRoute: EmpresarioLoginRoute,
   EmpresarioOnboardingRoute: EmpresarioOnboardingRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
