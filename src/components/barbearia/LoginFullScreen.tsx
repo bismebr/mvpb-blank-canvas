@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 
 
-type Mode = "login" | "cadastro";
+type Mode = "login" | "cadastro" | "esqueci";
 
 const NOME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
 const EMAIL_REGEX = /^[^\s@]+@(gmail\.com|hotmail\.com|outlook\.com)$/i;
@@ -38,6 +38,8 @@ export function LoginFullScreen({
   const [loadingCadastro, setLoadingCadastro] = useState(false);
   const [whatsappTouched, setWhatsappTouched] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
+  const [recoveryLoading, setRecoveryLoading] = useState(false);
+  const [recoverySent, setRecoverySent] = useState(false);
 
   // reset on open
   useEffect(() => {
@@ -48,6 +50,8 @@ export function LoginFullScreen({
       setWhatsapp(maskBrPhone(initialWhatsapp));
       setWhatsappTouched(false);
       setEmailTouched(false);
+      setRecoverySent(false);
+      setRecoveryLoading(false);
     }
   }, [open, initialMode, initialWhatsapp]);
 
@@ -179,6 +183,25 @@ export function LoginFullScreen({
     }
   }
 
+  async function handleRecovery() {
+    setErro(null);
+    const emailTrim = email.trim().toLowerCase();
+    if (!emailTrim || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) {
+      setErro("Informe um e-mail válido.");
+      return;
+    }
+    setRecoveryLoading(true);
+    try {
+      await supabase.auth.resetPasswordForEmail(emailTrim, {
+        redirectTo: `${window.location.origin}/cliente/redefinir-senha`,
+      });
+    } catch {
+      // não revelar existência do e-mail
+    }
+    setRecoveryLoading(false);
+    setRecoverySent(true);
+  }
+
 
   return (
     <div className="sreli-login-overlay" onClick={(e) => e.stopPropagation()}>
@@ -203,14 +226,77 @@ export function LoginFullScreen({
       <div className="sreli-login-content">
 
         <h2 className="sreli-login-title">
-          {mode === "login" ? "Bem-vindo de volta" : "Bem-vindo"}
+          {mode === "login"
+            ? "Bem-vindo de volta"
+            : mode === "esqueci"
+              ? "Recuperar senha"
+              : "Bem-vindo"}
         </h2>
         <p className="sreli-login-subtitle">
           {mode === "login"
             ? "Faça login ou crie uma conta para realizar seus agendamentos"
-            : "Crie uma conta para realizar seus agendamentos"}
+            : mode === "esqueci"
+              ? "Informe seu e-mail e enviaremos um link para redefinir sua senha."
+              : "Crie uma conta para realizar seus agendamentos"}
         </p>
 
+        {mode === "esqueci" ? (
+          <>
+            {recoverySent ? (
+              <>
+                <div
+                  style={{
+                    background: "#F3F4F6",
+                    border: "1px solid #E4E4E4",
+                    borderRadius: 8,
+                    padding: "14px 16px",
+                    fontSize: 14,
+                    color: "#111111",
+                    marginBottom: 14,
+                  }}
+                >
+                  Se este e-mail estiver cadastrado, enviaremos um link para redefinir sua senha.
+                </div>
+                <button
+                  type="button"
+                  className="sreli-signin-btn"
+                  onClick={() => { setMode("login"); setErro(null); setRecoverySent(false); }}
+                >
+                  Voltar ao login
+                </button>
+              </>
+            ) : (
+              <>
+                <FloatField
+                  label="E-mail"
+                  value={email}
+                  onChange={setEmail}
+                  type="email"
+                  autoComplete="email"
+                />
+                {erro && <div className="sreli-field-error" style={{ marginTop: 8 }}>{erro}</div>}
+                <button
+                  type="button"
+                  className="sreli-signin-btn"
+                  onClick={handleRecovery}
+                  disabled={!email.trim() || recoveryLoading}
+                  style={{
+                    opacity: !email.trim() || recoveryLoading ? 0.5 : 1,
+                    cursor: !email.trim() || recoveryLoading ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {recoveryLoading ? "Enviando..." : "Enviar link de recuperação"}
+                </button>
+                <div className="sreli-modal-switch-row">
+                  <strong onClick={() => { setMode("login"); setErro(null); }}>
+                    Voltar ao login
+                  </strong>
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <>
         <div className="sreli-social-buttons" style={{ display: "block" }}>
           <button
             type="button"
@@ -316,6 +402,27 @@ export function LoginFullScreen({
             </button>
           }
         />
+        {mode === "login" && (
+          <div style={{ marginTop: 10, textAlign: "right" }}>
+            <button
+              type="button"
+              onClick={() => { setMode("esqueci"); setErro(null); setRecoverySent(false); }}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                color: "#6F6F6F",
+                fontSize: 13,
+                fontWeight: 500,
+                cursor: "pointer",
+                textDecoration: "underline",
+                fontFamily: "inherit",
+              }}
+            >
+              Esqueci minha senha
+            </button>
+          </div>
+        )}
         {erro && <div className="sreli-field-error" style={{ marginTop: 8 }}>{erro}</div>}
 
         <button
@@ -362,7 +469,10 @@ export function LoginFullScreen({
             </>
           )}
         </div>
+          </>
+        )}
       </div>
+
 
     </div>
   );
