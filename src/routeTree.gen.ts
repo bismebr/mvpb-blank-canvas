@@ -26,6 +26,7 @@ import { Route as EmpresarioOnboardingRouteImport } from './routes/empresario.on
 import { Route as EmpresarioLoginRouteImport } from './routes/empresario.login'
 import { Route as EmpresarioEsqueciSenhaRouteImport } from './routes/empresario.esqueci-senha'
 import { Route as EmpresarioCadastroRouteImport } from './routes/empresario.cadastro'
+import { Route as ClienteRedefinirSenhaRouteImport } from './routes/cliente.redefinir-senha'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 
 const VendaRoute = VendaRouteImport.update({
@@ -114,6 +115,11 @@ const EmpresarioCadastroRoute = EmpresarioCadastroRouteImport.update({
   path: '/empresario/cadastro',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClienteRedefinirSenhaRoute = ClienteRedefinirSenhaRouteImport.update({
+  id: '/cliente/redefinir-senha',
+  path: '/cliente/redefinir-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe/webhook',
   path: '/api/public/stripe/webhook',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/termos-de-servico': typeof TermosDeServicoRoute
   '/venda': typeof VendaRoute
+  '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
   '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/termos-de-servico': typeof TermosDeServicoRoute
   '/venda': typeof VendaRoute
+  '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
   '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/termos-de-servico': typeof TermosDeServicoRoute
   '/venda': typeof VendaRoute
+  '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
   '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/termos-de-servico'
     | '/venda'
+    | '/cliente/redefinir-senha'
     | '/empresario/cadastro'
     | '/empresario/esqueci-senha'
     | '/empresario/login'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/termos-de-servico'
     | '/venda'
+    | '/cliente/redefinir-senha'
     | '/empresario/cadastro'
     | '/empresario/esqueci-senha'
     | '/empresario/login'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/termos-de-servico'
     | '/venda'
+    | '/cliente/redefinir-senha'
     | '/empresario/cadastro'
     | '/empresario/esqueci-senha'
     | '/empresario/login'
@@ -257,6 +269,7 @@ export interface RootRouteChildren {
   SobreRoute: typeof SobreRoute
   TermosDeServicoRoute: typeof TermosDeServicoRoute
   VendaRoute: typeof VendaRoute
+  ClienteRedefinirSenhaRoute: typeof ClienteRedefinirSenhaRoute
   EmpresarioCadastroRoute: typeof EmpresarioCadastroRoute
   EmpresarioEsqueciSenhaRoute: typeof EmpresarioEsqueciSenhaRoute
   EmpresarioLoginRoute: typeof EmpresarioLoginRoute
@@ -386,6 +399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmpresarioCadastroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cliente/redefinir-senha': {
+      id: '/cliente/redefinir-senha'
+      path: '/cliente/redefinir-senha'
+      fullPath: '/cliente/redefinir-senha'
+      preLoaderRoute: typeof ClienteRedefinirSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/stripe/webhook': {
       id: '/api/public/stripe/webhook'
       path: '/api/public/stripe/webhook'
@@ -409,6 +429,7 @@ const rootRouteChildren: RootRouteChildren = {
   SobreRoute: SobreRoute,
   TermosDeServicoRoute: TermosDeServicoRoute,
   VendaRoute: VendaRoute,
+  ClienteRedefinirSenhaRoute: ClienteRedefinirSenhaRoute,
   EmpresarioCadastroRoute: EmpresarioCadastroRoute,
   EmpresarioEsqueciSenhaRoute: EmpresarioEsqueciSenhaRoute,
   EmpresarioLoginRoute: EmpresarioLoginRoute,
