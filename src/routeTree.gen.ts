@@ -21,6 +21,7 @@ import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EmpresarioRedefinirSenhaRouteImport } from './routes/empresario.redefinir-senha'
 import { Route as EmpresarioOnboardingRouteImport } from './routes/empresario.onboarding'
 import { Route as EmpresarioLoginRouteImport } from './routes/empresario.login'
 import { Route as EmpresarioEsqueciSenhaRouteImport } from './routes/empresario.esqueci-senha'
@@ -87,6 +88,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmpresarioRedefinirSenhaRoute =
+  EmpresarioRedefinirSenhaRouteImport.update({
+    id: '/empresario/redefinir-senha',
+    path: '/empresario/redefinir-senha',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EmpresarioOnboardingRoute = EmpresarioOnboardingRouteImport.update({
   id: '/empresario/onboarding',
   path: '/empresario/onboarding',
@@ -130,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
   '/empresario/onboarding': typeof EmpresarioOnboardingRoute
+  '/empresario/redefinir-senha': typeof EmpresarioRedefinirSenhaRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -149,6 +157,7 @@ export interface FileRoutesByTo {
   '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
   '/empresario/onboarding': typeof EmpresarioOnboardingRoute
+  '/empresario/redefinir-senha': typeof EmpresarioRedefinirSenhaRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesById {
@@ -169,6 +178,7 @@ export interface FileRoutesById {
   '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
   '/empresario/onboarding': typeof EmpresarioOnboardingRoute
+  '/empresario/redefinir-senha': typeof EmpresarioRedefinirSenhaRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRouteTypes {
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/empresario/esqueci-senha'
     | '/empresario/login'
     | '/empresario/onboarding'
+    | '/empresario/redefinir-senha'
     | '/api/public/stripe/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/empresario/esqueci-senha'
     | '/empresario/login'
     | '/empresario/onboarding'
+    | '/empresario/redefinir-senha'
     | '/api/public/stripe/webhook'
   id:
     | '__root__'
@@ -228,6 +240,7 @@ export interface FileRouteTypes {
     | '/empresario/esqueci-senha'
     | '/empresario/login'
     | '/empresario/onboarding'
+    | '/empresario/redefinir-senha'
     | '/api/public/stripe/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -248,6 +261,7 @@ export interface RootRouteChildren {
   EmpresarioEsqueciSenhaRoute: typeof EmpresarioEsqueciSenhaRoute
   EmpresarioLoginRoute: typeof EmpresarioLoginRoute
   EmpresarioOnboardingRoute: typeof EmpresarioOnboardingRoute
+  EmpresarioRedefinirSenhaRoute: typeof EmpresarioRedefinirSenhaRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
@@ -337,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/empresario/redefinir-senha': {
+      id: '/empresario/redefinir-senha'
+      path: '/empresario/redefinir-senha'
+      fullPath: '/empresario/redefinir-senha'
+      preLoaderRoute: typeof EmpresarioRedefinirSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/empresario/onboarding': {
       id: '/empresario/onboarding'
       path: '/empresario/onboarding'
@@ -392,6 +413,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmpresarioEsqueciSenhaRoute: EmpresarioEsqueciSenhaRoute,
   EmpresarioLoginRoute: EmpresarioLoginRoute,
   EmpresarioOnboardingRoute: EmpresarioOnboardingRoute,
+  EmpresarioRedefinirSenhaRoute: EmpresarioRedefinirSenhaRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
