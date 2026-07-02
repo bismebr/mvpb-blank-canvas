@@ -1,0 +1,939 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --font-sans: "Inter", sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.129 0.042 264.695);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.129 0.042 264.695);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --primary: oklch(0.208 0.042 265.755);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.968 0.007 247.896);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.554 0.046 257.417);
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.929 0.013 255.508);
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.704 0.04 256.788);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.984 0.003 247.858);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    overscroll-behavior: none;
+  }
+}
+
+@layer utilities {
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+
+/* Barbearia Sr. Eli — UI styles */
+.sreli-root {
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+  background: #f8f8f8;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  color: #1A1A1A;
+  -webkit-overflow-scrolling: auto;
+  overscroll-behavior: none;
+}
+
+[class*="overflow-"], .sreli-login-overlay {
+  overscroll-behavior: none;
+}
+
+.sreli-no-scrollbar::-webkit-scrollbar { display: none; }
+.sreli-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Login overlay (full-screen modal) */
+.sreli-login-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: #FFFFFF;
+  z-index: 9999;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.sreli-login-close {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1A1A1A;
+  z-index: 2;
+  flex-shrink: 0;
+}
+.sreli-login-close svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.2;
+}
+.sreli-login-close:hover,
+.sreli-login-close:active,
+.sreli-login-close:focus,
+.sreli-login-close:focus-visible {
+  background: #FFFFFF;
+  outline: none;
+}
+
+.sreli-login-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 16px 8px;
+}
+.sreli-login-logo {
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sreli-login-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+.sreli-login-content {
+  flex: 1;
+  padding: 4px 24px 32px;
+  max-width: 440px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.sreli-login-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0 0 8px;
+  text-align: center;
+}
+.sreli-login-subtitle {
+  font-size: 14px;
+  color: #888888;
+  text-align: center;
+  margin: 0 0 24px;
+}
+
+.sreli-social-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.sreli-social-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 1.5px solid #EEEEEE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 200ms, transform 150ms;
+}
+.sreli-social-btn:hover { border-color: #5690f5; transform: translateY(-1px); }
+
+.sreli-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+.sreli-divider-line { flex: 1; height: 1px; background: #EEEEEE; }
+.sreli-divider-text { font-size: 12px; color: #AAAAAA; font-weight: 600; letter-spacing: 1px; }
+
+.sreli-field-group { margin-bottom: 16px; }
+.sreli-field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 6px;
+}
+.sreli-field-input {
+  width: 100%;
+  height: 48px;
+  border: 1.5px solid #EEEEEE;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 15px;
+  background: #FFFFFF;
+  color: #1A1A1A;
+  outline: none;
+  transition: border-color 150ms;
+  box-sizing: border-box;
+}
+.sreli-field-input:focus,
+.sreli-field-input:focus-visible {
+  border-color: #EEEEEE;
+  box-shadow: none;
+  outline: none;
+}
+.sreli-field-error { color: #5690f5; font-size: 13px; margin-top: 6px; }
+
+/* Reduz visualmente o tamanho das bolinhas da senha oculta sem alterar
+   a altura do input, o placeholder ou o ícone de mostrar/ocultar. */
+.sreli-password-input {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  letter-spacing: 1px;
+}
+
+.sreli-password-wrapper { position: relative; }
+.sreli-toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #888888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.phone-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #EEEEEE;
+  border-radius: 10px;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+.phone-wrapper:focus-within { border-color: #EEEEEE; box-shadow: none; }
+.phone-input:focus,
+.phone-input:focus-visible { outline: none; box-shadow: none; }
+.phone-prefix {
+  padding: 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #888888;
+  border-right: 1px solid #EEEEEE;
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
+.phone-input {
+  flex: 1;
+  height: 48px;
+  border: none;
+  padding: 0 14px;
+  font-size: 15px;
+  outline: none;
+  background: transparent;
+  color: #1A1A1A;
+}
+
+.sreli-signin-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  background: #5690f5;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity 200ms;
+}
+.sreli-signin-btn:hover:not(:disabled) { opacity: 0.92; }
+.sreli-signin-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.sreli-modal-switch-row {
+  text-align: center;
+  font-size: 14px;
+  color: #888888;
+  margin-top: 20px;
+}
+
+/* Prevent iOS auto-zoom on input focus — must be at least 16px */
+.sreli-field-input,
+.phone-input,
+.sreli-login-overlay input,
+.sreli-login-overlay textarea,
+.sreli-login-overlay select {
+  font-size: 16px !important;
+}
+.sreli-modal-switch-row strong {
+  color: #5690f5;
+  cursor: pointer;
+  font-weight: 700;
+}
+.sreli-modal-switch-row strong:hover { text-decoration: underline; }
+
+/* ============ Bisme: campos grandes de texto (textarea) ============
+   Visual unificado, responsivo e profissional para todos os textareas
+   do painel administrativo, onboarding e fluxo do empresário. */
+.bisme-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+  appearance: none;
+  -webkit-appearance: none;
+  background: #FFFFFF;
+  color: #111111;
+  border: 1.5px solid #E4E4E4;
+  border-radius: 8px;
+  padding: 14px 14px;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px; /* evita zoom no iOS */
+  line-height: 1.55;
+  letter-spacing: 0.005em;
+  resize: vertical;
+  min-height: 112px;
+  outline: none;
+  box-shadow: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  -webkit-font-smoothing: antialiased;
+}
+.bisme-textarea::placeholder {
+  color: #6F6F6F;
+  opacity: 1;
+  font-weight: 400;
+}
+.bisme-textarea:hover {
+  border-color: #E4E4E4;
+}
+.bisme-textarea:focus,
+.bisme-textarea:focus-visible {
+  background: #FFFFFF;
+  border-color: #E4E4E4;
+  box-shadow: none;
+}
+.bisme-textarea:disabled {
+  background: #F5F5F3;
+  color: #8A8A88;
+  cursor: not-allowed;
+}
+@media (max-width: 480px) {
+  .bisme-textarea {
+    padding: 14px 14px;
+    border-radius: 8px;
+    min-height: 104px;
+  }
+}
+
+/*
+ * Correção global de zoom ao digitar em campos no mobile (Safari/iPhone).
+ * O iOS aplica zoom automático sempre que um campo tem font-size < 16px.
+ * Forçamos no mínimo 16px em todos os campos digitáveis em telas pequenas,
+ * de forma global e reaproveitável para qualquer campo novo.
+ */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select,
+  [contenteditable="true"] {
+    font-size: 16px !important;
+  }
+}
+
+.bisme-action-btn:hover {
+  background: #EEF4FF !important;
+  box-shadow: 0 2px 6px rgba(86, 144, 245, 0.15) !important;
+}
+.bisme-action-btn:active {
+  transform: translateY(1px);
+  background: #DCE7FB !important;
+}
+.bisme-action-btn:focus-visible {
+  outline: 2px solid #5690f5;
+  outline-offset: 2px;
+}
+
+/* ============ Admin panel theme variables (light/dark) ============ */
+[data-admin-theme] {
+  --adm-bg-base: #f2f1f6;
+  --adm-bg-surface: #FFFFFF;
+  --adm-bg-elevated: #f2f1f6;
+  --adm-border: #FFFFFF;
+  --adm-divider: #e5e5e5;
+  --adm-text-primary: #1A1A1A;
+  --adm-text-muted: #888888;
+  --adm-accent: #111111;
+  --adm-accent-hover: #111111;
+  --adm-danger-bg: #FFF1EA;
+  --adm-danger-border: #FFD4BF;
+  --adm-success-bg: #F0FDF4;
+  --adm-success-border: #BBF7D0;
+  --adm-toggle-off: #f2f1f6;
+}
+/* Light-theme-only borders for specific admin elements (Phase 2). */
+[data-admin-theme="light"] .bisme-light-border,
+[data-admin-theme]:not([data-admin-theme="dark"]) .bisme-light-border {
+  border: 1px solid #d9d9d9 !important;
+}
+/* Dashboard light-theme overrides: white background, gray cards, stronger muted text. */
+[data-admin-theme="light"] .dash-root,
+[data-admin-theme]:not([data-admin-theme="dark"]) .dash-root {
+  --adm-bg-base: #FFFFFF;
+  --adm-bg-surface: #FFFFFF;
+  --adm-bg-elevated: #FFFFFF;
+  --adm-border: #E9EAEE;
+  --adm-text-muted: #4B4B4B;
+}
+/* Bottom-sheet drag handle visibility on light theme (--adm-border is white). */
+[data-admin-theme="light"] .bisme-sheet-handle,
+[data-admin-theme]:not([data-admin-theme="dark"]) .bisme-sheet-handle {
+  background: #d9d9d9 !important;
+}
+[data-admin-theme="dark"] {
+  --adm-bg-base: #0F0F10;
+  --adm-bg-surface: #18181B;
+  --adm-bg-elevated: #1F1F23;
+  --adm-border: #2A2A2F;
+  --adm-divider: #2A2A2F;
+  --adm-text-primary: #F4F4F5;
+  --adm-text-muted: #A1A1AA;
+  --adm-accent: #F4F4F5;
+  --adm-accent-hover: #FFFFFF;
+  --adm-danger-bg: #2A1410;
+  --adm-danger-border: #4A2218;
+  --adm-success-bg: #0F2418;
+  --adm-success-border: #1F4A30;
+  --adm-toggle-off: #2A2A2F;
+  color-scheme: dark;
+}
+[data-admin-theme="dark"] input,
+[data-admin-theme="dark"] textarea,
+[data-admin-theme="dark"] select {
+  color: #FFFFFF !important;
+  background-color: #252525 !important;
+  border-color: #252525 !important;
+}
+[data-admin-theme="dark"] .bisme-input-group,
+[data-admin-theme="dark"] .bisme-floating-field {
+  background: #252525 !important;
+  background-color: #252525 !important;
+  border-color: #252525 !important;
+  box-shadow: none !important;
+}
+[data-admin-theme="dark"] .bisme-input-group:hover,
+[data-admin-theme="dark"] .bisme-input-group:focus-within,
+[data-admin-theme="dark"] .bisme-input-group:active,
+[data-admin-theme="dark"] .bisme-floating-field:hover,
+[data-admin-theme="dark"] .bisme-floating-field:focus-within,
+[data-admin-theme="dark"] .bisme-floating-field:active {
+  background: #252525 !important;
+  background-color: #252525 !important;
+  border-color: #252525 !important;
+  box-shadow: none !important;
+}
+[data-admin-theme="dark"] .bisme-input-prefix,
+[data-admin-theme="dark"] .bisme-input-suffix {
+  background: #252525 !important;
+  background-color: #252525 !important;
+  border-color: #252525 !important;
+}
+[data-admin-theme="dark"] .bisme-input-group-control,
+[data-admin-theme="dark"] .bisme-floating-field-control {
+  color: #FFFFFF !important;
+  background: #252525 !important;
+  background-color: #252525 !important;
+  border-color: #252525 !important;
+  box-shadow: none !important;
+}
+[data-admin-theme="dark"] .bisme-input-group-control:hover,
+[data-admin-theme="dark"] .bisme-input-group-control:focus,
+[data-admin-theme="dark"] .bisme-input-group-control:focus-visible,
+[data-admin-theme="dark"] .bisme-input-group-control:active,
+[data-admin-theme="dark"] .bisme-input-group-control:disabled,
+[data-admin-theme="dark"] .bisme-floating-field-control:hover,
+[data-admin-theme="dark"] .bisme-floating-field-control:focus,
+[data-admin-theme="dark"] .bisme-floating-field-control:focus-visible,
+[data-admin-theme="dark"] .bisme-floating-field-control:active,
+[data-admin-theme="dark"] .bisme-floating-field-control:disabled {
+  color: #FFFFFF !important;
+  background: #252525 !important;
+  background-color: #252525 !important;
+  border-color: #252525 !important;
+  box-shadow: none !important;
+}
+[data-admin-theme="dark"] input::placeholder,
+[data-admin-theme="dark"] textarea::placeholder {
+  color: #71717A;
+}
+[data-admin-theme="dark"] .bisme-textarea {
+  background: #252525 !important;
+  color: #FFFFFF !important;
+  border-color: #252525 !important;
+  box-shadow: none;
+}
+[data-admin-theme="dark"] .bisme-textarea:focus,
+[data-admin-theme="dark"] .bisme-textarea:focus-visible {
+  background: #252525 !important;
+  border-color: #252525 !important;
+  box-shadow: none;
+}
+[data-admin-theme="dark"] .bisme-textarea::placeholder {
+  color: #71717A;
+}
+
+/* ============ Bisme: campo de texto curto (input) ============ */
+.bisme-input {
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  background: #FFFFFF;
+  color: #111111;
+  border: 1.5px solid #E4E4E4;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+.bisme-input::placeholder { color: #6F6F6F; opacity: 1; }
+.bisme-input:focus,
+.bisme-input:focus-visible { border-color: #5690f5; box-shadow: 0 0 0 3px rgba(86,144,245,0.15); }
+[data-admin-theme="dark"] .bisme-input {
+  background: #252525 !important;
+  color: #FFFFFF !important;
+  border-color: #252525 !important;
+}
+[data-admin-theme="dark"] .bisme-input::placeholder { color: #71717A; }
+[data-admin-theme="dark"] .bisme-input:focus,
+[data-admin-theme="dark"] .bisme-input:focus-visible {
+  border-color: #252525 !important;
+  box-shadow: none;
+}
+
+/* Dark overrides: hover/active states that hardcoded light orange backgrounds */
+[data-admin-theme="dark"] .bisme-action-btn:hover {
+  background: var(--adm-bg-elevated) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+}
+[data-admin-theme="dark"] .bisme-action-btn:active {
+  background: #2A2A2F !important;
+}
+
+/* Dark: native select option list (browsers render with system colors otherwise) */
+[data-admin-theme="dark"] select option {
+  background-color: #252525;
+  color: var(--adm-text-primary);
+}
+
+/* Dark: native date/time pickers indicator */
+[data-admin-theme="dark"] input[type="date"],
+[data-admin-theme="dark"] input[type="time"],
+[data-admin-theme="dark"] input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+/* ============ Admin: unified field visuals (matches Onboarding "Sobre você") ============
+   Placeholder color, clean focus (no colored ring), consistent across all admin tabs. */
+[data-admin-theme="light"] input::placeholder,
+[data-admin-theme="light"] textarea::placeholder,
+[data-admin-theme] input::placeholder,
+[data-admin-theme] textarea::placeholder {
+  color: #6F6F6F;
+  opacity: 1;
+}
+[data-admin-theme] input:focus,
+[data-admin-theme] input:focus-visible,
+[data-admin-theme] textarea:focus,
+[data-admin-theme] textarea:focus-visible,
+[data-admin-theme] select:focus,
+[data-admin-theme] select:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-color: #E4E4E4;
+}
+[data-admin-theme="dark"] input:focus,
+[data-admin-theme="dark"] input:focus-visible,
+[data-admin-theme="dark"] textarea:focus,
+[data-admin-theme="dark"] textarea:focus-visible,
+[data-admin-theme="dark"] select:focus,
+[data-admin-theme="dark"] select:focus-visible {
+  border-color: #252525 !important;
+}
+
+/* Global body scroll lock when a modal/drawer/sheet is open */
+body.bisme-no-scroll {
+  overflow: hidden !important;
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+/* Neutraliza links automáticos do iOS/Safari em endereços, telefones, datas etc.
+   Mantém a aparência herdada e remove sublinhado, sem afetar links reais. */
+a[x-apple-data-detectors] {
+  color: inherit !important;
+  text-decoration: none !important;
+  pointer-events: none !important;
+}
+span[data-no-auto-link],
+.no-auto-link {
+  color: inherit;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+/* Agendamentos: contraste no tema escuro para nomes, serviços e profissionais */
+[data-admin-theme="dark"] .agenda-cliente,
+[data-admin-theme="dark"] .agenda-servico,
+[data-admin-theme="dark"] .agenda-profissional {
+  color: #000000 !important;
+}
+
+/* Agendamentos: nome do profissional no header da visualização Por profissional */
+[data-admin-theme="dark"] .agenda-profissional-header {
+  color: #FFFFFF !important;
+}
+
+/* Agendamentos: página e seção no tema escuro */
+[data-admin-theme="dark"] .agenda-page {
+  background: var(--adm-bg-base) !important;
+}
+[data-admin-theme="dark"] .agenda-section {
+  background: var(--adm-bg-base) !important;
+}
+[data-admin-theme="dark"] .agenda-card {
+  background: var(--adm-bg-elevated) !important;
+}
+
+/* ===========================================================
+   Desktop-only improvements (≥1024px) — Bisme admin panel
+   Nothing below this line affects mobile/tablet < 1024px.
+   =========================================================== */
+@media (min-width: 1024px) {
+
+  /* Admin: center each tab content inside a comfortable container.
+     Each top-level tab is rendered as a direct child of <main.admin-main>.
+     Constraining max-width gives clean side gutters that pick up the
+     theme background (light: #f2f1f6, dark: #0F0F10). */
+  .admin-main > * {
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+  .admin-main {
+    padding-inline: 24px;
+  }
+
+  /* Agenda: keep the full-height surface but centered with rounded edges
+     so it doesn't look like a stretched phone screen. */
+  .admin-main > .agenda-page {
+    min-height: auto;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04);
+  }
+  [data-admin-theme="dark"] .admin-main > .agenda-page {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  /* Agenda: give the day strip and the appointments list a comfortable
+     reading width inside the wider container. */
+  .agenda-section {
+    max-width: 960px;
+    margin-inline: auto;
+    width: 100%;
+  }
+
+  /* Footer fixed nav — widen the inner grid on desktop for breathing room. */
+  nav[aria-label="Navegação principal"] > div {
+    max-width: 1120px !important;
+  }
+
+  /* Menu sheet (3-bar menu) — center as a real modal on desktop,
+     not a bottom sheet. */
+  div[role="dialog"][aria-label="Mais opções"] {
+    align-items: center !important;
+  }
+  div[role="dialog"][aria-label="Mais opções"] > div {
+    border-radius: 20px !important;
+    max-width: 560px !important;
+    max-height: 78vh !important;
+  }
+
+  /* Public areas — gentle desktop polish: cap content width, add gutters. */
+  .sreli-root {
+    max-width: 100%;
+  }
+  .sreli-login-content {
+    max-width: 480px;
+  }
+}
+
+/* Extra breathing on very wide screens */
+@media (min-width: 1440px) {
+  .admin-main > * { max-width: 1280px; }
+  nav[aria-label="Navegação principal"] > div { max-width: 1200px !important; }
+}
+
+/* Aba Meu Site — campo "Adicionar capa": borda da mesma cor do background */
+[data-admin-theme]:not([data-admin-theme="dark"]) .adm-cover,
+[data-admin-theme]:not([data-admin-theme="dark"]) .adm-cover.is-empty {
+  background: #FFFFFF !important;
+  border: 1px solid #FFFFFF !important;
+}
+[data-admin-theme="dark"] .adm-cover,
+[data-admin-theme="dark"] .adm-cover.is-empty {
+  border-color: var(--adm-bg-elevated) !important;
+}
+
+
+
+
+/* Aba Agendamentos — modal de notificações (sininho): dark mode */
+[data-admin-theme="dark"] .adm-notif-panel {
+  background: #0f0f10 !important;
+  border-color: #252525 !important;
+}
+[data-admin-theme="dark"] .adm-notif-header {
+  border-bottom-color: #252525 !important;
+}
+[data-admin-theme="dark"] .adm-notif-title {
+  color: #ffffff !important;
+}
+[data-admin-theme="dark"] .adm-notif-empty {
+  color: #9CA3AF !important;
+}
+[data-admin-theme="dark"] .adm-notif-item {
+  background: #18181b !important;
+  border-bottom-color: #252525 !important;
+}
+[data-admin-theme="dark"] .adm-notif-item.is-unread {
+  background: #252525 !important;
+}
+[data-admin-theme="dark"] .adm-notif-item.is-unread .adm-notif-text {
+  color: #ffffff !important;
+}
+[data-admin-theme="dark"] .adm-notif-item.is-read .adm-notif-text {
+  color: #9CA3AF !important;
+}
+[data-admin-theme="dark"] .adm-notif-meta {
+  color: #9CA3AF !important;
+}
+
+/* Aba Atividade — borda inferior de cada card de atividade no tema claro */
+[data-admin-theme="light"] .adm-atividade-item,
+[data-admin-theme]:not([data-admin-theme="dark"]) .adm-atividade-item {
+  border-bottom: 1px solid #d9d9d9 !important;
+}
+
+
+/* Aba Meu site — linha de toggle (ex: "Mostrar endereço para os clientes") */
+.adm-toggle-row { background: #f8f8f8; }
+[data-admin-theme="dark"] .adm-toggle-row {
+  background: var(--adm-bg-elevated) !important;
+  border-color: var(--adm-border) !important;
+}
+
+/* Aba Meu site — aviso "avaliações modelo não aparecerão..." */
+.adm-reviews-warning { background: #f8f8f8; }
+[data-admin-theme="dark"] .adm-reviews-warning {
+  background: var(--adm-bg-elevated) !important;
+  border-color: var(--adm-border) !important;
+}
+
+/* Aba Configurações — campo de link público: barrinha/divisória no tema escuro
+   entre o domínio "bisme.com.br/" e o nome do negócio. */
+[data-admin-theme="dark"] .adm-slug-group .bisme-input-prefix {
+  background: #1b1b1f !important;
+  background-color: #1b1b1f !important;
+  border-right: 1px solid #3a3a3f !important;
+  color: #A1A1AA !important;
+}
+
+/* Aba Serviços — botão "+ Categoria" e chips de categoria não selecionadas no tema escuro */
+[data-admin-theme="dark"] .adm-cat-add {
+  background: #18181b !important;
+  color: #9CA3AF !important;
+  border: 1px solid #252525 !important;
+  box-shadow: none !important;
+}
+[data-admin-theme="dark"] .adm-cat-add:hover {
+  background: #1f1f23 !important;
+  border-color: #2f2f33 !important;
+}
+[data-admin-theme="dark"] .adm-cat-chip:not(.is-active) {
+  background: #18181b !important;
+  color: #9CA3AF !important;
+  border: 1px solid #252525 !important;
+}
+[data-admin-theme="dark"] .adm-cat-chip:not(.is-active):hover {
+  background: #1f1f23 !important;
+  border-color: #2f2f33 !important;
+}
+
+/* Aba Assinatura — bordas visíveis no tema claro (tabela de pagamento e modal de confirmar plano) */
+[data-admin-theme="light"] .assinatura-tab .bisme-pay-table table,
+[data-admin-theme]:not([data-admin-theme="dark"]) .assinatura-tab .bisme-pay-table table,
+[data-admin-theme="light"] .assinatura-tab .bisme-pay-table table th,
+[data-admin-theme]:not([data-admin-theme="dark"]) .assinatura-tab .bisme-pay-table table th,
+[data-admin-theme="light"] .assinatura-tab .bisme-pay-table table td,
+[data-admin-theme]:not([data-admin-theme="dark"]) .assinatura-tab .bisme-pay-table table td,
+[data-admin-theme="light"] .assinatura-tab .bisme-pay-divider,
+[data-admin-theme]:not([data-admin-theme="dark"]) .assinatura-tab .bisme-pay-divider {
+  border-color: #e5e5e5 !important;
+}
+
+[data-admin-theme="light"] .assinatura-modal .bisme-modal-row,
+[data-admin-theme]:not([data-admin-theme="dark"]) .assinatura-modal .bisme-modal-row {
+  border-color: #e5e5e5 !important;
+}
+
+[data-admin-theme="dark"] .assinatura-modal .bisme-modal-row {
+  border-color: var(--adm-border) !important;
+}
