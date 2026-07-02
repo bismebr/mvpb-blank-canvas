@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { COLORS, FONT, PageHeader } from "./ui";
 import { supabase } from "@/integrations/supabase/client";
 import { createStripeCheckoutSession } from "@/lib/stripe.functions";
+import { syncStripeSubscription } from "@/lib/stripe-sync.functions";
 import {
   getDaysLeft,
   isPaidActive,
@@ -133,6 +134,42 @@ export function AssinaturaTela({ companyId, blocked = false }: Props) {
       clearInterval(timer);
     };
   }, [companyId, flash?.tone, sub?.status]);
+
+  // Esconde o banner de checkout assim que a assinatura vira active.
+  useEffect(() => {
+    if (sub?.status === "active" && flash?.tone === "success") {
+      setFlash(null);
+    }
+  }, [sub?.status, flash?.tone]);
+
+  // Backfill: se está active mas current_period_end está vazio, sincroniza da Stripe.
+  const syncFn = useServerFn(syncStripeSubscription);
+  useEffect(() => {
+    if (!companyId) return;
+    if (sub?.status !== "active") return;
+    if (sub?.current_period_end) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await syncFn({ data: { companyId } });
+        if (cancelled || !res?.updated) return;
+        const { data } = await supabase
+          .from("subscriptions")
+          .select(
+            "plan,status,trial_started_at,trial_ends_at,current_period_start,current_period_end,canceled_at,updated_at",
+          )
+          .eq("company_id", companyId)
+          .maybeSingle();
+        if (!cancelled && data) setSub(data as SubscriptionLike);
+      } catch (e) {
+        console.warn("[assinatura] falha ao sincronizar subscription:", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [companyId, sub?.status, sub?.current_period_end, syncFn]);
+
 
   const status = (sub?.status ?? "none") as SubscriptionStatus;
   const trialAtivo = isTrialActive(sub);
@@ -344,7 +381,18 @@ function StatusCard({
   if (status === "active") {
     const nome = planoNome(sub?.plan);
     const preco = planoPreco(sub?.plan);
+    const hasPeriodEnd = !!sub?.current_period_end;
     const dias = getDaysLeft(sub?.current_period_end);
+    const proxRenov = hasPeriodEnd ? fmtBRfromISO(sub?.current_period_end) : "Sincronizando...";
+    const faltamValor = hasPeriodEnd
+      ? dias > 1
+        ? `${dias} dias`
+        : dias === 1
+          ? "1 dia"
+          : dias === 0
+            ? "hoje"
+            : "vencido"
+      : "Aguardando Stripe";
     return (
       <Card highlight="accent">
         <Badge tone="success">Plano ativo</Badge>
@@ -354,13 +402,15 @@ function StatusCard({
         </Texto>
         <InfoRow
           items={[
-            { label: "Próxima renovação", valor: fmtBRfromISO(sub?.current_period_end) },
-            { label: "Faltam", valor: dias > 0 ? `${dias} dias` : "hoje" },
+            { label: "Próxima renovação", valor: proxRenov },
+            { label: "Faltam", valor: faltamValor },
           ]}
         />
       </Card>
     );
   }
+
+
 
   // 4) past_due
   if (status === "past_due") {

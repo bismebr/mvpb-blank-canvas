@@ -157,6 +157,23 @@ async function handleSubscriptionUpsert(
   const plan = mapStripePriceToPlan(priceId, env);
   const bismeStatus = mapStripeStatus(subscription.status);
 
+  // A partir de versões novas da API Stripe, current_period_* pode vir apenas
+  // no item da subscription. Buscamos com fallback: top-level → item por priceId → primeiro item.
+  type WithPeriod = { current_period_start?: number | null; current_period_end?: number | null };
+  const items = subscription.items?.data ?? [];
+  const matchedItem =
+    (priceId ? items.find((it) => it.price?.id === priceId) : undefined) ?? items[0] ?? null;
+  const subLevel = subscription as unknown as WithPeriod;
+  const itemLevel = (matchedItem ?? {}) as unknown as WithPeriod;
+  const cpsRaw = subLevel.current_period_start ?? itemLevel.current_period_start ?? null;
+  const cpeRaw = subLevel.current_period_end ?? itemLevel.current_period_end ?? null;
+  const periodSource = subLevel.current_period_start
+    ? "top-level"
+    : itemLevel.current_period_start
+      ? "item"
+      : "none";
+
+
   if (!bismeStatus) {
     console.warn("[stripe-webhook] status Stripe não mapeado", subscription.status);
     return { ignored: true, reason: "unmapped_status" };
@@ -168,9 +185,17 @@ async function handleSubscriptionUpsert(
     return { ignored: true, reason: "unknown_price" };
   }
 
-  const currentPeriodStart = toIso((subscription as unknown as { current_period_start?: number }).current_period_start);
-  const currentPeriodEnd = toIso((subscription as unknown as { current_period_end?: number }).current_period_end);
+  const currentPeriodStart = toIso(cpsRaw);
+  const currentPeriodEnd = toIso(cpeRaw);
   const cancelAtPeriodEnd = subscription.cancel_at_period_end ?? false;
+
+  console.log("[stripe-webhook] subscription upsert", {
+    subscription_id: subscription.id,
+    price_id: priceId,
+    period_source: periodSource,
+    current_period_start: currentPeriodStart,
+    current_period_end: currentPeriodEnd,
+  });
 
   const update: SubscriptionUpdate = {
     status: bismeStatus,
@@ -184,6 +209,7 @@ async function handleSubscriptionUpsert(
   if (plan) update.plan = plan;
   if (currentPeriodStart) update.current_period_start = currentPeriodStart;
   if (currentPeriodEnd) update.current_period_end = currentPeriodEnd;
+
 
   if (bismeStatus === "active") {
     update.canceled_at = null;
