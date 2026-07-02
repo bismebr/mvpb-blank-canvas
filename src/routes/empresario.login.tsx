@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApp } from "@/components/admin/AppContext";
 import { AuthScreen } from "@/components/empresario/AuthScreen";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,14 @@ function LoginEmpresario() {
   const { setAdmin, setAdminEmail, setAuthProvider, setHasPassword } = useApp();
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("reset") === "1") {
+      setErro("Senha alterada. Entre com sua nova senha.");
+    }
+  }, []);
 
   async function handleSubmit({ email, senha }: { email: string; senha: string }) {
     setErro(null);

@@ -148,6 +148,21 @@ export function AuthScreen(props: Props) {
                     </ul>
                   </div>
                 )}
+                {mode === "login" && (
+                  <div style={{ textAlign: "right", marginTop: 8 }}>
+                    <Link
+                      to="/empresario/esqueci-senha"
+                      style={{
+                        fontSize: 13,
+                        color: COLORS.textMuted,
+                        textDecoration: "underline",
+                        fontFamily: FONT,
+                      }}
+                    >
+                      Esqueci minha senha
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 
