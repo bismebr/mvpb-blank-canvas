@@ -135,6 +135,42 @@ export function AssinaturaTela({ companyId, blocked = false }: Props) {
     };
   }, [companyId, flash?.tone, sub?.status]);
 
+  // Esconde o banner de checkout assim que a assinatura vira active.
+  useEffect(() => {
+    if (sub?.status === "active" && flash?.tone === "success") {
+      setFlash(null);
+    }
+  }, [sub?.status, flash?.tone]);
+
+  // Backfill: se está active mas current_period_end está vazio, sincroniza da Stripe.
+  const syncFn = useServerFn(syncStripeSubscription);
+  useEffect(() => {
+    if (!companyId) return;
+    if (sub?.status !== "active") return;
+    if (sub?.current_period_end) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await syncFn({ data: { companyId } });
+        if (cancelled || !res?.updated) return;
+        const { data } = await supabase
+          .from("subscriptions")
+          .select(
+            "plan,status,trial_started_at,trial_ends_at,current_period_start,current_period_end,canceled_at,updated_at",
+          )
+          .eq("company_id", companyId)
+          .maybeSingle();
+        if (!cancelled && data) setSub(data as SubscriptionLike);
+      } catch (e) {
+        console.warn("[assinatura] falha ao sincronizar subscription:", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [companyId, sub?.status, sub?.current_period_end, syncFn]);
+
+
   const status = (sub?.status ?? "none") as SubscriptionStatus;
   const trialAtivo = isTrialActive(sub);
   const pagoAtivo = isPaidActive(sub);
