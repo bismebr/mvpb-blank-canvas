@@ -50,6 +50,8 @@ export function LoginFullScreen({
       setWhatsapp(maskBrPhone(initialWhatsapp));
       setWhatsappTouched(false);
       setEmailTouched(false);
+      setRecoverySent(false);
+      setRecoveryLoading(false);
     }
   }, [open, initialMode, initialWhatsapp]);
 
