@@ -381,7 +381,18 @@ function StatusCard({
   if (status === "active") {
     const nome = planoNome(sub?.plan);
     const preco = planoPreco(sub?.plan);
+    const hasPeriodEnd = !!sub?.current_period_end;
     const dias = getDaysLeft(sub?.current_period_end);
+    const proxRenov = hasPeriodEnd ? fmtBRfromISO(sub?.current_period_end) : "Sincronizando...";
+    const faltamValor = hasPeriodEnd
+      ? dias > 1
+        ? `${dias} dias`
+        : dias === 1
+          ? "1 dia"
+          : dias === 0
+            ? "hoje"
+            : "vencido"
+      : "Aguardando Stripe";
     return (
       <Card highlight="accent">
         <Badge tone="success">Plano ativo</Badge>
@@ -391,13 +402,15 @@ function StatusCard({
         </Texto>
         <InfoRow
           items={[
-            { label: "Próxima renovação", valor: fmtBRfromISO(sub?.current_period_end) },
-            { label: "Faltam", valor: dias > 0 ? `${dias} dias` : "hoje" },
+            { label: "Próxima renovação", valor: proxRenov },
+            { label: "Faltam", valor: faltamValor },
           ]}
         />
       </Card>
     );
   }
+
+
 
   // 4) past_due
   if (status === "past_due") {
