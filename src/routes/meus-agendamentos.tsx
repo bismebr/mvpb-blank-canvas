@@ -426,7 +426,7 @@ function Conteudo({
           }}
         >
           {slug
-            ? "Esta conta ainda não está vinculada a este estabelecimento. Ao concluir seu primeiro agendamento aqui, ele aparecerá nesta lista."
+            ? "Você ainda não possui agendamentos neste estabelecimento. Quando você fizer seu primeiro agendamento aqui, ele aparecerá nesta lista."
             : "Você ainda não possui agendamentos."}
         </div>
       ) : (
