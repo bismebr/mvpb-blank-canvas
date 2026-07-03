@@ -253,19 +253,23 @@ function Conteudo({
       // como mapa company_id->slug (best effort). Sem slug, mostramos tudo do usuário.
       let rowsRaw = data ?? [];
       if (slug) {
+        // Fase 2: nunca exibir agendamentos sem restringir ao company_id
+        // do slug atual. Sem tradução server-side segura de slug → id
+        // (RLS de companies não permite anon), usamos o mapa
+        // slug ↔ companyId gravado localmente por este navegador quando
+        // o próprio usuário cria um agendamento. Se não houver mapa,
+        // não exibimos nada — cliente da empresa A NÃO vê seus
+        // agendamentos dentro do slug da empresa B.
         const local = listPublicAppointments({ slug });
         const allowedIds = new Set(local.map((r) => r.id));
         const allowedCompanyIds = new Set(
           local.map((r) => (r as unknown as { companyId?: string }).companyId).filter(Boolean),
         );
-        // Mantém todas as linhas se não conseguirmos mapear o slug (fallback seguro)
-        if (allowedIds.size > 0 || allowedCompanyIds.size > 0) {
-          rowsRaw = rowsRaw.filter(
-            (r) =>
-              allowedIds.has(r.id) ||
-              (r.company_id && allowedCompanyIds.has(r.company_id)),
-          );
-        }
+        rowsRaw = rowsRaw.filter(
+          (r) =>
+            allowedIds.has(r.id) ||
+            (r.company_id ? allowedCompanyIds.has(r.company_id) : false),
+        );
       }
       const rows: Row[] = rowsRaw.map((r) => {
         const { date, time } = splitStartsAtBR(r.starts_at);
