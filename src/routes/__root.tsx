@@ -11,6 +11,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { AppProvider } from "../components/admin/AppContext";
+import { AvaliacoesProvider } from "../components/admin/AvaliacoesContext";
+import { SiteConfigProvider } from "../components/admin/SiteConfigContext";
+import { ClientUserProvider } from "../components/barbearia/ClientUserContext";
 
 function NotFoundComponent() {
   return (
@@ -77,18 +81,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "A simple web page displaying the text \"Bisme\"." },
+      { title: "mvpb" },
+      { name: "description", content: "mvpb" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "A simple web page displaying the text \"Bisme\"." },
+      { property: "og:title", content: "mvpb" },
+      { property: "og:description", content: "mvpb" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "A simple web page displaying the text \"Bisme\"." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b240c3f5-08d5-4a8f-a303-2237eb7114de/id-preview-8cce066e--f7790a2a-8565-493f-ad0b-0686ba0151bd.lovable.app-1783034860554.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b240c3f5-08d5-4a8f-a303-2237eb7114de/id-preview-8cce066e--f7790a2a-8565-493f-ad0b-0686ba0151bd.lovable.app-1783034860554.png" },
+      { name: "twitter:title", content: "mvpb" },
+      { name: "twitter:description", content: "mvpb" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d57f2f38-75ef-4c87-ad13-b1cd16691f6f/id-preview-7528270d--44815680-2d43-4e1a-889b-6e3c578d0e9f.lovable.app-1782942047485.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d57f2f38-75ef-4c87-ad13-b1cd16691f6f/id-preview-7528270d--44815680-2d43-4e1a-889b-6e3c578d0e9f.lovable.app-1782942047485.png" },
     ],
     links: [
       {
@@ -123,8 +127,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <SiteConfigProvider>
+        <AppProvider>
+          <AvaliacoesProvider>
+            <ClientUserProvider>
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </ClientUserProvider>
+          </AvaliacoesProvider>
+        </AppProvider>
+      </SiteConfigProvider>
     </QueryClientProvider>
   );
 }
