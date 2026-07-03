@@ -220,7 +220,6 @@ export function SistemaTela() {
   }
 
   /* ---------- Login ---------- */
-  const [email, setEmail] = useState(adminEmail || "");
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmaSenha, setConfirmaSenha] = useState("");
@@ -230,9 +229,6 @@ export function SistemaTela() {
   const [showAtual, setShowAtual] = useState(false);
   const [savingLogin, setSavingLogin] = useState(false);
 
-  useEffect(() => { setEmail(adminEmail || ""); }, [adminEmail]);
-
-  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const reqLetter = /[A-Za-z]/.test(novaSenha);
   const reqDigit = /\d/.test(novaSenha);
   const reqLength = novaSenha.length >= 8;
@@ -240,9 +236,8 @@ export function SistemaTela() {
   const senhasBatem = novaSenha.length > 0 && novaSenha === confirmaSenha;
 
   // Estados separados por bloco: digitar apenas a senha atual NÃO conta como alteração.
-  const emailDirty = email.trim().toLowerCase() !== (adminEmail || "").trim().toLowerCase();
   const passwordChanged = novaSenha.length > 0 || confirmaSenha.length > 0;
-  const loginDirty = emailDirty || passwordChanged;
+  const loginDirty = passwordChanged;
 
   async function handleSaveLogin() {
     if (emailDirty && !emailValido) { toast.error("Informe um e-mail válido."); return; }
