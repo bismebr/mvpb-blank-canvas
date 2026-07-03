@@ -297,32 +297,26 @@ function Conteudo({
     fecharModal();
 
     try {
-      if (row?.source === "public") {
-        const token =
-          row.cancelToken ??
-          publicItems.find((p) => p.id === id)?.cancelToken ??
-          null;
-        if (token) {
-          const { error } = await supabase.rpc("cancel_appointment_by_token", {
-            _id: id,
-            _reason: motivoTxt,
-            _token: token,
-          });
-          if (error) throw error;
-        } else {
-          // Cliente autenticado: cancela via RLS por auth.uid()
-          const { error } = await supabase.rpc("cancel_appointment_as_client", {
-            _id: id,
-            _reason: motivoTxt,
-          });
-          if (error) throw error;
-        }
-        updatePublicAppointmentStatus(id, "cancelado", motivoTxt);
-        setStoreTick((n) => n + 1);
+      const token = row?.cancelToken ?? null;
+      if (token) {
+        const { error } = await supabase.rpc("cancel_appointment_by_token", {
+          _id: id,
+          _reason: motivoTxt,
+          _token: token,
+        });
+        if (error) throw error;
       } else {
-        updateStatusAg(id, "cancelado", motivoTxt);
+        // Cliente autenticado: cancela via RLS por auth.uid()
+        const { error } = await supabase.rpc("cancel_appointment_as_client", {
+          _id: id,
+          _reason: motivoTxt,
+        });
+        if (error) throw error;
       }
+      // Refetch da fonte real (Supabase) — sem cache local.
+      setStoreTick((n) => n + 1);
       setSucessoOpen(true);
+
 
     } catch (err) {
       console.error("[publicBooking] cancel_appointment_by_token", err);
