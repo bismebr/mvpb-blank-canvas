@@ -137,6 +137,7 @@ function MeusAgendamentosPage() {
         <Conteudo
           usuario={usuario}
           slug={slug}
+          companyId={publicSite?.companyId ?? null}
           abrirLogin={() => setLoginOpen(true)}
           enderecoFmt={publicSite && publicSite.showAddress ? publicSite.address : ""}
           siteLoading={siteLoading}
