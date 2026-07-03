@@ -39,7 +39,10 @@ function LoginEmpresario() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
       if (error) {
-        setErro(error.message);
+        const msg = /invalid login credentials/i.test(error.message)
+          ? "E-mail ou senha incorretos."
+          : "Não foi possível entrar agora. Tente novamente.";
+        setErro(msg);
         return;
       }
       setAdminEmail(email);
