@@ -171,7 +171,6 @@ function Conteudo({
   siteLoading: boolean;
   onBack: () => void;
 }) {
-  const { agendamentos: agendamentosCtx, servicos, funcionarios, updateStatusAg } = useApp();
   const [cancelandoId, setCancelandoId] = useState<string | null>(null);
   const [motivo, setMotivo] = useState<CancelMotivo | null>(null);
   const [sucessoOpen, setSucessoOpen] = useState(false);
@@ -187,30 +186,8 @@ function Conteudo({
     horario: string;
     status: StatusAg;
     cancelToken?: string | null;
-    source: "public" | "legacy";
   };
 
-  // Itens vindos do fluxo público (Supabase via create_public_appointment), persistidos localmente
-  // Servem de fallback enquanto o fetch remoto não retorna (agendamento recém-criado).
-  const publicItems: PublicAppointmentRecord[] = useMemo(() => {
-    if (!usuario) return [];
-    return listPublicAppointments({
-      email: usuario.email,
-      phoneDigits: usuario.telefone,
-      slug: slug || null,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usuario, slug, storeTick]);
-
-  // Itens legados em memória (modelo padrão / AppContext)
-  // Itens legados em memória (modelo padrão / AppContext)
-  const legacyItems = useMemo(() => {
-    if (!usuario) return [];
-    // Nunca mostra legacy items quando visualizamos por slug — legacy
-    // não carrega company_id e não deve vazar entre estabelecimentos.
-    if (slug) return [];
-    return agendamentosCtx.filter((a) => a.email && a.email === usuario.email);
-  }, [agendamentosCtx, usuario, slug]);
 
   // Itens reais do Supabase (RLS: customer_user_id = auth.uid())
   const [remoteRows, setRemoteRows] = useState<Row[] | null>(null);
