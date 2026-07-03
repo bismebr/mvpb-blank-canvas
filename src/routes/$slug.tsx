@@ -536,16 +536,34 @@ function BookingFlow({
     }
   };
 
-  if (usuario && pending && !confirmando && !sucessoOpen) {
+  // Após login, retomar finalize do pending — em efeito, com guarda para não
+  // disparar múltiplas vezes (evita flash/duplicidade de re-render).
+  const finalizingPendingRef = useRef(false);
+  useEffect(() => {
+    if (!usuario || !pending || confirmando || sucessoOpen) return;
+    if (finalizingPendingRef.current) return;
     const phone = usuario.telefone || pending.whatsapp;
     if (isPhoneValid(phone ?? "")) {
-      // dispara finalize de forma assíncrona sem chamar dentro do render
-      Promise.resolve().then(() => finalize(pending, usuario));
-    } else {
-      if (!bookingOpen) setBookingOpen(true);
+      finalizingPendingRef.current = true;
+      const p = pending;
+      const u = usuario;
+      // limpa pending imediatamente para não re-disparar em novas renders
       setPending(null);
+      Promise.resolve().then(async () => {
+        try {
+          await finalize(p, u);
+        } finally {
+          finalizingPendingRef.current = false;
+        }
+      });
+    } else {
+      // Precisa completar o WhatsApp — reabre booking se fechou
+      setPending(null);
+      if (!bookingOpen) setBookingOpen(true);
     }
-  }
+    // finalize é estável o suficiente; incluir causaria loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuario, pending, confirmando, sucessoOpen]);
 
   return (
     <>
