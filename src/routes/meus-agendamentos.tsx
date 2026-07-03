@@ -47,6 +47,7 @@ function MeusAgendamentosPage() {
   // Quando há slug, buscamos os dados públicos reais daquela empresa para
   // exibir corretamente "Local" conforme show_address e aplicar o template/cor.
   const [publicSite, setPublicSite] = useState<{
+    companyId: string | null;
     showAddress: boolean;
     address: string;
     templateKey: SiteTemplateId;
@@ -66,6 +67,7 @@ function MeusAgendamentosPage() {
       if (!active) return;
       const tpl = (data?.site?.template_key as SiteTemplateId) || DEFAULT_TEMPLATE_ID;
       setPublicSite({
+        companyId: data?.company?.id ?? null,
         showAddress: data?.site?.show_address === true,
         address: data?.site?.address ?? "",
         templateKey: tpl,
