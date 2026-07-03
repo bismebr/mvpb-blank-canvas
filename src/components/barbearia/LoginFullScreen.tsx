@@ -96,6 +96,24 @@ export function LoginFullScreen({
         setErro("E-mail ou senha incorretos.");
         return;
       }
+      // Bloqueia contas de empresário no login do cliente final.
+      // A checagem usa a sessão recém-criada no client público — como
+      // company_members tem RLS por auth.uid(), retorna vazio para
+      // contas que não são membros de nenhuma empresa.
+      try {
+        const { data: member } = await supabase
+          .from("company_members")
+          .select("company_id")
+          .limit(1)
+          .maybeSingle();
+        if (member?.company_id) {
+          await supabase.auth.signOut();
+          setErro("Esta conta é de empresário. Use o acesso do painel.");
+          return;
+        }
+      } catch (e) {
+        console.warn("[LoginFullScreen] verificação de empresário falhou", e);
+      }
       const meta = (data.user.user_metadata ?? {}) as Record<string, unknown>;
       const telExistente = typeof meta.telefone === "string" ? meta.telefone : "";
       let telefoneFinal = telExistente;
