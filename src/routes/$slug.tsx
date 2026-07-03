@@ -29,7 +29,7 @@ import {
   type AvailableSlot,
 } from "@/lib/publicBooking";
 import { addPublicAppointment } from "@/lib/publicAppointmentsStore";
-import { supabase } from "@/integrations/supabase/client";
+import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
 import { toast } from "sonner";
 
 
