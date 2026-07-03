@@ -245,7 +245,6 @@ function Conteudo({
           horario: time,
           status: r.status as StatusAg,
           cancelToken: r.cancel_token ?? null,
-          source: "public",
         };
       });
 
@@ -259,37 +258,10 @@ function Conteudo({
 
   const meus: Row[] = useMemo(() => {
     const fromRemote = remoteRows ?? [];
-    const remoteIds = new Set(fromRemote.map((r) => r.id));
-    // fallback local apenas para itens ainda não refletidos no remoto
-    const fromPublicLocal: Row[] = publicItems
-      .filter((r) => !remoteIds.has(r.id))
-      .map((r) => ({
-        id: r.id,
-        servicoNome: r.serviceName,
-        profissionalNome: r.professionalName ?? undefined,
-        data: r.data,
-        horario: r.horario,
-        status: r.status,
-        cancelToken: r.cancelToken,
-        source: "public",
-      }));
-    const fromLegacy: Row[] = legacyItems.map((a) => {
-      const svc = servicos.find((s) => s.id === a.servicoId);
-      const func = a.funcionarioId ? funcionarios.find((f) => f.id === a.funcionarioId) : undefined;
-      return {
-        id: a.id,
-        servicoNome: svc?.nome ?? "Serviço",
-        profissionalNome: func?.nome,
-        data: a.data,
-        horario: a.horario,
-        status: a.status,
-        source: "legacy",
-      } as Row;
-    });
-    return [...fromRemote, ...fromPublicLocal, ...fromLegacy].sort((a, b) =>
+    return [...fromRemote].sort((a, b) =>
       (b.data + b.horario).localeCompare(a.data + a.horario),
     );
-  }, [remoteRows, publicItems, legacyItems, servicos, funcionarios]);
+  }, [remoteRows]);
 
 
   if (!usuario) {
