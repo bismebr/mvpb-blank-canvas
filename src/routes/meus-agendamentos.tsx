@@ -4,15 +4,10 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { LoginFullScreen } from "@/components/barbearia/LoginFullScreen";
 import { initLocalStorage, type Usuario } from "@/components/barbearia/data";
 import { useClientUser } from "@/components/barbearia/ClientUserContext";
-import { useApp, type StatusAg } from "@/components/admin/AppContext";
+import { type StatusAg } from "@/components/admin/AppContext";
 import { LoadingOverlay } from "@/components/barbearia/LoadingOverlay";
 import { CancelamentoModal, type SucessoInfo } from "@/components/barbearia/Modals";
-import { useSiteConfig, formatAddressParts } from "@/components/admin/SiteConfigContext";
-import {
-  listPublicAppointments,
-  updatePublicAppointmentStatus,
-  type PublicAppointmentRecord,
-} from "@/lib/publicAppointmentsStore";
+import { useSiteConfig } from "@/components/admin/SiteConfigContext";
 import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
 import { buildTemplateCss, getTemplate, DEFAULT_TEMPLATE_ID, type SiteTemplateId } from "@/lib/siteTemplates";
 
