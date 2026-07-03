@@ -162,6 +162,7 @@ function MeusAgendamentosPage() {
 function Conteudo({
   usuario,
   slug,
+  companyId,
   abrirLogin,
   enderecoFmt,
   siteLoading,
@@ -169,6 +170,7 @@ function Conteudo({
 }: {
   usuario: Usuario | null;
   slug?: string;
+  companyId: string | null;
   abrirLogin: () => void;
   enderecoFmt: string;
   siteLoading: boolean;
