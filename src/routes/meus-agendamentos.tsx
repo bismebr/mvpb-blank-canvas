@@ -47,6 +47,7 @@ function MeusAgendamentosPage() {
   // Quando há slug, buscamos os dados públicos reais daquela empresa para
   // exibir corretamente "Local" conforme show_address e aplicar o template/cor.
   const [publicSite, setPublicSite] = useState<{
+    companyId: string | null;
     showAddress: boolean;
     address: string;
     templateKey: SiteTemplateId;
@@ -66,6 +67,7 @@ function MeusAgendamentosPage() {
       if (!active) return;
       const tpl = (data?.site?.template_key as SiteTemplateId) || DEFAULT_TEMPLATE_ID;
       setPublicSite({
+        companyId: data?.company?.id ?? null,
         showAddress: data?.site?.show_address === true,
         address: data?.site?.address ?? "",
         templateKey: tpl,
@@ -135,6 +137,7 @@ function MeusAgendamentosPage() {
         <Conteudo
           usuario={usuario}
           slug={slug}
+          companyId={publicSite?.companyId ?? null}
           abrirLogin={() => setLoginOpen(true)}
           enderecoFmt={publicSite && publicSite.showAddress ? publicSite.address : ""}
           siteLoading={siteLoading}
@@ -159,6 +162,7 @@ function MeusAgendamentosPage() {
 function Conteudo({
   usuario,
   slug,
+  companyId,
   abrirLogin,
   enderecoFmt,
   siteLoading,
@@ -166,6 +170,7 @@ function Conteudo({
 }: {
   usuario: Usuario | null;
   slug?: string;
+  companyId: string | null;
   abrirLogin: () => void;
   enderecoFmt: string;
   siteLoading: boolean;
@@ -219,28 +224,34 @@ function Conteudo({
       setRemoteRows(null);
       return;
     }
+    // Se há slug mas o companyId real ainda não foi resolvido pela RPC,
+    // aguardamos — nunca listamos sem restrição por company_id.
+    if (slug && !companyId) {
+      setRemoteRows(null);
+      return;
+    }
     let active = true;
     (async () => {
       const { data: sess } = await supabase.auth.getSession();
       const sessionUserId = sess.session?.user?.id ?? null;
-      console.log("[Meus Agendamentos] session user id:", sessionUserId);
-      console.log("[Meus Agendamentos] usuario context:", usuario);
-      console.log("[Meus Agendamentos] slug:", slug ?? null);
       if (!sessionUserId) {
         setRemoteRows([]);
         return;
       }
-      console.log("[Meus Agendamentos] buscando appointments no Supabase");
-      // Não usar companies!inner — a RLS de companies só libera para membros,
-      // e isso zera o resultado para o cliente final. RLS de appointments
-      // já restringe a customer_user_id = auth.uid().
-      const { data, error } = await supabase
+      // RLS de appointments já restringe a customer_user_id = auth.uid().
+      // Quando estamos dentro de um slug, filtramos adicionalmente pelo
+      // company_id real vindo da RPC pública (fonte confiável, não local).
+      let query = supabase
         .from("appointments")
         .select(
           "id, starts_at, status, service_name_snapshot, professional_name_snapshot, cancel_token, company_id",
         )
         .eq("customer_user_id", sessionUserId)
         .order("starts_at", { ascending: false });
+      if (slug && companyId) {
+        query = query.eq("company_id", companyId);
+      }
+      const { data, error } = await query;
       if (!active) return;
       if (error) {
         console.error("[Meus Agendamentos] erro Supabase:", {
@@ -252,32 +263,8 @@ function Conteudo({
         setRemoteRows([]);
         return;
       }
-      console.log("[Meus Agendamentos] appointments retornados:", data);
-      // Se houver slug, tentamos filtrar usando o publicAppointmentsStore local
-      // como mapa company_id->slug (best effort). Sem slug, mostramos tudo do usuário.
-      let rowsRaw = data ?? [];
-      if (slug) {
-        // Fase 2: nunca exibir agendamentos sem restringir ao company_id
-        // do slug atual. Sem tradução server-side segura de slug → id
-        // (RLS de companies não permite anon), usamos o mapa
-        // slug ↔ companyId gravado localmente por este navegador quando
-        // o próprio usuário cria um agendamento. Se não houver mapa,
-        // não exibimos nada — cliente da empresa A NÃO vê seus
-        // agendamentos dentro do slug da empresa B.
-        const local = listPublicAppointments({ slug });
-        const allowedIds = new Set(local.map((r) => r.id));
-        const allowedCompanyIds = new Set(
-          local.map((r) => (r as unknown as { companyId?: string }).companyId).filter(Boolean),
-        );
-        rowsRaw = rowsRaw.filter(
-          (r) =>
-            allowedIds.has(r.id) ||
-            (r.company_id ? allowedCompanyIds.has(r.company_id) : false),
-        );
-      }
-      const rows: Row[] = rowsRaw.map((r) => {
+      const rows: Row[] = (data ?? []).map((r) => {
         const { date, time } = splitStartsAtBR(r.starts_at);
-        console.log("[Meus Agendamentos] status bruto:", r.status, "id:", r.id);
         return {
           id: r.id,
           servicoNome: r.service_name_snapshot ?? "Serviço",
@@ -295,7 +282,7 @@ function Conteudo({
     return () => {
       active = false;
     };
-  }, [usuario, slug, storeTick]);
+  }, [usuario, slug, companyId, storeTick]);
 
 
   const meus: Row[] = useMemo(() => {
