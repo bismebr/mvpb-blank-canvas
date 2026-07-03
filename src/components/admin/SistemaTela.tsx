@@ -194,16 +194,26 @@ export function SistemaTela() {
     const cid = companyIdRef.current;
     if (!cid) { toast.error("Empresa não identificada."); return; }
     setSavingSlug(true);
-    const { error } = await supabase.from("companies").update({ slug: next }).eq("id", cid);
+    const { data, error } = await supabase
+      .from("companies")
+      .update({ slug: next })
+      .eq("id", cid)
+      .select("id");
     setSavingSlug(false);
     if (error) {
       console.error("[sistema] update slug", error);
-      toast.error(`Falha ao salvar: ${error.message}`);
+      toast.error(`Não foi possível salvar a URL: ${error.message}`);
+      return;
+    }
+    if (!data || data.length === 0) {
+      // Nenhuma linha atualizada: normalmente bloqueio de permissão (RLS).
+      toast.error("Não foi possível salvar a URL. Você não tem permissão para alterar este dado.");
       return;
     }
     setDbSlug(next);
+    setSlug(next);
     updateConfig({ username: next });
-    toast.success("Nome de usuário atualizado com sucesso!");
+    toast.success("URL atualizada com sucesso!");
   }
 
   /* ---------- Login ---------- */
@@ -226,13 +236,14 @@ export function SistemaTela() {
   const senhaValida = reqLetter && reqDigit && reqLength;
   const senhasBatem = novaSenha.length > 0 && novaSenha === confirmaSenha;
 
-  const emailDirty = email.trim() !== (adminEmail || "").trim();
-  const senhaTouched = senhaAtual.length > 0 || novaSenha.length > 0 || confirmaSenha.length > 0;
-  const loginDirty = emailDirty || senhaTouched;
+  // Estados separados por bloco: digitar apenas a senha atual NÃO conta como alteração.
+  const emailDirty = email.trim().toLowerCase() !== (adminEmail || "").trim().toLowerCase();
+  const passwordChanged = novaSenha.length > 0 || confirmaSenha.length > 0;
+  const loginDirty = emailDirty || passwordChanged;
 
   async function handleSaveLogin() {
-    if (!emailValido) { toast.error("Informe um e-mail válido."); return; }
-    const trocarSenha = senhaTouched;
+    if (emailDirty && !emailValido) { toast.error("Informe um e-mail válido."); return; }
+    const trocarSenha = passwordChanged;
     if (trocarSenha) {
       setTouchedSenha(true);
       setTouchedConfirma(true);
@@ -243,6 +254,7 @@ export function SistemaTela() {
       if (!senhaValida) { toast.error("A nova senha não atende aos requisitos."); return; }
       if (!senhasBatem) { toast.error("A confirmação de senha não confere."); return; }
     }
+    if (!emailDirty && !trocarSenha) return;
     setSavingLogin(true);
     try {
       // Verifica senha atual (se aplicável) via reautenticação leve
@@ -257,23 +269,38 @@ export function SistemaTela() {
           return;
         }
       }
-      const patch: { email?: string; password?: string } = {};
-      if (emailDirty) patch.email = email.trim();
-      if (trocarSenha) patch.password = novaSenha;
-      if (Object.keys(patch).length > 0) {
-        const { error } = await supabase.auth.updateUser(patch);
+      // Senha
+      if (trocarSenha) {
+        const { error } = await supabase.auth.updateUser({ password: novaSenha });
         if (error) {
-          toast.error(`Falha ao salvar: ${error.message}`);
+          toast.error("Não foi possível alterar a senha. Tente novamente.");
           setSavingLogin(false);
           return;
         }
+        setHasPassword(true);
       }
-      if (trocarSenha) setHasPassword(true);
+      // E-mail
       if (emailDirty) {
-        setAdminEmail(email.trim());
-        toast.success("Verifique seu novo e-mail para confirmar a alteração.");
-      } else {
-        toast.success("Dados de acesso atualizados com sucesso!");
+        const novoEmail = email.trim();
+        const { data, error } = await supabase.auth.updateUser({ email: novoEmail });
+        if (error) {
+          toast.error("Não foi possível alterar o e-mail. Tente novamente.");
+          setSavingLogin(false);
+          return;
+        }
+        const aplicado = data?.user?.email?.toLowerCase() === novoEmail.toLowerCase();
+        if (aplicado) {
+          setAdminEmail(novoEmail);
+          toast.success("E-mail de acesso atualizado com sucesso.");
+        } else {
+          // Supabase exige confirmação: não fingir que já mudou.
+          setEmail(adminEmail || "");
+          toast.success(
+            "Enviamos um link de confirmação para o novo e-mail. A alteração será concluída após a confirmação.",
+          );
+        }
+      } else if (trocarSenha) {
+        toast.success("Senha atualizada com sucesso!");
       }
       setSenhaAtual(""); setNovaSenha(""); setConfirmaSenha("");
       setTouchedSenha(false); setTouchedConfirma(false);
