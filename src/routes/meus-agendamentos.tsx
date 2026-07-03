@@ -203,10 +203,14 @@ function Conteudo({
   }, [usuario, slug, storeTick]);
 
   // Itens legados em memória (modelo padrão / AppContext)
+  // Itens legados em memória (modelo padrão / AppContext)
   const legacyItems = useMemo(() => {
     if (!usuario) return [];
+    // Nunca mostra legacy items quando visualizamos por slug — legacy
+    // não carrega company_id e não deve vazar entre estabelecimentos.
+    if (slug) return [];
     return agendamentosCtx.filter((a) => a.email && a.email === usuario.email);
-  }, [agendamentosCtx, usuario]);
+  }, [agendamentosCtx, usuario, slug]);
 
   // Itens reais do Supabase (RLS: customer_user_id = auth.uid())
   const [remoteRows, setRemoteRows] = useState<Row[] | null>(null);
