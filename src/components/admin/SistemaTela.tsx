@@ -240,7 +240,6 @@ export function SistemaTela() {
   const loginDirty = passwordChanged;
 
   async function handleSaveLogin() {
-    if (emailDirty && !emailValido) { toast.error("Informe um e-mail válido."); return; }
     const trocarSenha = passwordChanged;
     if (trocarSenha) {
       setTouchedSenha(true);
@@ -252,13 +251,13 @@ export function SistemaTela() {
       if (!senhaValida) { toast.error("A nova senha não atende aos requisitos."); return; }
       if (!senhasBatem) { toast.error("A confirmação de senha não confere."); return; }
     }
-    if (!emailDirty && !trocarSenha) return;
+    if (!trocarSenha) return;
     setSavingLogin(true);
     try {
       // Verifica senha atual (se aplicável) via reautenticação leve
       if (trocarSenha && hasPassword) {
         const { error: reErr } = await supabase.auth.signInWithPassword({
-          email: adminEmail || email,
+          email: adminEmail,
           password: senhaAtual,
         });
         if (reErr) {
@@ -277,29 +276,7 @@ export function SistemaTela() {
         }
         setHasPassword(true);
       }
-      // E-mail
-      if (emailDirty) {
-        const novoEmail = email.trim();
-        const { data, error } = await supabase.auth.updateUser({ email: novoEmail });
-        if (error) {
-          toast.error("Não foi possível alterar o e-mail. Tente novamente.");
-          setSavingLogin(false);
-          return;
-        }
-        const aplicado = data?.user?.email?.toLowerCase() === novoEmail.toLowerCase();
-        if (aplicado) {
-          setAdminEmail(novoEmail);
-          toast.success("E-mail de acesso atualizado com sucesso.");
-        } else {
-          // Supabase exige confirmação: não fingir que já mudou.
-          setEmail(adminEmail || "");
-          toast.success(
-            "Enviamos um link de confirmação para o novo e-mail. A alteração será concluída após a confirmação.",
-          );
-        }
-      } else if (trocarSenha) {
-        toast.success("Senha atualizada com sucesso!");
-      }
+      toast.success("Senha atualizada com sucesso!");
       setSenhaAtual(""); setNovaSenha(""); setConfirmaSenha("");
       setTouchedSenha(false); setTouchedConfirma(false);
       setShowNova(false); setShowAtual(false);
@@ -424,8 +401,8 @@ export function SistemaTela() {
         <SectionTitle
           hint={
             !hasPassword
-              ? "Você entrou com o Google. Atualize seu e-mail de acesso ou defina uma senha caso queira também acessar por e-mail/senha."
-              : "Altere o e-mail de acesso e/ou defina uma nova senha. Deixe os campos de senha em branco para manter a senha atual."
+              ? "Você entrou com o Google. Defina uma senha caso queira também acessar por e-mail/senha."
+              : "Defina uma nova senha. Deixe os campos de senha em branco para manter a senha atual."
           }
         >
           Dados de acesso
@@ -435,15 +412,21 @@ export function SistemaTela() {
           <Label>E-mail de acesso</Label>
           <input
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="seuemail@exemplo.com"
-            style={{ ...inputStyle, borderColor: email && !emailValido ? "#e11d48" : "#E4E4E4" }}
+            value={adminEmail || ""}
+            readOnly
+            disabled
+            style={{
+              ...inputStyle,
+              background: "var(--adm-bg-elevated)",
+              color: "var(--adm-text-muted)",
+              borderColor: "var(--adm-border)",
+              cursor: "default",
+              WebkitUserSelect: "none",
+              userSelect: "none",
+              opacity: 0.85,
+            }}
             autoComplete="email"
           />
-          {email && !emailValido && (
-            <div style={{ marginTop: 6, fontSize: 12.5, color: "#e11d48" }}>Informe um e-mail válido.</div>
-          )}
         </div>
 
         {hasPassword && (
