@@ -153,7 +153,7 @@ export function siteConfigPatchFromLoad(loaded: LoadedCompanySite): Partial<Site
 // ---- Public site (RPC) ----
 
 export interface PublicSiteData {
-  company: { name: string; slug: string; timezone: string };
+  company: { id: string; name: string; slug: string; timezone: string };
   site: {
     display_name: string | null;
     about: string | null;
