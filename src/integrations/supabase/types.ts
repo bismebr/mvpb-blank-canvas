@@ -1054,6 +1054,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      update_company_slug: {
+        Args: { _company_id: string; _new_slug: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "owner" | "admin"

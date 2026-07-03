@@ -193,25 +193,29 @@ export function SistemaTela() {
     const cid = companyIdRef.current;
     if (!cid) { toast.error("Empresa não identificada."); return; }
     setSavingSlug(true);
-    const { data, error } = await supabase
-      .from("companies")
-      .update({ slug: next })
-      .eq("id", cid)
-      .select("id");
+    const { data, error } = await supabase.rpc("update_company_slug", {
+      _company_id: cid,
+      _new_slug: next,
+    });
     setSavingSlug(false);
     if (error) {
-      console.error("[sistema] update slug", error);
-      toast.error(`Não foi possível salvar a URL: ${error.message}`);
+      console.error("[sistema] update_company_slug", error.message);
+      const msg = error.message || "";
+      if (/slug_taken/.test(msg)) {
+        toast.error("Esta URL já está em uso. Escolha outra.");
+      } else if (/invalid_slug/.test(msg)) {
+        toast.error("Use apenas letras, números e hífen.");
+      } else if (/forbidden|not_authenticated/.test(msg)) {
+        toast.error("Você não tem permissão para alterar esta URL.");
+      } else {
+        toast.error("Não foi possível salvar a URL. Tente novamente.");
+      }
       return;
     }
-    if (!data || data.length === 0) {
-      // Nenhuma linha atualizada: normalmente bloqueio de permissão (RLS).
-      toast.error("Não foi possível salvar a URL. Você não tem permissão para alterar este dado.");
-      return;
-    }
-    setDbSlug(next);
-    setSlug(next);
-    updateConfig({ username: next });
+    const savedSlug = (typeof data === "string" && data) || next;
+    setDbSlug(savedSlug);
+    setSlug(savedSlug);
+    updateConfig({ username: savedSlug });
     toast.success("URL atualizada com sucesso!");
   }
 
