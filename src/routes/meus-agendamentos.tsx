@@ -13,7 +13,7 @@ import {
   updatePublicAppointmentStatus,
   type PublicAppointmentRecord,
 } from "@/lib/publicAppointmentsStore";
-import { supabase } from "@/integrations/supabase/client";
+import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
 import { buildTemplateCss, getTemplate, DEFAULT_TEMPLATE_ID, type SiteTemplateId } from "@/lib/siteTemplates";
 
 type SearchShape = { slug?: string };

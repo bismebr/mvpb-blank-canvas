@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
 
 export const Route = createFileRoute("/cliente/redefinir-senha")({
   head: () => ({

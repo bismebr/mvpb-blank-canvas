@@ -4,7 +4,7 @@ import { BISME_LOGOS } from "@/config/assets";
 const bismeLogo = BISME_LOGOS.user;
 import { LoadingOverlay } from "./LoadingOverlay";
 import { isPhoneValid, maskBrPhone } from "./phoneMask";
-import { supabase } from "@/integrations/supabase/client";
+import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
 
 
 

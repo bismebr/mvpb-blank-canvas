@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
 import type { Usuario } from "./data";
 
 function userToUsuario(user: User | null): Usuario | null {

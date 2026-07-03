@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
 
 /** Converte número mascarado/digits BR em E.164 (+55 + 11 dígitos). */
 export function toE164BR(input: string): string {
