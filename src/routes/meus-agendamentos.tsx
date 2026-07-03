@@ -425,7 +425,9 @@ function Conteudo({
             fontSize: 14,
           }}
         >
-          Você ainda não possui agendamentos.
+          {slug
+            ? "Esta conta ainda não está vinculada a este estabelecimento. Ao concluir seu primeiro agendamento aqui, ele aparecerá nesta lista."
+            : "Você ainda não possui agendamentos."}
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
