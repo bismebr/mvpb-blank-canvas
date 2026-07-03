@@ -4,7 +4,6 @@ import { useSiteConfig, SITE_PUBLIC_BASE } from "./SiteConfigContext";
 import { useApp } from "./AppContext";
 import { COLORS, FONT, cardStyle, inputStyle, saveBtn, Label, PageHeader } from "./ui";
 import { Check, Eye, EyeOff } from "lucide-react";
-import { SavedOnBlurScope } from "./SavedToast";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveCurrentCompanyId } from "@/lib/companySite";
 
