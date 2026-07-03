@@ -4,15 +4,10 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { LoginFullScreen } from "@/components/barbearia/LoginFullScreen";
 import { initLocalStorage, type Usuario } from "@/components/barbearia/data";
 import { useClientUser } from "@/components/barbearia/ClientUserContext";
-import { useApp, type StatusAg } from "@/components/admin/AppContext";
+import { type StatusAg } from "@/components/admin/AppContext";
 import { LoadingOverlay } from "@/components/barbearia/LoadingOverlay";
 import { CancelamentoModal, type SucessoInfo } from "@/components/barbearia/Modals";
-import { useSiteConfig, formatAddressParts } from "@/components/admin/SiteConfigContext";
-import {
-  listPublicAppointments,
-  updatePublicAppointmentStatus,
-  type PublicAppointmentRecord,
-} from "@/lib/publicAppointmentsStore";
+import { useSiteConfig } from "@/components/admin/SiteConfigContext";
 import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
 import { buildTemplateCss, getTemplate, DEFAULT_TEMPLATE_ID, type SiteTemplateId } from "@/lib/siteTemplates";
 
@@ -176,7 +171,6 @@ function Conteudo({
   siteLoading: boolean;
   onBack: () => void;
 }) {
-  const { agendamentos: agendamentosCtx, servicos, funcionarios, updateStatusAg } = useApp();
   const [cancelandoId, setCancelandoId] = useState<string | null>(null);
   const [motivo, setMotivo] = useState<CancelMotivo | null>(null);
   const [sucessoOpen, setSucessoOpen] = useState(false);
@@ -192,30 +186,8 @@ function Conteudo({
     horario: string;
     status: StatusAg;
     cancelToken?: string | null;
-    source: "public" | "legacy";
   };
 
-  // Itens vindos do fluxo público (Supabase via create_public_appointment), persistidos localmente
-  // Servem de fallback enquanto o fetch remoto não retorna (agendamento recém-criado).
-  const publicItems: PublicAppointmentRecord[] = useMemo(() => {
-    if (!usuario) return [];
-    return listPublicAppointments({
-      email: usuario.email,
-      phoneDigits: usuario.telefone,
-      slug: slug || null,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usuario, slug, storeTick]);
-
-  // Itens legados em memória (modelo padrão / AppContext)
-  // Itens legados em memória (modelo padrão / AppContext)
-  const legacyItems = useMemo(() => {
-    if (!usuario) return [];
-    // Nunca mostra legacy items quando visualizamos por slug — legacy
-    // não carrega company_id e não deve vazar entre estabelecimentos.
-    if (slug) return [];
-    return agendamentosCtx.filter((a) => a.email && a.email === usuario.email);
-  }, [agendamentosCtx, usuario, slug]);
 
   // Itens reais do Supabase (RLS: customer_user_id = auth.uid())
   const [remoteRows, setRemoteRows] = useState<Row[] | null>(null);
@@ -273,7 +245,6 @@ function Conteudo({
           horario: time,
           status: r.status as StatusAg,
           cancelToken: r.cancel_token ?? null,
-          source: "public",
         };
       });
 
@@ -287,37 +258,10 @@ function Conteudo({
 
   const meus: Row[] = useMemo(() => {
     const fromRemote = remoteRows ?? [];
-    const remoteIds = new Set(fromRemote.map((r) => r.id));
-    // fallback local apenas para itens ainda não refletidos no remoto
-    const fromPublicLocal: Row[] = publicItems
-      .filter((r) => !remoteIds.has(r.id))
-      .map((r) => ({
-        id: r.id,
-        servicoNome: r.serviceName,
-        profissionalNome: r.professionalName ?? undefined,
-        data: r.data,
-        horario: r.horario,
-        status: r.status,
-        cancelToken: r.cancelToken,
-        source: "public",
-      }));
-    const fromLegacy: Row[] = legacyItems.map((a) => {
-      const svc = servicos.find((s) => s.id === a.servicoId);
-      const func = a.funcionarioId ? funcionarios.find((f) => f.id === a.funcionarioId) : undefined;
-      return {
-        id: a.id,
-        servicoNome: svc?.nome ?? "Serviço",
-        profissionalNome: func?.nome,
-        data: a.data,
-        horario: a.horario,
-        status: a.status,
-        source: "legacy",
-      } as Row;
-    });
-    return [...fromRemote, ...fromPublicLocal, ...fromLegacy].sort((a, b) =>
+    return [...fromRemote].sort((a, b) =>
       (b.data + b.horario).localeCompare(a.data + a.horario),
     );
-  }, [remoteRows, publicItems, legacyItems, servicos, funcionarios]);
+  }, [remoteRows]);
 
 
   if (!usuario) {
@@ -353,32 +297,26 @@ function Conteudo({
     fecharModal();
 
     try {
-      if (row?.source === "public") {
-        const token =
-          row.cancelToken ??
-          publicItems.find((p) => p.id === id)?.cancelToken ??
-          null;
-        if (token) {
-          const { error } = await supabase.rpc("cancel_appointment_by_token", {
-            _id: id,
-            _reason: motivoTxt,
-            _token: token,
-          });
-          if (error) throw error;
-        } else {
-          // Cliente autenticado: cancela via RLS por auth.uid()
-          const { error } = await supabase.rpc("cancel_appointment_as_client", {
-            _id: id,
-            _reason: motivoTxt,
-          });
-          if (error) throw error;
-        }
-        updatePublicAppointmentStatus(id, "cancelado", motivoTxt);
-        setStoreTick((n) => n + 1);
+      const token = row?.cancelToken ?? null;
+      if (token) {
+        const { error } = await supabase.rpc("cancel_appointment_by_token", {
+          _id: id,
+          _reason: motivoTxt,
+          _token: token,
+        });
+        if (error) throw error;
       } else {
-        updateStatusAg(id, "cancelado", motivoTxt);
+        // Cliente autenticado: cancela via RLS por auth.uid()
+        const { error } = await supabase.rpc("cancel_appointment_as_client", {
+          _id: id,
+          _reason: motivoTxt,
+        });
+        if (error) throw error;
       }
+      // Refetch da fonte real (Supabase) — sem cache local.
+      setStoreTick((n) => n + 1);
       setSucessoOpen(true);
+
 
     } catch (err) {
       console.error("[publicBooking] cancel_appointment_by_token", err);
