@@ -55,7 +55,12 @@ function LoginEmpresario() {
       if (member?.company_id) {
         navigate({ to: "/admin", search: { tab: "agendamentos" } });
       } else {
-        navigate({ to: "/empresario/onboarding" });
+        // Conta autenticada mas sem vínculo empresarial:
+        // não deve entrar no painel nem iniciar onboarding aqui
+        // (onboarding é acessível apenas via /empresario/cadastro).
+        await supabase.auth.signOut();
+        setAdmin(false);
+        setErro("Esta conta não possui acesso ao painel do empresário.");
       }
     } finally {
       setLoading(false);
