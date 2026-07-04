@@ -291,8 +291,8 @@ async function handleSubscriptionDeleted(
     .update(update)
     .eq("company_id", row.company_id);
   if (error) {
-    // Não retornar 500: o objetivo é marcar canceled e ser idempotente.
     // Relê o estado atual; se já está canceled, considera sucesso.
+    // Se não estiver canceled, a falha é real: deve retornar 500 para a Stripe reenviar.
     console.error("[stripe-webhook] deleted update falhou", {
       ...logBase,
       supabase_error: error.message,
@@ -304,7 +304,7 @@ async function handleSubscriptionDeleted(
     if (after?.status === BISME_STATUS.CANCELED) {
       return { ignored: true, reason: "already_canceled_after_error" };
     }
-    return { ignored: true, reason: "update_failed_acked", error: error.message };
+    throw new Error(`update subscriptions (canceled) falhou: ${error.message}`);
   }
   console.log("[stripe-webhook] deleted -> canceled", { ...logBase, reason: "updated" });
   return { ignored: false, companyId: row.company_id };
