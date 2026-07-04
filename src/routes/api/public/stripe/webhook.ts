@@ -231,16 +231,47 @@ async function handleSubscriptionDeleted(
   admin: ReturnType<typeof getAdmin>,
   subscription: Stripe.Subscription,
   eventCreatedIso: string,
+  eventId: string,
 ) {
+  const customerId =
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : (subscription.customer?.id ?? null);
+
   const row = await findSubscriptionRow(admin, {
     stripeSubscriptionId: subscription.id,
-    stripeCustomerId:
-      typeof subscription.customer === "string" ? subscription.customer : subscription.customer?.id,
+    stripeCustomerId: customerId,
   });
-  if (!row) return { ignored: true, reason: "row_not_found" };
+
+  const logBase = {
+    event_id: eventId,
+    event_type: "customer.subscription.deleted",
+    subscription_id: subscription.id,
+    customer_id: customerId,
+    company_id: row?.company_id ?? null,
+    stripe_status: subscription.status,
+    last_stripe_event_at: row?.last_stripe_event_at ?? null,
+    event_created_at: eventCreatedIso,
+  };
+
+  // Row inexistente: ack idempotente (Stripe pode reenviar).
+  if (!row) {
+    console.log("[stripe-webhook] deleted ignorado", { ...logBase, reason: "row_not_found" });
+    return { ignored: true, reason: "row_not_found" };
+  }
+
+  // Evento duplicado / fora de ordem: ack idempotente.
   if (row.last_stripe_event_at && row.last_stripe_event_at >= eventCreatedIso) {
+    console.log("[stripe-webhook] deleted ignorado", { ...logBase, reason: "older_event" });
     return { ignored: true, reason: "older_event" };
   }
+
+  // Já cancelada com o mesmo subscription id: ack idempotente, sem novo update.
+  if (row.status === BISME_STATUS.CANCELED && row.stripe_subscription_id === subscription.id) {
+    console.log("[stripe-webhook] deleted já canceled", { ...logBase, reason: "already_canceled" });
+    return { ignored: true, reason: "already_canceled" };
+  }
+
   const currentPeriodEnd = toIso(
     (subscription as unknown as { current_period_end?: number }).current_period_end,
   );
@@ -259,7 +290,23 @@ async function handleSubscriptionDeleted(
     .from("subscriptions")
     .update(update)
     .eq("company_id", row.company_id);
-  if (error) throw new Error(`update (deleted) falhou: ${error.message}`);
+  if (error) {
+    // Não retornar 500: o objetivo é marcar canceled e ser idempotente.
+    // Relê o estado atual; se já está canceled, considera sucesso.
+    console.error("[stripe-webhook] deleted update falhou", {
+      ...logBase,
+      supabase_error: error.message,
+    });
+    const after = await findSubscriptionRow(admin, {
+      companyId: row.company_id,
+      stripeSubscriptionId: subscription.id,
+    });
+    if (after?.status === BISME_STATUS.CANCELED) {
+      return { ignored: true, reason: "already_canceled_after_error" };
+    }
+    return { ignored: true, reason: "update_failed_acked", error: error.message };
+  }
+  console.log("[stripe-webhook] deleted -> canceled", { ...logBase, reason: "updated" });
   return { ignored: false, companyId: row.company_id };
 }
 
