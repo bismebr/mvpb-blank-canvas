@@ -458,6 +458,7 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
                 admin,
                 event.data.object as Stripe.Subscription,
                 eventCreatedIso,
+                event.id,
               );
               return jsonResponse(200, { received: true, ...res });
             }
