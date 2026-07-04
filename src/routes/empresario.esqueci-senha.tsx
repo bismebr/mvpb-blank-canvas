@@ -26,9 +26,6 @@ const COLORS = {
   textMuted: "#6F6F6F",
 };
 
-const REDIRECT_URL =
-  "https://simply-mvpb-page.lovable.app/empresario/redefinir-senha";
-
 function EsqueciSenha() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -49,7 +46,7 @@ function EsqueciSenha() {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(
         email.trim(),
-        { redirectTo: REDIRECT_URL },
+        { redirectTo: `${window.location.origin}/empresario/redefinir-senha` },
       );
       // Sempre mostrar mensagem genérica, independentemente do resultado.
       if (error) {
