@@ -126,6 +126,10 @@ export function SistemaTela() {
   const { config, updateConfig } = useSiteConfig();
   const { adminEmail, setAdminEmail, hasPassword, setHasPassword } = useApp();
 
+  /* ---------- Troca de e-mail ---------- */
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState<string | null>(null);
+
   const companyIdRef = useRef<string | null>(null);
   const [dbSlug, setDbSlug] = useState<string>(config.username || "");
   const [hydrated, setHydrated] = useState(false);
