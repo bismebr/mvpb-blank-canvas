@@ -21,6 +21,68 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { isSubscriptionBlocked, type SubscriptionLike } from "@/lib/subscription";
+import { ImageCropper } from "@/components/admin/ImageCropper";
+import { toast } from "sonner";
+
+function DefaultAvatar({ size = 34 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 212 212" aria-hidden style={{ display: "block" }}>
+      <rect width="212" height="212" fill="#DFE5E7" />
+      <path fill="#FFFFFF" d="M106.251.5C164.653.5 212 47.846 212 106.25S164.653 212 106.25 212C47.846 212 .5 164.654.5 106.25S47.846.5 106.251.5z" opacity="0" />
+      <path fill="#B8C0C6" d="M173.561 171.615c-3.601-4.031-8.019-7.416-12.947-10.53-2.229-1.408-4.592-2.681-7.058-3.836-3.359-1.573-6.888-2.923-10.523-4.045-4.115-1.27-8.29-2.145-12.454-2.622a3 3 0 0 1-1.61-.834l-6.302-6.302a3 3 0 0 1-.848-2.53l1.454-9.518a3 3 0 0 1 .667-1.483c3.735-4.552 6.36-10.098 7.36-16.174.24-1.459.61-4.05.685-6.164.02-.548.05-1.276.05-2.038v-9.792c0-.412-.017-.822-.05-1.229-.06-.723-.128-1.492-.239-2.243-.13-.87-.293-1.72-.502-2.55-.212-.844-.482-1.657-.788-2.446-.29-.75-.622-1.483-.998-2.183-.36-.673-.75-1.322-1.174-1.94a20.36 20.36 0 0 0-1.36-1.788c-.24-.278-.487-.549-.744-.812a20.42 20.42 0 0 0-1.51-1.406c-.55-.464-1.132-.897-1.744-1.294-.588-.383-1.202-.734-1.845-1.049-.632-.31-1.29-.582-1.972-.816-.674-.232-1.372-.428-2.087-.583a19.02 19.02 0 0 0-2.096-.353c-.723-.093-1.454-.153-2.19-.184a25.62 25.62 0 0 0-1.086-.023h-3.5c-.361 0-.723.008-1.086.023-.735.031-1.466.09-2.19.184-.708.09-1.408.208-2.096.353-.715.155-1.413.35-2.087.583-.68.234-1.34.507-1.972.816-.643.315-1.257.666-1.845 1.049-.612.397-1.194.83-1.744 1.294a20.42 20.42 0 0 0-1.51 1.406c-.257.263-.505.534-.744.812-.475.552-.923 1.135-1.36 1.788-.424.618-.813 1.267-1.174 1.94-.376.7-.708 1.433-.998 2.183-.306.789-.576 1.602-.788 2.447-.209.829-.371 1.68-.502 2.549-.11.751-.18 1.52-.239 2.243-.033.407-.05.817-.05 1.229v9.792c0 .762.03 1.49.05 2.038.075 2.114.446 4.705.685 6.164 1 6.076 3.625 11.622 7.36 16.174a3 3 0 0 1 .667 1.483l1.454 9.518a3 3 0 0 1-.848 2.53l-6.302 6.302a3 3 0 0 1-1.61.834c-4.164.477-8.34 1.353-12.454 2.622-3.635 1.122-7.164 2.472-10.523 4.045-2.466 1.155-4.83 2.428-7.058 3.836-4.928 3.114-9.346 6.499-12.947 10.53a2 2 0 0 0-.116 2.492c19.286 25.036 49.508 41.146 83.512 41.146s64.226-16.11 83.512-41.146a2 2 0 0 0-.116-2.492z" />
+    </svg>
+  );
+}
+
+function AvatarButton({
+  size,
+  avatarUrl,
+  uploading,
+  onClick,
+  ring = false,
+}: {
+  size: number;
+  avatarUrl: string | null | undefined;
+  uploading: boolean;
+  onClick: () => void;
+  ring?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Alterar foto de perfil"
+      title="Alterar foto de perfil"
+      style={{
+        position: "relative",
+        width: size, height: size, borderRadius: "50%",
+        overflow: "hidden", padding: 0,
+        border: ring ? "1px solid rgba(0,0,0,0.05)" : "none",
+        background: "#DFE5E7", cursor: "pointer", flexShrink: 0,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}
+    >
+      {avatarUrl ? (
+        <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      ) : (
+        <DefaultAvatar size={size} />
+      )}
+      {uploading && (
+        <div style={{
+          position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <div style={{
+            width: Math.round(size * 0.35), height: Math.round(size * 0.35),
+            border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff",
+            borderRadius: "50%", animation: "bismeAvatarSpin 0.8s linear infinite",
+          }} />
+        </div>
+      )}
+      <style>{`@keyframes bismeAvatarSpin { to { transform: rotate(360deg); } }`}</style>
+    </button>
+  );
+}
 
 
 function WhatsAppIcon({ size = 20 }: { size?: number }) {
@@ -122,6 +184,10 @@ function AdminPage() {
   const [subscription, setSubscription] = useState<SubscriptionLike | null>(null);
   const trialStartedForRef = useRef<string | null>(null);
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
   const blocked = isSubscriptionBlocked(subscription);
   const ALLOWED_WHEN_BLOCKED: Tela[] = ["assinatura"];
 
@@ -170,7 +236,15 @@ function AdminPage() {
         setAdminName(parts.slice(0, 2).join(" "));
       }
       if (profile?.avatar_url) {
-        setAdminAvatar(profile.avatar_url);
+        const v = profile.avatar_url;
+        if (/^https?:\/\//i.test(v)) {
+          setAdminAvatar(v);
+        } else {
+          const { data: signed } = await supabase.storage
+            .from("profile-avatars")
+            .createSignedUrl(v, 60 * 60);
+          if (!cancelled && signed?.signedUrl) setAdminAvatar(signed.signedUrl);
+        }
       }
       if (data.user.email) setAdminEmail(data.user.email);
       setAdmin(true);
@@ -269,6 +343,76 @@ function AdminPage() {
     navigate({ to: "/empresario/login", replace: true });
   };
 
+  const openAvatarPicker = React.useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const onAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) {
+      toast.error("Envie um arquivo JPG, PNG ou WEBP.");
+      return;
+    }
+    if (f.size > 5 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 5MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setCropSrc(String(reader.result));
+    reader.onerror = () => toast.error("Não foi possível ler a imagem.");
+    reader.readAsDataURL(f);
+  };
+
+  const onCropConfirm = async (dataUrl: string) => {
+    setCropSrc(null);
+    if (!currentUserId) return;
+    setUploadingAvatar(true);
+    try {
+      const img = new Image();
+      img.src = dataUrl;
+      await new Promise<void>((res, rej) => {
+        img.onload = () => res();
+        img.onerror = () => rej(new Error("Não foi possível carregar a imagem."));
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Falha ao processar imagem.");
+      ctx.drawImage(img, 0, 0, 512, 512);
+      const blob: Blob = await new Promise((res, rej) => {
+        canvas.toBlob(
+          (b) => (b ? res(b) : rej(new Error("Falha ao gerar imagem."))),
+          "image/webp",
+          0.9,
+        );
+      });
+      const path = `${currentUserId}/avatar-${Date.now()}.webp`;
+      const { error: upErr } = await supabase.storage
+        .from("profile-avatars")
+        .upload(path, blob, { contentType: "image/webp", upsert: false });
+      if (upErr) throw upErr;
+      const { error: profErr } = await supabase
+        .from("profiles")
+        .update({ avatar_url: path })
+        .eq("id", currentUserId);
+      if (profErr) throw profErr;
+      const { data: signed, error: sErr } = await supabase.storage
+        .from("profile-avatars")
+        .createSignedUrl(path, 60 * 60);
+      if (sErr) throw sErr;
+      setAdminAvatar(signed.signedUrl);
+      toast.success("Foto de perfil atualizada.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha ao atualizar foto.";
+      toast.error(msg);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   return (
     <div data-admin-theme={theme} style={{ background: COLORS.bgBase, minHeight: "100vh", fontFamily: FONT, color: COLORS.textPrimary }}>
       <style>{`
@@ -289,6 +433,8 @@ function AdminPage() {
         adminName={adminName}
         adminEmail={adminEmail}
         adminAvatar={adminAvatar}
+        onAvatarClick={openAvatarPicker}
+        uploadingAvatar={uploadingAvatar}
       />
 
       <main className="admin-main" style={{ paddingBottom: `calc(${FOOTER_HEIGHT}px + env(safe-area-inset-bottom, 0px) + 8px)` }}>
@@ -331,6 +477,27 @@ function AdminPage() {
         adminAvatar={adminAvatar}
         theme={theme}
         onToggleTheme={toggleTheme}
+        onAvatarClick={openAvatarPicker}
+        uploadingAvatar={uploadingAvatar}
+      />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        style={{ display: "none" }}
+        onChange={onAvatarFileChange}
+      />
+
+      <ImageCropper
+        open={!!cropSrc}
+        src={cropSrc}
+        aspect={1}
+        circular
+        outputSize={{ w: 512, h: 512 }}
+        title="Ajustar foto de perfil"
+        onCancel={() => setCropSrc(null)}
+        onConfirm={onCropConfirm}
       />
     </div>
   );
@@ -345,9 +512,11 @@ interface SideNavProps {
   adminName: string | null | undefined;
   adminEmail: string | null | undefined;
   adminAvatar: string | null | undefined;
+  onAvatarClick: () => void;
+  uploadingAvatar: boolean;
 }
 
-function SideNav({ tela, onSelect, theme, onToggleTheme, onSignOut, adminName, adminEmail, adminAvatar }: SideNavProps) {
+function SideNav({ tela, onSelect, theme, onToggleTheme, onSignOut, adminName, adminEmail, adminAvatar, onAvatarClick, uploadingAvatar }: SideNavProps) {
   const isLight = theme === "light";
   const bg = isLight ? "#FFFFFF" : COLORS.bgSurface;
   const border = isLight ? "#E5E7EB" : COLORS.border;
@@ -371,8 +540,6 @@ function SideNav({ tela, onSelect, theme, onToggleTheme, onSignOut, adminName, a
     { key: "sistema",      label: "Configurações",Icon: ({ size = 18 }) => <Settings size={size} />,      active: tela === "sistema",                             onClick: () => onSelect("sistema") },
   ];
 
-  const initial = (adminName || adminEmail || "?").trim().charAt(0).toUpperCase();
-
   return (
     <aside
       className="admin-sidebar"
@@ -385,9 +552,7 @@ function SideNav({ tela, onSelect, theme, onToggleTheme, onSignOut, adminName, a
     >
       <div style={{ borderBottom: `1px solid ${border}`, padding: "12px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 6px 10px", minWidth: 0 }}>
-          <div style={{ width: 34, height: 34, borderRadius: "50%", overflow: "hidden", background: "#5690f5", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFF", fontWeight: 700, flexShrink: 0, fontSize: 14 }}>
-            {adminAvatar ? <img src={adminAvatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initial}
-          </div>
+          <AvatarButton size={34} avatarUrl={adminAvatar} uploading={uploadingAvatar} onClick={onAvatarClick} />
           <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 12.5, color: isLight ? "#111827" : COLORS.textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{adminName || "Empresário"}</div>
             <div style={{ fontSize: 11, color: subText, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{adminEmail || "—"}</div>
@@ -525,9 +690,11 @@ interface MenuSheetProps {
   adminAvatar: string | null | undefined;
   theme: "light" | "dark";
   onToggleTheme: () => void;
+  onAvatarClick: () => void;
+  uploadingAvatar: boolean;
 }
 
-function MenuSheet({ open, onClose, currentTela, onSelect, onSignOut, adminName, adminEmail, adminAvatar, theme, onToggleTheme }: MenuSheetProps) {
+function MenuSheet({ open, onClose, currentTela, onSelect, onSignOut, adminName, adminEmail, adminAvatar, theme, onToggleTheme, onAvatarClick, uploadingAvatar }: MenuSheetProps) {
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const [dragY, setDragY] = useState(0);
   const dragStartY = useRef<number | null>(null);
@@ -549,7 +716,6 @@ function MenuSheet({ open, onClose, currentTela, onSelect, onSignOut, adminName,
 
   if (!open) return null;
 
-  const initial = (adminName || adminEmail || "?").trim().charAt(0).toUpperCase();
   const isDark = theme === "dark";
   const sheetBg = isDark ? COLORS.bgSurface : "#FFFFFF";
   const sheetText = isDark ? COLORS.textPrimary : "#111827";
@@ -621,11 +787,9 @@ function MenuSheet({ open, onClose, currentTela, onSelect, onSignOut, adminName,
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-            <div style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", background: "#5690f5", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFF", fontWeight: 700, flexShrink: 0 }}>
-              {adminAvatar ? <img src={adminAvatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initial}
-            </div>
+            <AvatarButton size={40} avatarUrl={adminAvatar} uploading={uploadingAvatar} onClick={onAvatarClick} />
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 700, fontSize: 14, color: sheetText, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{adminName || "Cliente"}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: sheetText, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{adminName || "Empresário"}</div>
               <div style={{ fontSize: 12, color: subText, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{adminEmail || "—"}</div>
             </div>
           </div>
