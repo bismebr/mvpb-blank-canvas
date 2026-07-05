@@ -38,7 +38,10 @@ export const Route = createFileRoute("/bisme-admin")({
   component: BismeAdminPage,
 });
 
-const PANEL_LOGIN_URL = "https://bisme-simple-canvas.lovable.app/empresario/login";
+const getPanelLoginUrl = () =>
+  typeof window !== "undefined"
+    ? `${window.location.origin}/empresario/login`
+    : "/empresario/login";
 
 function statusTone(status: string): "default" | "secondary" | "destructive" | "outline" {
   switch (status) {
@@ -609,7 +612,7 @@ function AccessTab({ companies }: { companies: CompanyRow[] }) {
             <p className="text-sm text-muted-foreground">Copie os dados abaixo para entregar ao empresário:</p>
             <pre className="text-sm bg-muted rounded-md p-3 whitespace-pre-wrap break-all">
 {`Painel:
-${PANEL_LOGIN_URL}
+${getPanelLoginUrl()}
 
 E-mail:
 ${result.email}
@@ -621,7 +624,7 @@ Após o primeiro acesso, altere sua senha em Configurações.`}
             </pre>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => navigator.clipboard?.writeText(
-                `Painel:\n${PANEL_LOGIN_URL}\n\nE-mail:\n${result.email}\n\nSenha provisória:\n${result.password}\n\nApós o primeiro acesso, altere sua senha em Configurações.`
+                `Painel:\n${getPanelLoginUrl()}\n\nE-mail:\n${result.email}\n\nSenha provisória:\n${result.password}\n\nApós o primeiro acesso, altere sua senha em Configurações.`
               )}><Copy /> Copiar</Button>
               <Button variant="ghost" size="sm" onClick={() => setResult(null)}><X /> Fechar</Button>
             </div>
