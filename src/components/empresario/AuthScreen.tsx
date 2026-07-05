@@ -179,6 +179,26 @@ export function AuthScreen(props: Props) {
               Política de Privacidade
             </Link>
           </p>
+
+          <div style={altDivider} />
+
+          <p style={altTextStyle}>
+            {mode === "login" ? (
+              <>
+                Não tem uma conta?{" "}
+                <Link to="/empresario/cadastro" style={altLinkStyle}>
+                  Cadastre-se
+                </Link>
+              </>
+            ) : (
+              <>
+                Já tem uma conta?{" "}
+                <Link to="/empresario/login" style={altLinkStyle}>
+                  Entrar
+                </Link>
+              </>
+            )}
+          </p>
         </div>
       </main>
 
@@ -372,6 +392,29 @@ const linkStyle: CSSProperties = {
   fontWeight: 400,
   fontSize: 12.5,
   textDecoration: "underline",
+  fontFamily: FONT,
+};
+
+const altDivider: CSSProperties = {
+  width: "100%",
+  height: 1,
+  background: COLORS.border,
+  margin: "20px 0 0",
+  border: "none",
+};
+
+const altTextStyle: CSSProperties = {
+  margin: "14px 0 0",
+  textAlign: "center",
+  fontSize: 13.5,
+  color: COLORS.textMuted,
+  fontFamily: FONT,
+};
+
+const altLinkStyle: CSSProperties = {
+  color: "#5690f5",
+  textDecoration: "underline",
+  fontWeight: 600,
   fontFamily: FONT,
 };
 
