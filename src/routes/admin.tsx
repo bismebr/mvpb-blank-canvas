@@ -330,6 +330,10 @@ function AdminPage() {
     } catch { /* ignore */ }
   }, [tela]);
 
+  const openAvatarPicker = React.useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
   if (!authReady) return null;
 
   function go(t: Tela) {
@@ -342,10 +346,6 @@ function AdminPage() {
     signOut();
     navigate({ to: "/empresario/login", replace: true });
   };
-
-  const openAvatarPicker = React.useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
 
   const onAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
