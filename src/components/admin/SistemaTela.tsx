@@ -433,6 +433,48 @@ export function SistemaTela() {
           />
         </div>
 
+          <div style={{ marginTop: -4, marginBottom: 14, display: "flex", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              onClick={() => { setEmailSuccess(null); setEmailModalOpen(true); }}
+              style={{
+                background: "transparent",
+                border: `1.5px solid ${COLORS.border}`,
+                color: COLORS.textPrimary,
+                borderRadius: 10,
+                height: 40,
+                padding: "0 16px",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: FONT,
+              }}
+            >
+              Alterar e-mail
+            </button>
+          </div>
+
+          {emailSuccess && (
+            <div
+              style={{
+                marginBottom: 14,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 8,
+                padding: "12px 14px",
+                background: COLORS.successBg,
+                border: `1px solid ${COLORS.successBorder}`,
+                borderRadius: 8,
+                color: "#16a34a",
+                fontSize: 13.5,
+                lineHeight: 1.5,
+              }}
+            >
+              <Check size={16} strokeWidth={3} style={{ flexShrink: 0, marginTop: 2 }} />
+              <span>{emailSuccess}</span>
+            </div>
+          )}
+
         {hasPassword && (
           <div style={{ marginBottom: 14 }}>
             <Label>Senha atual</Label>
