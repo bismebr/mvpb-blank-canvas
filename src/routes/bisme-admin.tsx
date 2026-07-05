@@ -1,16 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  LayoutDashboard, Filter, Building2, CreditCard, BarChart3, Users, CalendarDays,
-  DollarSign, LifeBuoy, ShieldAlert, Settings, Trash2, Search, Menu, X, AlertTriangle,
-  TrendingUp, Activity, Heart, Trophy, Bell,
+  LayoutDashboard, Building2, CreditCard, KeyRound, ShieldAlert,
+  Search, Copy, ExternalLink, LogOut, Loader2, CheckCircle2, Eye, X,
 } from "lucide-react";
-
-/* ============================================================
-   /bisme-admin — Painel Administrativo Master da Bisme
-   Estrutura visual completa, pronta para integração com Supabase.
-   Sem dados falsos persistidos, sem localStorage, sem auth fake.
-   ============================================================ */
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  getMasterStatus, getMasterOverview, listMasterCompanies,
+  getMasterCompanyDetails, changeEmpresarioAccess,
+} from "@/lib/bisme-admin.functions";
 
 export const Route = createFileRoute("/bisme-admin")({
   head: () => ({
@@ -23,965 +38,610 @@ export const Route = createFileRoute("/bisme-admin")({
   component: BismeAdminPage,
 });
 
-/* ---------- Design tokens (alinhados ao admin existente) ---------- */
-const C = {
-  bg: "#F7F7F5",
-  surface: "#FFFFFF",
-  elevated: "#FAFAF8",
-  border: "#ECECEC",
-  borderStrong: "#E2E2E0",
-  text: "#111111",
-  textMuted: "#6B7280",
-  textSubtle: "#9CA3AF",
-  accent: "#F6671B",
-  accentSoft: "#FEEDDB",
-  ok: "#16A34A",
-  okSoft: "#DCFCE7",
-  warn: "#D97706",
-  warnSoft: "#FEF3C7",
-  danger: "#5690f5",
-  dangerSoft: "#FFF1EA",
-  info: "#2563EB",
-  infoSoft: "#DBEAFE",
-  purple: "#7C3AED",
-  purpleSoft: "#EDE9FE",
+const PANEL_LOGIN_URL = "https://bisme-simple-canvas.lovable.app/empresario/login";
+
+function statusTone(status: string): "default" | "secondary" | "destructive" | "outline" {
+  switch (status) {
+    case "active": return "default";
+    case "trial": return "secondary";
+    case "past_due": return "destructive";
+    case "canceled": return "destructive";
+    default: return "outline";
+  }
+}
+const STATUS_LABEL: Record<string, string> = {
+  active: "Ativa", trial: "Trial", past_due: "Inadimplente",
+  canceled: "Cancelada", none: "Sem assinatura",
 };
-const FONT = "'Inter', 'Inter', system-ui, sans-serif";
+function fmtDate(v?: string | null) {
+  if (!v) return "—";
+  return new Date(v).toLocaleDateString("pt-BR");
+}
+function brl(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
-/* ---------- Tipos de seção ---------- */
-type SectionId =
-  | "overview" | "funnel" | "companies" | "subscriptions" | "analytics"
-  | "endusers" | "appointments" | "finance" | "support" | "logs"
-  | "settings" | "trash";
-
-const SECTIONS: { id: SectionId; label: string; icon: typeof LayoutDashboard }[] = [
-  { id: "overview",      label: "Visão Geral",         icon: LayoutDashboard },
-  { id: "funnel",        label: "Funil de Conversão",  icon: Filter },
-  { id: "companies",     label: "Empresas / Clientes", icon: Building2 },
-  { id: "subscriptions", label: "Assinaturas e Planos",icon: CreditCard },
-  { id: "analytics",     label: "Acessos & Analytics", icon: BarChart3 },
-  { id: "endusers",      label: "Usuários Finais",     icon: Users },
-  { id: "appointments",  label: "Agendamentos",        icon: CalendarDays },
-  { id: "finance",       label: "Financeiro",          icon: DollarSign },
-  { id: "support",       label: "Suporte",             icon: LifeBuoy },
-  { id: "logs",          label: "Logs & Segurança",    icon: ShieldAlert },
-  { id: "settings",      label: "Configurações",       icon: Settings },
-  { id: "trash",         label: "Lixeira / Exclusões", icon: Trash2 },
-];
-
-/* ============================================================
-   Página principal + guard preparado p/ super_admin
-   ============================================================ */
-
-// Modo preview temporário: libera visualização do painel sem auth real.
-// NÃO salva nada no navegador. Remover quando o Supabase for conectado.
-const PREVIEW_MODE = true;
-
+/* ============================================================ */
 function BismeAdminPage() {
-  // TODO(supabase): substituir por consulta real à tabela user_roles
-  //   const { data: { user } } = await supabase.auth.getUser();
-  //   const { data } = await supabase.from('user_roles')
-  //     .select('role').eq('user_id', user.id).eq('role','super_admin').maybeSingle();
-  //   const isSuperAdmin = !!data;
-  const isSuperAdmin = false;
-  const cloudReady = false;
+  const [sessionReady, setSessionReady] = useState(false);
+  const qc = useQueryClient();
+  const statusFn = useServerFn(getMasterStatus);
 
-  if (!isSuperAdmin && !PREVIEW_MODE) {
-    return <AccessGate cloudReady={cloudReady} />;
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(() => mounted && setSessionReady(true));
+    const { data: sub } = supabase.auth.onAuthStateChange(() => {
+      qc.invalidateQueries({ queryKey: ["master-status"] });
+    });
+    return () => { mounted = false; sub.subscription.unsubscribe(); };
+  }, [qc]);
+
+  const statusQ = useQuery({
+    queryKey: ["master-status"],
+    queryFn: () => statusFn(),
+    enabled: sessionReady,
+    retry: false,
+  });
+
+  if (!sessionReady || statusQ.isLoading) return <FullCenter><Loader2 className="animate-spin" /></FullCenter>;
+
+  // Não autenticado (middleware lança Unauthorized) → login
+  if (statusQ.isError) return <LoginScreen onLogged={() => qc.invalidateQueries({ queryKey: ["master-status"] })} />;
+
+  if (!statusQ.data?.isMaster) return <BlockedScreen email={statusQ.data?.email} />;
+
+  return <MasterPanel adminEmail={statusQ.data.email} />;
+}
+
+function FullCenter({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen grid place-items-center bg-background text-foreground">{children}</div>
+  );
+}
+
+/* ---------- Login ---------- */
+function LoginScreen({ onLogged }: { onLogged: () => void }) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setErro(null);
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
+    setLoading(false);
+    if (error) { setErro("E-mail ou senha incorretos."); return; }
+    onLogged();
   }
-  return <MasterLayout previewMode={!isSuperAdmin} />;
+
+  return (
+    <FullCenter>
+      <Card className="w-full max-w-sm mx-4">
+        <CardHeader>
+          <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground grid place-items-center font-extrabold text-lg mb-2">B</div>
+          <CardTitle>Painel Master Bisme</CardTitle>
+          <p className="text-sm text-muted-foreground">Acesso restrito ao administrador da Bisme.</p>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={submit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input id="email" type="email" value={email} autoComplete="username"
+                onChange={(e) => setEmail(e.target.value)} required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="senha">Senha</Label>
+              <Input id="senha" type="password" value={senha} autoComplete="current-password"
+                onChange={(e) => setSenha(e.target.value)} required />
+            </div>
+            {erro && <p className="text-sm text-destructive">{erro}</p>}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? <Loader2 className="animate-spin" /> : "Entrar"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </FullCenter>
+  );
 }
 
-/* ---------- Tela de acesso negado / aguardando Cloud ---------- */
-function AccessGate({ cloudReady }: { cloudReady: boolean }) {
+/* ---------- Bloqueado ---------- */
+function BlockedScreen({ email }: { email?: string }) {
   return (
-    <div style={{
-      minHeight: "100vh", display: "grid", placeItems: "center",
-      background: C.bg, fontFamily: FONT, padding: 24,
-    }}>
-      <div style={{
-        maxWidth: 480, width: "100%", background: C.surface,
-        border: `1.5px solid ${C.border}`, borderRadius: 16, padding: 32,
-        boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
-      }}>
-        <div style={{
-          width: 56, height: 56, borderRadius: 14, background: C.dangerSoft,
-          display: "grid", placeItems: "center", marginBottom: 20,
-        }}>
-          <ShieldAlert size={28} color={C.danger} />
-        </div>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: C.text, margin: "0 0 8px" }}>
-          Acesso restrito
-        </h1>
-        <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.6, margin: "0 0 16px" }}>
-          Esta área é exclusiva para administradores da Bisme com permissão
-          <strong> super_admin</strong>. Empresários e clientes finais não têm acesso.
-        </p>
-        {!cloudReady && (
-          <div style={{
-            background: C.warnSoft, border: `1px solid ${C.warn}33`,
-            borderRadius: 10, padding: 12, fontSize: 13, color: "#92400E",
-            lineHeight: 1.5,
-          }}>
-            <strong>Aguardando integração:</strong> o Lovable Cloud ainda não está
-            ativo neste projeto. Após ativar, marque manualmente seu usuário
-            como <code style={{ background: "#FFF7ED", padding: "1px 6px", borderRadius: 4 }}>super_admin</code> na
-            tabela <code style={{ background: "#FFF7ED", padding: "1px 6px", borderRadius: 4 }}>user_roles</code> do
-            Supabase para liberar este painel.
+    <FullCenter>
+      <Card className="w-full max-w-md mx-4">
+        <CardHeader>
+          <div className="w-12 h-12 rounded-xl bg-destructive/10 text-destructive grid place-items-center mb-2">
+            <ShieldAlert />
           </div>
-        )}
-      </div>
-    </div>
+          <CardTitle>Acesso não autorizado</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            A conta {email ? <strong>{email}</strong> : "atual"} não tem permissão de administrador master da Bisme.
+          </p>
+          <Button variant="outline" onClick={() => supabase.auth.signOut()}>
+            <LogOut /> Sair
+          </Button>
+        </CardContent>
+      </Card>
+    </FullCenter>
   );
 }
 
 /* ============================================================
-   Layout master: sidebar (desktop) + bottom bar (mobile)
+   Painel principal
    ============================================================ */
-function MasterLayout({ previewMode = false }: { previewMode?: boolean }) {
-  const [section, setSection] = useState<SectionId>("overview");
-  const [mobileOpen, setMobileOpen] = useState(false);
+type CompanyRow = Awaited<ReturnType<typeof listMasterCompanies>>[number];
 
-  const current = SECTIONS.find(s => s.id === section)!;
+function MasterPanel({ adminEmail }: { adminEmail: string }) {
+  const overviewFn = useServerFn(getMasterOverview);
+  const companiesFn = useServerFn(listMasterCompanies);
+
+  const overviewQ = useQuery({ queryKey: ["master-overview"], queryFn: () => overviewFn(), retry: false });
+  const companiesQ = useQuery({ queryKey: ["master-companies"], queryFn: () => companiesFn(), retry: false });
+
+  const [detailsId, setDetailsId] = useState<string | null>(null);
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: FONT, color: C.text }}>
-      {previewMode && (
-        <div style={{
-          background: C.warnSoft, borderBottom: `1px solid ${C.warn}33`,
-          padding: "10px 16px", textAlign: "center", fontSize: 13,
-          color: "#92400E", lineHeight: 1.4, fontWeight: 500,
-        }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <AlertTriangle size={14} color={C.warn} />
-            Modo preview: painel visual sem dados reais e sem autenticação real.
-            A proteção por super_admin será ativada quando o Supabase for conectado.
-          </span>
-        </div>
-      )}
-      <div style={{ display: "flex" }}>
-        {/* Sidebar desktop */}
-        <aside className="bisme-sidebar" style={{
-          width: 240, minHeight: "100vh", background: C.surface,
-          borderRight: `1.5px solid ${C.border}`, padding: "20px 12px",
-          position: "sticky", top: 0,
-        }}>
-          <BrandHeader />
-          <nav style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 2 }}>
-            {SECTIONS.map(s => (
-              <NavItem key={s.id} active={section === s.id} icon={s.icon} label={s.label}
-                onClick={() => setSection(s.id)} />
-            ))}
-          </nav>
-        </aside>
-
-        {/* Conteúdo */}
-        <main style={{ flex: 1, minWidth: 0 }}>
-          {/* Topbar */}
-          <header style={{
-            background: C.surface, borderBottom: `1.5px solid ${C.border}`,
-            height: 64, padding: "0 24px", display: "flex", alignItems: "center",
-            justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50,
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <button
-                onClick={() => setMobileOpen(true)}
-                className="bisme-menu-btn"
-                style={iconBtn}
-                aria-label="Abrir menu"
-              >
-                <Menu size={20} />
-              </button>
-              <div>
-                <div style={{ fontSize: 11, color: C.textSubtle, fontWeight: 500, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  Bisme · Painel Master
-                </div>
-                <h1 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{current.label}</h1>
-              </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b sticky top-0 bg-background z-40">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground grid place-items-center font-extrabold">B</div>
+            <div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">Bisme</div>
+              <div className="font-bold leading-none">Painel Master</div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <button style={iconBtn} aria-label="Notificações"><Bell size={18} /></button>
-              <div style={{
-                width: 36, height: 36, borderRadius: "50%", background: C.accent,
-                color: "#fff", display: "grid", placeItems: "center", fontWeight: 700, fontSize: 13,
-              }}>SA</div>
-            </div>
-          </header>
-
-          {/* Section content */}
-          <div style={{ padding: "24px", maxWidth: 1400, margin: "0 auto" }}>
-            <SectionRenderer id={section} />
           </div>
-        </main>
-      </div>
-
-      {/* Mobile drawer */}
-      {mobileOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 200 }}>
-          <div onClick={() => setMobileOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }} />
-          <div style={{
-            position: "absolute", top: 0, left: 0, bottom: 0, width: 280,
-            background: C.surface, padding: "20px 12px", overflowY: "auto",
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 8px 8px" }}>
-              <BrandHeader />
-              <button onClick={() => setMobileOpen(false)} style={iconBtn} aria-label="Fechar">
-                <X size={18} />
-              </button>
-            </div>
-            <nav style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 2 }}>
-              {SECTIONS.map(s => (
-                <NavItem key={s.id} active={section === s.id} icon={s.icon} label={s.label}
-                  onClick={() => { setSection(s.id); setMobileOpen(false); }} />
-              ))}
-            </nav>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground hidden sm:inline">{adminEmail}</span>
+            <Button variant="outline" size="sm" onClick={() => supabase.auth.signOut()}>
+              <LogOut /> Sair
+            </Button>
           </div>
         </div>
-      )}
+      </header>
 
-      <style>{`
-        @media (max-width: 900px) {
-          .bisme-sidebar { display: none !important; }
-          .bisme-menu-btn { display: grid !important; }
-        }
-        @media (min-width: 901px) {
-          .bisme-menu-btn { display: none !important; }
-        }
-      `}</style>
+      <main className="max-w-6xl mx-auto px-4 py-6">
+        <Tabs defaultValue="overview">
+          <TabsList className="mb-4 flex-wrap h-auto">
+            <TabsTrigger value="overview"><LayoutDashboard className="mr-1" /> Visão geral</TabsTrigger>
+            <TabsTrigger value="companies"><Building2 className="mr-1" /> Empresas</TabsTrigger>
+            <TabsTrigger value="subscriptions"><CreditCard className="mr-1" /> Assinaturas</TabsTrigger>
+            <TabsTrigger value="access"><KeyRound className="mr-1" /> Entregar acesso</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            <OverviewTab data={overviewQ.data} loading={overviewQ.isLoading} />
+          </TabsContent>
+
+          <TabsContent value="companies">
+            <CompaniesTab
+              companies={companiesQ.data || []}
+              loading={companiesQ.isLoading}
+              onDetails={setDetailsId}
+            />
+          </TabsContent>
+
+          <TabsContent value="subscriptions">
+            <SubscriptionsTab companies={companiesQ.data || []} loading={companiesQ.isLoading} />
+          </TabsContent>
+
+          <TabsContent value="access">
+            <AccessTab companies={companiesQ.data || []} />
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      {detailsId && <CompanyDetailsDialog companyId={detailsId} onClose={() => setDetailsId(null)} />}
     </div>
   );
 }
 
-/* ---------- Header + Nav item ---------- */
-function BrandHeader() {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 8px" }}>
-      <div style={{
-        width: 32, height: 32, borderRadius: 8, background: C.text,
-        color: "#fff", display: "grid", placeItems: "center", fontWeight: 800, fontSize: 14,
-      }}>B</div>
-      <div>
-        <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1 }}>Bisme</div>
-        <div style={{ fontSize: 10, color: C.textSubtle, marginTop: 2, letterSpacing: 0.5 }}>MASTER ADMIN</div>
-      </div>
-    </div>
-  );
-}
-
-const iconBtn: CSSProperties = {
-  width: 36, height: 36, borderRadius: 8, border: `1px solid ${C.border}`,
-  background: C.surface, display: "grid", placeItems: "center", cursor: "pointer",
-  color: C.text,
-};
-
-function NavItem({ active, icon: Icon, label, onClick }: {
-  active: boolean; icon: typeof LayoutDashboard; label: string; onClick: () => void;
-}) {
-  return (
-    <button onClick={onClick} style={{
-      display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-      borderRadius: 8, border: "none", cursor: "pointer", textAlign: "left",
-      background: active ? C.accentSoft : "transparent",
-      color: active ? C.accent : C.text,
-      fontWeight: active ? 600 : 500, fontSize: 14, fontFamily: FONT,
-      transition: "background 120ms",
-    }}>
-      <Icon size={18} />
-      <span>{label}</span>
-    </button>
-  );
-}
-
-/* ============================================================
-   Componentes utilitários (cards, tabelas, gráficos vazios)
-   ============================================================ */
-const card: CSSProperties = {
-  background: C.surface, border: `1.5px solid ${C.border}`,
-  borderRadius: 12, padding: 20,
-};
-
-function SectionTitle({ children, sub }: { children: ReactNode; sub?: string }) {
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{children}</h2>
-      {sub && <p style={{ fontSize: 13, color: C.textMuted, margin: "4px 0 0" }}>{sub}</p>}
-    </div>
-  );
-}
-
-function StatCard({ label, value, hint, tone = "default", icon: Icon }: {
-  label: string; value: string; hint?: string;
-  tone?: "default" | "ok" | "warn" | "danger" | "info" | "purple";
-  icon?: typeof LayoutDashboard;
-}) {
-  const toneMap = {
-    default: { bg: C.elevated, fg: C.text },
-    ok:      { bg: C.okSoft, fg: C.ok },
-    warn:    { bg: C.warnSoft, fg: C.warn },
-    danger:  { bg: C.dangerSoft, fg: C.danger },
-    info:    { bg: C.infoSoft, fg: C.info },
-    purple:  { bg: C.purpleSoft, fg: C.purple },
-  }[tone];
-  return (
-    <div style={card}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-        <div style={{ fontSize: 12, color: C.textMuted, fontWeight: 500 }}>{label}</div>
-        {Icon && (
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: toneMap.bg, color: toneMap.fg, display: "grid", placeItems: "center" }}>
-            <Icon size={16} />
-          </div>
-        )}
-      </div>
-      <div style={{ fontSize: 26, fontWeight: 700, margin: "10px 0 4px", letterSpacing: -0.5 }}>{value}</div>
-      {hint && <div style={{ fontSize: 12, color: C.textSubtle }}>{hint}</div>}
-    </div>
-  );
-}
-
-function Badge({ children, tone = "default" }: {
-  children: ReactNode; tone?: "default" | "ok" | "warn" | "danger" | "info" | "purple";
-}) {
-  const toneMap = {
-    default: { bg: C.elevated, fg: C.text, br: C.border },
-    ok:      { bg: C.okSoft, fg: C.ok, br: "transparent" },
-    warn:    { bg: C.warnSoft, fg: C.warn, br: "transparent" },
-    danger:  { bg: C.dangerSoft, fg: C.danger, br: "transparent" },
-    info:    { bg: C.infoSoft, fg: C.info, br: "transparent" },
-    purple:  { bg: C.purpleSoft, fg: C.purple, br: "transparent" },
-  }[tone];
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 4,
-      padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600,
-      background: toneMap.bg, color: toneMap.fg, border: `1px solid ${toneMap.br}`,
-    }}>{children}</span>
-  );
-}
-
-function EmptyState({ icon: Icon = Activity, title, hint }: {
-  icon?: typeof LayoutDashboard; title: string; hint?: string;
-}) {
-  return (
-    <div style={{
-      padding: "48px 24px", textAlign: "center", color: C.textMuted,
-      border: `1.5px dashed ${C.borderStrong}`, borderRadius: 12, background: C.elevated,
-    }}>
-      <div style={{
-        width: 48, height: 48, borderRadius: 12, background: C.surface,
-        display: "inline-grid", placeItems: "center", marginBottom: 12,
-        border: `1px solid ${C.border}`,
-      }}>
-        <Icon size={22} color={C.textSubtle} />
-      </div>
-      <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{title}</div>
-      {hint && <div style={{ fontSize: 13, marginTop: 4 }}>{hint}</div>}
-    </div>
-  );
-}
-
-function Grid({ cols = 4, children }: { cols?: number; children: ReactNode }) {
-  return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: `repeat(auto-fit, minmax(${cols === 4 ? 220 : 280}px, 1fr))`,
-      gap: 16,
-    }}>{children}</div>
-  );
-}
-
-function ChartPlaceholder({ title, height = 200 }: { title: string; height?: number }) {
-  // Pequeno gráfico decorativo "vazio" — apenas visual, sem dados.
-  return (
-    <div style={card}>
-      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: C.text }}>{title}</div>
-      <div style={{
-        height, background: `linear-gradient(180deg, ${C.elevated} 0%, ${C.surface} 100%)`,
-        border: `1px dashed ${C.border}`, borderRadius: 8,
-        display: "grid", placeItems: "center", color: C.textSubtle, fontSize: 12,
-      }}>
-        Aguardando dados reais
-      </div>
-    </div>
-  );
-}
-
-function DataTable({ columns, emptyText }: { columns: string[]; emptyText: string }) {
-  return (
-    <div style={{ ...card, padding: 0, overflow: "hidden" }}>
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-          <thead>
-            <tr style={{ background: C.elevated }}>
-              {columns.map(c => (
-                <th key={c} style={{
-                  textAlign: "left", padding: "12px 16px", fontWeight: 600,
-                  color: C.textMuted, fontSize: 11, textTransform: "uppercase",
-                  letterSpacing: 0.5, borderBottom: `1px solid ${C.border}`, whiteSpace: "nowrap",
-                }}>{c}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={columns.length} style={{ padding: 0 }}>
-                <div style={{ padding: 32 }}>
-                  <EmptyState title="Nenhum dado ainda" hint={emptyText} />
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-function Toolbar({ placeholder, filters }: { placeholder: string; filters?: string[] }) {
-  return (
-    <div style={{
-      display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16, alignItems: "center",
-    }}>
-      <div style={{
-        display: "flex", alignItems: "center", gap: 8, flex: "1 1 240px",
-        background: C.surface, border: `1.5px solid ${C.border}`, borderRadius: 10,
-        padding: "10px 12px", minWidth: 0,
-      }}>
-        <Search size={16} color={C.textSubtle} />
-        <input placeholder={placeholder} style={{
-          border: "none", outline: "none", background: "transparent",
-          fontSize: 14, flex: 1, fontFamily: FONT, color: C.text, minWidth: 0,
-        }} />
-      </div>
-      {filters?.map(f => (
-        <button key={f} style={{
-          padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${C.border}`,
-          background: C.surface, fontSize: 13, fontWeight: 500, cursor: "pointer",
-          color: C.text, fontFamily: FONT, display: "inline-flex", alignItems: "center", gap: 6,
-        }}>
-          <Filter size={13} /> {f}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/* ============================================================
-   Section Renderer
-   ============================================================ */
-function SectionRenderer({ id }: { id: SectionId }) {
-  switch (id) {
-    case "overview":      return <OverviewSection />;
-    case "funnel":        return <FunnelSection />;
-    case "companies":     return <CompaniesSection />;
-    case "subscriptions": return <SubscriptionsSection />;
-    case "analytics":     return <AnalyticsSection />;
-    case "endusers":      return <EndUsersSection />;
-    case "appointments":  return <AppointmentsSection />;
-    case "finance":       return <FinanceSection />;
-    case "support":       return <SupportSection />;
-    case "logs":          return <LogsSection />;
-    case "settings":      return <SettingsSection />;
-    case "trash":         return <TrashSection />;
-  }
-}
-
-/* ---------- 1. Visão Geral ---------- */
-function OverviewSection() {
-  return (
-    <>
-      <SectionTitle sub="Resumo macro do SaaS Bisme em tempo real.">Visão geral</SectionTitle>
-
-      <div style={{ marginBottom: 24 }}>
-        <Grid cols={4}>
-          <StatCard label="Empresas cadastradas" value="—" icon={Building2} tone="info" hint="Total histórico" />
-          <StatCard label="Empresas ativas" value="—" icon={Activity} tone="ok" />
-          <StatCard label="Em teste grátis" value="—" icon={TrendingUp} tone="warn" />
-          <StatCard label="Pagamento em atraso" value="—" icon={AlertTriangle} tone="danger" />
-          <StatCard label="Inativas" value="—" icon={Building2} />
-          <StatCard label="Canceladas" value="—" icon={Building2} tone="danger" />
-          <StatCard label="Usuários finais" value="—" icon={Users} tone="purple" />
-          <StatCard label="Agendamentos totais" value="—" icon={CalendarDays} tone="info" />
-        </Grid>
-      </div>
-
-      <div style={{ marginBottom: 24 }}>
-        <SectionTitle sub="Tráfego, conversão e receita recorrente.">Receita & conversão</SectionTitle>
-        <Grid cols={4}>
-          <StatCard label="Acessos · página de vendas" value="—" icon={BarChart3} />
-          <StatCard label="Acessos · cadastro" value="—" icon={BarChart3} />
-          <StatCard label="Conversão vendas → cadastro" value="—%" tone="info" />
-          <StatCard label="Conclusão do cadastro" value="—%" tone="ok" />
-          <StatCard label="Desistência no cadastro" value="—%" tone="danger" />
-          <StatCard label="MRR estimado" value="R$ —" icon={DollarSign} tone="ok" />
-          <StatCard label="ARR estimado" value="R$ —" icon={DollarSign} tone="ok" />
-          <StatCard label="Novos clientes · 7d" value="—" tone="info" />
-          <StatCard label="Novos clientes · 30d" value="—" tone="info" />
-          <StatCard label="Cancelamentos · 30d" value="—" tone="danger" />
-        </Grid>
-      </div>
-
-      <SectionTitle>Tendências</SectionTitle>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
-        <ChartPlaceholder title="Crescimento de empresas (dia/semana/mês)" />
-        <ChartPlaceholder title="Acessos · página de vendas" />
-        <ChartPlaceholder title="Conversão visitante → cadastro" />
-        <ChartPlaceholder title="Empresas ativas × inativas" />
-        <ChartPlaceholder title="Planos mais usados" />
-        <ChartPlaceholder title="Agendamentos por período" />
-      </div>
-    </>
-  );
-}
-
-/* ---------- 2. Funil de Conversão ---------- */
-function FunnelSection() {
-  const steps = useMemo(() => [
-    "Página de vendas acessada",
-    "Clique em “Começar agora”",
-    "Página de cadastro aberta",
-    "Cadastro iniciado",
-    "Cadastro concluído",
-    "Onboarding iniciada",
-    "Onboarding concluída",
-    "Primeiro acesso ao painel",
-  ], []);
-
-  const dropoffs = [
-    "Criação de senha", "Escolha da categoria", "Funcionários", "Serviços",
-    "Escolha do link", "Antes de finalizar onboarding",
+/* ---------- Visão geral ---------- */
+function OverviewTab({ data, loading }: { data?: Awaited<ReturnType<typeof getMasterOverview>>; loading: boolean }) {
+  if (loading || !data) return <Loader2 className="animate-spin" />;
+  const stats = [
+    { label: "Empresas cadastradas", value: String(data.totalCompanies) },
+    { label: "Em trial", value: String(data.trial) },
+    { label: "Ativas pagas", value: String(data.active) },
+    { label: "Canceladas", value: String(data.canceled) },
+    { label: "Inadimplentes", value: String(data.pastDue) },
+    { label: "Sem assinatura", value: String(data.none) },
+    { label: "Receita mensal estimada*", value: brl(data.monthlyRevenue) },
+    { label: "Receita anual estimada*", value: brl(data.yearlyRevenue) },
+    { label: "Novos cadastros (7 dias)", value: String(data.newLast7Days) },
+    { label: "Agendamentos totais", value: String(data.totalAppointments) },
   ];
-
   return (
-    <>
-      <SectionTitle sub="Acompanhe o caminho do visitante até virar cliente ativo.">Funil de conversão</SectionTitle>
-      <Toolbar placeholder="Filtrar por período" filters={["Hoje", "7 dias", "30 dias", "Este mês", "Personalizado"]} />
-
-      <div style={{ ...card, marginBottom: 24 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {steps.map((step, i) => {
-            const width = 100 - i * 11;
-            return (
-              <div key={step} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: C.elevated, display: "grid", placeItems: "center", fontSize: 12, fontWeight: 700, color: C.textMuted, flexShrink: 0 }}>
-                  {i + 1}
-                </div>
-                <div style={{ flex: 1, position: "relative", height: 40, background: C.elevated, borderRadius: 8, overflow: "hidden" }}>
-                  <div style={{
-                    position: "absolute", inset: 0, width: `${Math.max(width, 12)}%`,
-                    background: `linear-gradient(90deg, ${C.accent}, ${C.accent}cc)`,
-                    borderRadius: 8, opacity: 0.15,
-                  }} />
-                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 14px" }}>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: C.text }}>{step}</span>
-                    <span style={{ fontSize: 12, color: C.textMuted, fontWeight: 600 }}>—</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <SectionTitle sub="Em qual etapa o usuário mais desistiu.">Pontos de desistência</SectionTitle>
-      <Grid cols={4}>
-        {dropoffs.map(d => (
-          <StatCard key={d} label={`Desistiu em: ${d}`} value="—" tone="danger" />
+    <div>
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        {stats.map((s) => (
+          <Card key={s.label}>
+            <CardContent className="p-4">
+              <div className="text-xs text-muted-foreground">{s.label}</div>
+              <div className="text-2xl font-bold mt-1">{s.value}</div>
+            </CardContent>
+          </Card>
         ))}
-      </Grid>
-    </>
-  );
-}
-
-/* ---------- 3. Empresas / Clientes Bisme ---------- */
-function CompaniesSection() {
-  return (
-    <>
-      <SectionTitle sub="Todas as empresas cadastradas na plataforma.">Empresas / Clientes Bisme</SectionTitle>
-      <Toolbar
-        placeholder="Buscar por nome, responsável, e-mail, WhatsApp, slug ou cidade…"
-        filters={["Status", "Plano", "Categoria", "Cidade", "Estado", "Data"]}
-      />
-
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-        <Badge tone="ok">Ativa</Badge>
-        <Badge tone="info">Em teste grátis</Badge>
-        <Badge tone="warn">Pagamento pendente</Badge>
-        <Badge>Inativa</Badge>
-        <Badge tone="danger">Cancelada</Badge>
-        <Badge tone="danger">Bloqueada</Badge>
-        <Badge>Excluída</Badge>
       </div>
-
-      <DataTable
-        columns={["Empresa", "Responsável", "WhatsApp", "Slug", "Categoria", "Cidade/UF", "Cadastro", "Plano", "Assinatura", "Acessos", "Agendamentos", "Último acesso"]}
-        emptyText="As empresas cadastradas via /empresario/cadastro aparecerão aqui."
-      />
-    </>
-  );
-}
-
-/* ---------- 4. Assinaturas e Planos ---------- */
-function SubscriptionsSection() {
-  return (
-    <>
-      <SectionTitle sub="Visão geral das assinaturas e da receita recorrente.">Assinaturas e Planos</SectionTitle>
-      <Grid cols={4}>
-        <StatCard label="Assinaturas ativas" value="—" tone="ok" icon={CreditCard} />
-        <StatCard label="Em teste grátis" value="—" tone="info" />
-        <StatCard label="Vencidas" value="—" tone="warn" />
-        <StatCard label="Canceladas" value="—" tone="danger" />
-        <StatCard label="Pagamento pendente" value="—" tone="warn" />
-        <StatCard label="MRR estimado" value="R$ —" tone="ok" icon={DollarSign} />
-        <StatCard label="ARR estimado" value="R$ —" tone="ok" icon={DollarSign} />
-        <StatCard label="Churn 30d" value="—%" tone="danger" />
-        <StatCard label="Fim de teste em 7d" value="—" tone="warn" />
-        <StatCard label="Renovação em 7d" value="—" tone="info" />
-      </Grid>
-
-      <div style={{ marginTop: 24 }}>
-        <SectionTitle>Tabela de assinaturas</SectionTitle>
-        <DataTable
-          columns={["Empresa", "Responsável", "Plano", "Valor", "Ciclo", "Status", "Próxima cobrança", "Início", "Cancelamento", "Stripe ID"]}
-          emptyText="Conecte o Stripe para listar assinaturas reais."
-        />
-      </div>
-    </>
-  );
-}
-
-/* ---------- 5. Acessos e Analytics ---------- */
-function AnalyticsSection() {
-  return (
-    <>
-      <SectionTitle sub="Tráfego da página de vendas, painéis e sites públicos das empresas.">Acessos & Analytics</SectionTitle>
-      <Toolbar placeholder="Filtrar por empresa, página ou período" filters={["Hoje", "7d", "30d", "Personalizado"]} />
-
-      <Grid cols={4}>
-        <StatCard label="Total · página de vendas" value="—" />
-        <StatCard label="Únicos · página de vendas" value="—" />
-        <StatCard label="Acessos · cadastro" value="—" />
-        <StatCard label="Acessos · painéis dos clientes" value="—" />
-        <StatCard label="Acessos · sites das empresas" value="—" tone="info" />
-        <StatCard label="Mobile" value="—%" />
-        <StatCard label="Desktop" value="—%" />
-        <StatCard label="Tablet" value="—%" />
-      </Grid>
-
-      <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
-        <ChartPlaceholder title="Acessos por dia" />
-        <ChartPlaceholder title="Top empresas por acessos" />
-        <ChartPlaceholder title="Origem do tráfego" />
-        <ChartPlaceholder title="Navegadores mais usados" />
-      </div>
-    </>
-  );
-}
-
-/* ---------- 6. Usuários Finais ---------- */
-function EndUsersSection() {
-  return (
-    <>
-      <SectionTitle sub="Clientes finais que se cadastraram nos sites das empresas.">Usuários finais</SectionTitle>
-      <Toolbar placeholder="Buscar por nome, e-mail, WhatsApp ou empresa" filters={["Empresa", "Status", "Data"]} />
-      <Grid cols={4}>
-        <StatCard label="Total de usuários finais" value="—" icon={Users} tone="purple" />
-        <StatCard label="Novos · 7d" value="—" tone="info" />
-        <StatCard label="Novos · 30d" value="—" tone="info" />
-        <StatCard label="Inativos · 30d" value="—" tone="warn" />
-      </Grid>
-      <div style={{ marginTop: 16 }}>
-        <DataTable
-          columns={["Cliente", "E-mail", "WhatsApp", "Empresa", "Cadastro", "Último acesso", "Agendamentos", "Cancelamentos", "Status"]}
-          emptyText="Os clientes finais aparecerão quando os sites das empresas começarem a receber cadastros."
-        />
-      </div>
-    </>
-  );
-}
-
-/* ---------- 7. Agendamentos ---------- */
-function AppointmentsSection() {
-  return (
-    <>
-      <SectionTitle sub="Todos os agendamentos criados em todas as empresas.">Agendamentos</SectionTitle>
-      <Toolbar placeholder="Buscar agendamento" filters={["Empresa", "Categoria", "Cidade", "Status", "Período"]} />
-      <Grid cols={4}>
-        <StatCard label="Total" value="—" icon={CalendarDays} />
-        <StatCard label="Confirmados" value="—" tone="ok" />
-        <StatCard label="Cancelados" value="—" tone="danger" />
-        <StatCard label="Hoje" value="—" tone="info" />
-      </Grid>
-      <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
-        <ChartPlaceholder title="Agendamentos por dia da semana" />
-        <ChartPlaceholder title="Horários mais usados" />
-        <ChartPlaceholder title="Top empresas por agendamentos" />
-        <ChartPlaceholder title="Serviços mais agendados" />
-      </div>
-      <div style={{ marginTop: 16 }}>
-        <DataTable
-          columns={["Empresa", "Cliente", "Serviço", "Funcionário", "Data", "Hora", "Status", "Criado em", "Valor"]}
-          emptyText="Os agendamentos das empresas aparecerão aqui."
-        />
-      </div>
-    </>
-  );
-}
-
-/* ---------- 8. Financeiro ---------- */
-function FinanceSection() {
-  return (
-    <>
-      <SectionTitle sub="Receita, pendências e clientes que mais geram caixa.">Financeiro</SectionTitle>
-      <Grid cols={4}>
-        <StatCard label="Receita mensal estimada" value="R$ —" tone="ok" icon={DollarSign} />
-        <StatCard label="Receita anual estimada" value="R$ —" tone="ok" icon={DollarSign} />
-        <StatCard label="Total recebido" value="R$ —" tone="info" />
-        <StatCard label="Total pendente" value="R$ —" tone="warn" />
-        <StatCard label="Em atraso" value="R$ —" tone="danger" />
-        <StatCard label="Clientes inadimplentes" value="—" tone="danger" />
-      </Grid>
-      <div style={{ marginTop: 24 }}>
-        <SectionTitle>Top clientes por receita</SectionTitle>
-        <DataTable
-          columns={["Empresa", "Plano", "Valor mensal", "Total pago", "Status", "Última fatura"]}
-          emptyText="Conecte o Stripe para visualizar histórico financeiro real."
-        />
-      </div>
-    </>
-  );
-}
-
-/* ---------- 9. Suporte ---------- */
-function SupportSection() {
-  const buckets = [
-    { label: "Sem concluir onboarding", tone: "warn" as const },
-    { label: "Sem acessar há 7 dias", tone: "warn" as const },
-    { label: "Sem acessar há 30 dias", tone: "danger" as const },
-    { label: "Erro no cadastro", tone: "danger" as const },
-    { label: "Pagamento pendente", tone: "warn" as const },
-    { label: "Slug duplicado", tone: "info" as const },
-    { label: "Baixo uso da plataforma", tone: "warn" as const },
-  ];
-  return (
-    <>
-      <SectionTitle sub="Clientes que precisam de acompanhamento ativo.">Suporte</SectionTitle>
-      <Grid cols={4}>
-        {buckets.map(b => <StatCard key={b.label} label={b.label} value="—" tone={b.tone} />)}
-      </Grid>
-      <div style={{ marginTop: 16 }}>
-        <DataTable
-          columns={["Empresa", "Responsável", "Categoria de problema", "Última atividade", "Anotação interna", "Status"]}
-          emptyText="Anotações internas e fila de suporte aparecerão aqui."
-        />
-      </div>
-    </>
-  );
-}
-
-/* ---------- 10. Logs & Segurança ---------- */
-function LogsSection() {
-  return (
-    <>
-      <SectionTitle sub="Auditoria completa de ações administrativas.">Logs & Segurança</SectionTitle>
-      <Toolbar placeholder="Buscar log por ator, ação ou empresa" filters={["Tipo de ação", "Período", "Severidade"]} />
-      <DataTable
-        columns={["Quando", "Quem", "Ação", "Empresa afetada", "IP / Dispositivo", "Detalhes"]}
-        emptyText="Toda ação sensível (alterar plano, bloquear, resetar senha, excluir) será registrada aqui."
-      />
-    </>
-  );
-}
-
-/* ---------- 11. Configurações ---------- */
-function SettingsSection() {
-  const fields = [
-    { label: "Tempo de teste grátis padrão (dias)", placeholder: "Ex: 14" },
-    { label: "Valor do plano mensal (R$)", placeholder: "Ex: 49,90" },
-    { label: "Valor do plano anual (R$)", placeholder: "Ex: 499,00" },
-    { label: "Texto de aviso global para clientes", placeholder: "Ex: Manutenção amanhã às 02h" },
-    { label: "Limite de funcionários por empresa", placeholder: "Vazio = sem limite" },
-    { label: "Limite de serviços por empresa", placeholder: "Vazio = sem limite" },
-    { label: "Dias até bloqueio por pagamento atrasado", placeholder: "Ex: 7" },
-    { label: "Domínio público padrão", placeholder: "bisme.app" },
-  ];
-  return (
-    <>
-      <SectionTitle sub="Regras globais do SaaS Bisme.">Configurações do sistema</SectionTitle>
-
-      <div style={{ ...card, marginBottom: 16 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <ToggleRow label="Permitir novos cadastros de empresas" defaultOn />
-          <ToggleRow label="Página de vendas ativa" defaultOn />
-          <ToggleRow label="Modo manutenção (bloqueia o sistema)" />
-          <ToggleRow label="Bloquear automaticamente clientes em atraso" defaultOn />
-        </div>
-      </div>
-
-      <div style={card}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
-          {fields.map(f => (
-            <div key={f.label}>
-              <label style={{ fontSize: 12, fontWeight: 500, color: C.textMuted, display: "block", marginBottom: 6 }}>
-                {f.label}
-              </label>
-              <input placeholder={f.placeholder} style={{
-                width: "100%", padding: "10px 12px", borderRadius: 8,
-                border: `1.5px solid ${C.border}`, fontSize: 14, fontFamily: FONT,
-                background: C.elevated, color: C.text, outline: "none", boxSizing: "border-box",
-              }} />
-            </div>
-          ))}
-        </div>
-        <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
-          <button style={{
-            background: C.accent, color: "#fff", border: "none", padding: "10px 20px",
-            borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: "pointer", fontFamily: FONT,
-          }}>Salvar configurações</button>
-        </div>
-      </div>
-    </>
-  );
-}
-
-function ToggleRow({ label, defaultOn = false }: { label: string; defaultOn?: boolean }) {
-  const [on, setOn] = useState(defaultOn);
-  return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-      <span style={{ fontSize: 14, color: C.text }}>{label}</span>
-      <button onClick={() => setOn(!on)} style={{
-        width: 44, height: 24, borderRadius: 12, background: on ? C.accent : C.borderStrong,
-        border: "none", padding: 0, position: "relative", cursor: "pointer", flexShrink: 0,
-      }} aria-pressed={on}>
-        <span style={{
-          position: "absolute", top: 2, left: on ? 22 : 2, width: 20, height: 20,
-          background: "#FFFFFF", borderRadius: "50%", transition: "left 200ms",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-        }} />
-      </button>
+      <p className="text-xs text-muted-foreground mt-3">
+        * Receita estimada com base nos planos ativos e em preços de referência configurados no código. A cobrança real é feita pelo Stripe.
+      </p>
     </div>
   );
 }
 
-/* ---------- 12. Lixeira / Exclusões ---------- */
-function TrashSection() {
-  const [confirmOpen, setConfirmOpen] = useState(false);
+/* ---------- Empresas ---------- */
+function CompaniesTab({ companies, loading, onDetails }: {
+  companies: CompanyRow[]; loading: boolean; onDetails: (id: string) => void;
+}) {
+  const [q, setQ] = useState("");
+  const [status, setStatus] = useState("all");
+  const [plan, setPlan] = useState("all");
+
+  const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    return companies.filter((c) => {
+      if (status !== "all" && c.status !== status) return false;
+      if (plan !== "all" && (c.plan ?? "none") !== plan) return false;
+      if (!term) return true;
+      return [c.name, c.slug, c.ownerEmail].some((v) => (v || "").toLowerCase().includes(term));
+    });
+  }, [companies, q, status, plan]);
 
   return (
-    <>
-      <SectionTitle sub="Empresas excluídas e histórico de exclusões.">Lixeira / Exclusões</SectionTitle>
-
-      <div style={{ ...card, background: C.dangerSoft, border: `1.5px solid ${C.danger}33`, marginBottom: 16 }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-          <AlertTriangle size={20} color={C.danger} style={{ flexShrink: 0, marginTop: 2 }} />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, color: C.danger, marginBottom: 4 }}>
-              Zona de perigo
-            </div>
-            <p style={{ fontSize: 13, color: "#7F1D1D", margin: 0, lineHeight: 1.5 }}>
-              A exclusão completa de uma empresa apaga dados, serviços, funcionários,
-              clientes finais, agendamentos, mensagens e arquivos no Storage.
-              Esta ação só deve ser executada por uma função protegida do Supabase
-              (RPC / Edge Function) com verificação de <strong>super_admin</strong>.
-            </p>
-          </div>
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input className="pl-9" placeholder="Buscar por nome, slug ou e-mail" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os status</SelectItem>
+            <SelectItem value="trial">Trial</SelectItem>
+            <SelectItem value="active">Ativa</SelectItem>
+            <SelectItem value="past_due">Inadimplente</SelectItem>
+            <SelectItem value="canceled">Cancelada</SelectItem>
+            <SelectItem value="none">Sem assinatura</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={plan} onValueChange={setPlan}>
+          <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os planos</SelectItem>
+            <SelectItem value="mensal">Mensal</SelectItem>
+            <SelectItem value="anual">Anual</SelectItem>
+            <SelectItem value="none">Sem plano</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      <DataTable
-        columns={["Empresa excluída", "Slug", "Responsável", "Excluída em", "Por quem", "Restaurar"]}
-        emptyText="Nenhuma exclusão registrada."
-      />
-
-      <div style={{ marginTop: 16 }}>
-        <button onClick={() => setConfirmOpen(true)} style={{
-          background: C.danger, color: "#fff", border: "none", padding: "12px 20px",
-          borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: "pointer", fontFamily: FONT,
-          display: "inline-flex", alignItems: "center", gap: 8,
-        }}>
-          <Trash2 size={16} /> Simular exclusão de empresa
-        </button>
-      </div>
-
-      {confirmOpen && <DeleteConfirmModal onClose={() => setConfirmOpen(false)} />}
-    </>
+      {loading ? <Loader2 className="animate-spin" /> : (
+        <Card>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Empresa</TableHead>
+                  <TableHead>Slug</TableHead>
+                  <TableHead>Responsável</TableHead>
+                  <TableHead>Plano</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Trial até</TableHead>
+                  <TableHead>Período pago até</TableHead>
+                  <TableHead>Criada em</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.length === 0 && (
+                  <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Nenhuma empresa encontrada.</TableCell></TableRow>
+                )}
+                {filtered.map((c) => (
+                  <TableRow key={c.id}>
+                    <TableCell className="font-medium">{c.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{c.slug}</TableCell>
+                    <TableCell className="text-muted-foreground">{c.ownerEmail || "—"}</TableCell>
+                    <TableCell>{c.plan || "—"}</TableCell>
+                    <TableCell><Badge variant={statusTone(c.status)}>{STATUS_LABEL[c.status] ?? c.status}</Badge></TableCell>
+                    <TableCell>{fmtDate(c.trialEndsAt)}</TableCell>
+                    <TableCell>{fmtDate(c.currentPeriodEnd)}</TableCell>
+                    <TableCell>{fmtDate(c.createdAt)}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-1 justify-end">
+                        <Button variant="ghost" size="icon" title="Abrir site público" asChild>
+                          <a href={`/${c.slug}`} target="_blank" rel="noopener noreferrer"><ExternalLink /></a>
+                        </Button>
+                        <Button variant="ghost" size="icon" title="Copiar URL"
+                          onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/${c.slug}`)}>
+                          <Copy />
+                        </Button>
+                        <Button variant="ghost" size="icon" title="Ver detalhes" onClick={() => onDetails(c.id)}>
+                          <Eye />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </Card>
+      )}
+    </div>
   );
 }
 
-function DeleteConfirmModal({ onClose }: { onClose: () => void }) {
-  const [text, setText] = useState("");
-  const [step, setStep] = useState<1 | 2>(1);
-  const canConfirm = text.trim() === "EXCLUIR TUDO";
+/* ---------- Assinaturas ---------- */
+function SubscriptionsTab({ companies, loading }: { companies: CompanyRow[]; loading: boolean }) {
+  if (loading) return <Loader2 className="animate-spin" />;
+  return (
+    <Card>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Empresa</TableHead>
+              <TableHead>Plano</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Trial até</TableHead>
+              <TableHead>Período pago até</TableHead>
+              <TableHead>Stripe customer</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {companies.map((c) => (
+              <TableRow key={c.id}>
+                <TableCell className="font-medium">{c.name}</TableCell>
+                <TableCell>{c.plan || "—"}</TableCell>
+                <TableCell><Badge variant={statusTone(c.status)}>{STATUS_LABEL[c.status] ?? c.status}</Badge></TableCell>
+                <TableCell>{fmtDate(c.trialEndsAt)}</TableCell>
+                <TableCell>{fmtDate(c.currentPeriodEnd)}</TableCell>
+                <TableCell className="text-muted-foreground text-xs">{c.stripeCustomerId || "—"}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </Card>
+  );
+}
+
+/* ---------- Detalhes da empresa ---------- */
+function CompanyDetailsDialog({ companyId, onClose }: { companyId: string; onClose: () => void }) {
+  const detailsFn = useServerFn(getMasterCompanyDetails);
+  const q = useQuery({
+    queryKey: ["master-company", companyId],
+    queryFn: () => detailsFn({ data: { companyId } }),
+    retry: false,
+  });
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 400, display: "grid", placeItems: "center", padding: 16 }}>
-      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)" }} />
-      <div style={{
-        position: "relative", background: C.surface, borderRadius: 16, padding: 24,
-        maxWidth: 480, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
-      }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 16 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: C.dangerSoft, display: "grid", placeItems: "center", flexShrink: 0 }}>
-            <AlertTriangle size={22} color={C.danger} />
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader><DialogTitle>Detalhes da empresa</DialogTitle></DialogHeader>
+        {q.isLoading || !q.data ? <Loader2 className="animate-spin" /> : (
+          <div className="space-y-5 text-sm">
+            <section>
+              <h4 className="font-semibold mb-2">Empresa</h4>
+              <Row k="ID" v={q.data.company.id} />
+              <Row k="Nome" v={q.data.company.name} />
+              <Row k="Slug" v={q.data.company.slug} />
+              <Row k="URL pública" v={`${window.location.origin}/${q.data.company.slug}`} />
+              <Row k="Timezone" v={q.data.company.timezone} />
+              <Row k="Criada em" v={fmtDate(q.data.company.created_at)} />
+            </section>
+            <section>
+              <h4 className="font-semibold mb-2">Responsáveis / membros</h4>
+              {q.data.members.map((m) => (
+                <div key={m.userId} className="border rounded-md p-2 mb-2">
+                  <Row k="user_id" v={m.userId} />
+                  <Row k="E-mail" v={m.email || "—"} />
+                  <Row k="Role" v={m.role} />
+                  <Row k="Criado em" v={fmtDate(m.createdAt)} />
+                </div>
+              ))}
+            </section>
+            <section>
+              <h4 className="font-semibold mb-2">Assinatura</h4>
+              {q.data.subscription ? (
+                <>
+                  <Row k="Status" v={q.data.subscription.status} />
+                  <Row k="Plano" v={q.data.subscription.plan} />
+                  <Row k="Trial iniciado" v={fmtDate(q.data.subscription.trial_started_at)} />
+                  <Row k="Trial termina" v={fmtDate(q.data.subscription.trial_ends_at)} />
+                  <Row k="Período início" v={fmtDate(q.data.subscription.current_period_start)} />
+                  <Row k="Período fim" v={fmtDate(q.data.subscription.current_period_end)} />
+                  <Row k="Cancela no fim" v={String(q.data.subscription.cancel_at_period_end)} />
+                  <Row k="Cancelada em" v={fmtDate(q.data.subscription.canceled_at)} />
+                  <Row k="Stripe customer" v={q.data.subscription.stripe_customer_id || "—"} />
+                  <Row k="Stripe subscription" v={q.data.subscription.stripe_subscription_id || "—"} />
+                  <Row k="Stripe price" v={q.data.subscription.stripe_price_id || "—"} />
+                </>
+              ) : <p className="text-muted-foreground">Sem assinatura.</p>}
+            </section>
+            <section>
+              <h4 className="font-semibold mb-2">Dados operacionais</h4>
+              <Row k="Agendamentos" v={String(q.data.counts.appointments)} />
+              <Row k="Clientes" v={String(q.data.counts.clients)} />
+              <Row k="Serviços" v={String(q.data.counts.services)} />
+              <Row k="Profissionais" v={String(q.data.counts.professionals)} />
+            </section>
           </div>
-          <div>
-            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Excluir empresa completamente</h3>
-            <p style={{ margin: "4px 0 0", fontSize: 13, color: C.textMuted, lineHeight: 1.5 }}>
-              Essa ação não pode ser desfeita. Todos os dados, arquivos e
-              assinaturas vinculadas serão apagados.
-            </p>
-          </div>
-        </div>
-
-        {step === 1 ? (
-          <>
-            <div style={{ background: C.elevated, borderRadius: 10, padding: 14, fontSize: 13, color: C.textMuted, marginBottom: 16 }}>
-              Serão apagados: dados da empresa, logo, capa, configurações, serviços,
-              funcionários, horários, bloqueios, clientes finais, agendamentos,
-              mensagens, analytics e arquivos no Storage.
-            </div>
-            <label style={{ fontSize: 12, fontWeight: 500, color: C.textMuted, display: "block", marginBottom: 6 }}>
-              Digite <strong style={{ color: C.danger }}>EXCLUIR TUDO</strong> para confirmar
-            </label>
-            <input value={text} onChange={e => setText(e.target.value)} placeholder="EXCLUIR TUDO" style={{
-              width: "100%", padding: "12px 14px", borderRadius: 10,
-              border: `1.5px solid ${canConfirm ? C.danger : C.border}`,
-              fontSize: 14, fontFamily: FONT, background: C.surface, color: C.text,
-              outline: "none", boxSizing: "border-box", marginBottom: 16,
-            }} />
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button onClick={onClose} style={ghostBtn}>Cancelar</button>
-              <button disabled={!canConfirm} onClick={() => setStep(2)} style={{
-                ...dangerBtn, opacity: canConfirm ? 1 : 0.5, cursor: canConfirm ? "pointer" : "not-allowed",
-              }}>Continuar</button>
-            </div>
-          </>
-        ) : (
-          <>
-            <div style={{ background: C.dangerSoft, borderRadius: 10, padding: 14, fontSize: 13, color: "#7F1D1D", marginBottom: 16, lineHeight: 1.5 }}>
-              Última confirmação. Ao clicar em <strong>Excluir definitivamente</strong> a função
-              protegida do Supabase será chamada para apagar todos os dados ligados a esta empresa.
-            </div>
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button onClick={() => setStep(1)} style={ghostBtn}>Voltar</button>
-              <button onClick={onClose} style={dangerBtn}>Excluir definitivamente</button>
-            </div>
-          </>
         )}
-      </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+function Row({ k, v }: { k: string; v: React.ReactNode }) {
+  return (
+    <div className="flex gap-2 py-0.5">
+      <span className="text-muted-foreground min-w-[130px]">{k}</span>
+      <span className="break-all">{v}</span>
     </div>
   );
 }
 
-const ghostBtn: CSSProperties = {
-  background: "transparent", border: `1.5px solid ${C.border}`, color: C.text,
-  padding: "10px 16px", borderRadius: 10, fontWeight: 600, fontSize: 13,
-  cursor: "pointer", fontFamily: FONT,
-};
-const dangerBtn: CSSProperties = {
-  background: C.danger, color: "#fff", border: "none",
-  padding: "10px 18px", borderRadius: 10, fontWeight: 600, fontSize: 13,
-  cursor: "pointer", fontFamily: FONT,
-};
+/* ---------- Entregar acesso ---------- */
+function AccessTab({ companies }: { companies: CompanyRow[] }) {
+  const detailsFn = useServerFn(getMasterCompanyDetails);
+  const changeFn = useServerFn(changeEmpresarioAccess);
 
-/* (sufixo intencional para silenciar warnings de imports auxiliares usados em ícones decorativos) */
-void Heart; void Trophy;
+  const [companyId, setCompanyId] = useState("");
+  const [userId, setUserId] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [pw, setPw] = useState("");
+  const [pw2, setPw2] = useState("");
+  const [erro, setErro] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [result, setResult] = useState<{ email: string; password: string } | null>(null);
+
+  const membersQ = useQuery({
+    queryKey: ["master-company-members", companyId],
+    queryFn: () => detailsFn({ data: { companyId } }),
+    enabled: !!companyId,
+    retry: false,
+  });
+  const members = membersQ.data?.members || [];
+
+  function validate(): string | null {
+    if (!companyId) return "Selecione a empresa.";
+    if (!userId) return "Selecione o membro responsável.";
+    if (!newEmail.trim()) return "Informe o novo e-mail.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail.trim())) return "E-mail inválido.";
+    if (pw.length < 6) return "A senha provisória deve ter ao menos 6 caracteres.";
+    if (pw !== pw2) return "As senhas não coincidem.";
+    return null;
+  }
+
+  function openConfirm() {
+    const v = validate();
+    if (v) { setErro(v); return; }
+    setErro(null);
+    setConfirmOpen(true);
+  }
+
+  async function execute() {
+    setSaving(true);
+    setErro(null);
+    try {
+      await changeFn({ data: { companyId, userId, newEmail: newEmail.trim(), newPassword: pw } });
+      setResult({ email: newEmail.trim(), password: pw });
+      setConfirmOpen(false);
+      setPw(""); setPw2("");
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Falha ao alterar o acesso.");
+      setConfirmOpen(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="max-w-xl space-y-4">
+      <Card>
+        <CardHeader><CardTitle>Trocar acesso do empresário</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Altera o e-mail e a senha do usuário existente. O mesmo <code>user_id</code> é mantido e o vínculo com a empresa não muda.
+          </p>
+
+          <div className="space-y-2">
+            <Label>Empresa</Label>
+            <Select value={companyId} onValueChange={(v) => { setCompanyId(v); setUserId(""); }}>
+              <SelectTrigger><SelectValue placeholder="Selecione a empresa" /></SelectTrigger>
+              <SelectContent>
+                {companies.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Membro responsável</Label>
+            <Select value={userId} onValueChange={setUserId} disabled={!companyId || membersQ.isLoading}>
+              <SelectTrigger><SelectValue placeholder={membersQ.isLoading ? "Carregando..." : "Selecione o membro"} /></SelectTrigger>
+              <SelectContent>
+                {members.map((m) => (
+                  <SelectItem key={m.userId} value={m.userId}>
+                    {(m.email || m.userId)} · {m.role}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="newEmail">Novo e-mail</Label>
+            <Input id="newEmail" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="pw">Senha provisória</Label>
+              <Input id="pw" type="text" value={pw} onChange={(e) => setPw(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pw2">Confirmar senha</Label>
+              <Input id="pw2" type="text" value={pw2} onChange={(e) => setPw2(e.target.value)} />
+            </div>
+          </div>
+
+          {erro && <p className="text-sm text-destructive">{erro}</p>}
+          <Button onClick={openConfirm}><KeyRound /> Trocar acesso</Button>
+        </CardContent>
+      </Card>
+
+      {result && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-600">
+              <CheckCircle2 /> Acesso atualizado
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">Copie os dados abaixo para entregar ao empresário:</p>
+            <pre className="text-sm bg-muted rounded-md p-3 whitespace-pre-wrap break-all">
+{`Painel:
+${PANEL_LOGIN_URL}
+
+E-mail:
+${result.email}
+
+Senha provisória:
+${result.password}
+
+Após o primeiro acesso, altere sua senha em Configurações.`}
+            </pre>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigator.clipboard?.writeText(
+                `Painel:\n${PANEL_LOGIN_URL}\n\nE-mail:\n${result.email}\n\nSenha provisória:\n${result.password}\n\nApós o primeiro acesso, altere sua senha em Configurações.`
+              )}><Copy /> Copiar</Button>
+              <Button variant="ghost" size="sm" onClick={() => setResult(null)}><X /> Fechar</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Dialog open={confirmOpen} onOpenChange={(o) => !o && setConfirmOpen(false)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Confirmar troca de acesso</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Você está prestes a alterar o e-mail de acesso deste usuário. O <strong>user_id continuará o mesmo</strong> e o vínculo com a empresa será mantido.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={saving}>Cancelar</Button>
+            <Button onClick={execute} disabled={saving}>
+              {saving ? <Loader2 className="animate-spin" /> : "Confirmar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
