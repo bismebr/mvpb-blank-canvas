@@ -126,6 +126,10 @@ export function SistemaTela() {
   const { config, updateConfig } = useSiteConfig();
   const { adminEmail, setAdminEmail, hasPassword, setHasPassword } = useApp();
 
+  /* ---------- Troca de e-mail ---------- */
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState<string | null>(null);
+
   const companyIdRef = useRef<string | null>(null);
   const [dbSlug, setDbSlug] = useState<string>(config.username || "");
   const [hydrated, setHydrated] = useState(false);
@@ -294,6 +298,7 @@ export function SistemaTela() {
   }
 
   return (
+    <>
     <div style={{ padding: "30px 16px 8px", maxWidth: 880, margin: "0 auto", fontFamily: FONT, color: COLORS.textPrimary }}>
       <PageHeader
         title="Configurações do seu sistema"
@@ -429,6 +434,48 @@ export function SistemaTela() {
           />
         </div>
 
+          <div style={{ marginTop: -4, marginBottom: 14, display: "flex", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              onClick={() => { setEmailSuccess(null); setEmailModalOpen(true); }}
+              style={{
+                background: "transparent",
+                border: `1.5px solid ${COLORS.border}`,
+                color: COLORS.textPrimary,
+                borderRadius: 10,
+                height: 40,
+                padding: "0 16px",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: FONT,
+              }}
+            >
+              Alterar e-mail
+            </button>
+          </div>
+
+          {emailSuccess && (
+            <div
+              style={{
+                marginBottom: 14,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 8,
+                padding: "12px 14px",
+                background: COLORS.successBg,
+                border: `1px solid ${COLORS.successBorder}`,
+                borderRadius: 8,
+                color: "#16a34a",
+                fontSize: 13.5,
+                lineHeight: 1.5,
+              }}
+            >
+              <Check size={16} strokeWidth={3} style={{ flexShrink: 0, marginTop: 2 }} />
+              <span>{emailSuccess}</span>
+            </div>
+          )}
+
         {hasPassword && (
           <div style={{ marginBottom: 14 }}>
             <Label>Senha atual</Label>
@@ -497,6 +544,185 @@ export function SistemaTela() {
           </div>
         )}
       </section>
+    </div>
+      {emailModalOpen && (
+        <EmailChangeModal
+          currentEmail={adminEmail || ""}
+          onClose={() => setEmailModalOpen(false)}
+          onSuccess={(msg) => { setEmailSuccess(msg); setEmailModalOpen(false); }}
+        />
+      )}
+    </>
+  );
+}
+
+/* ---------- Modal de troca de e-mail ---------- */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function EmailChangeModal({
+  currentEmail,
+  onClose,
+  onSuccess,
+}: {
+  currentEmail: string;
+  onClose: () => void;
+  onSuccess: (msg: string) => void;
+}) {
+  const [novoEmail, setNovoEmail] = useState("");
+  const [confirmaEmail, setConfirmaEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [showSenha, setShowSenha] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  async function handleSubmit() {
+    setErro(null);
+    const email = novoEmail.trim().toLowerCase();
+    const confirma = confirmaEmail.trim().toLowerCase();
+    if (!EMAIL_RE.test(email)) { setErro("Digite um e-mail válido."); return; }
+    if (email === currentEmail.trim().toLowerCase()) {
+      setErro("O novo e-mail precisa ser diferente do e-mail atual."); return;
+    }
+    if (email !== confirma) { setErro("Os e-mails não coincidem."); return; }
+    if (senha.trim().length === 0) { setErro("Informe sua senha atual."); return; }
+
+    setSaving(true);
+    try {
+      const { error: reErr } = await supabase.auth.signInWithPassword({
+        email: currentEmail,
+        password: senha,
+      });
+      if (reErr) { setErro("Senha atual incorreta."); setSaving(false); return; }
+
+      const { error } = await supabase.auth.updateUser({ email });
+      if (error) {
+        const msg = error.message || "";
+        if (/already|registered|in use|exists/i.test(msg)) {
+          setErro("Este e-mail já está em uso.");
+        } else {
+          setErro("Não foi possível solicitar a alteração de e-mail. Tente novamente.");
+        }
+        setSaving(false);
+        return;
+      }
+      onSuccess("Enviamos um link de confirmação para o novo e-mail. Confirme pelo novo e-mail para concluir a alteração.");
+    } catch {
+      setErro("Não foi possível solicitar a alteração de e-mail. Tente novamente.");
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 1000,
+        background: "rgba(0,0,0,0.5)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          ...cardStyle,
+          width: "100%", maxWidth: 440, padding: 22,
+          maxHeight: "90vh", overflowY: "auto",
+        }}
+      >
+        <h3 style={{ margin: "0 0 6px", fontSize: 18, fontWeight: 700, color: COLORS.textPrimary, fontFamily: FONT }}>
+          Alterar e-mail de acesso
+        </h3>
+        <p style={{ margin: "0 0 16px", fontSize: 13, color: COLORS.textMuted, fontFamily: FONT, lineHeight: 1.5 }}>
+          Você receberá um link de confirmação no novo e-mail. A alteração só será concluída após a confirmação.
+        </p>
+
+        <div style={{ marginBottom: 12 }}>
+          <Label>E-mail atual</Label>
+          <input
+            type="email"
+            value={currentEmail}
+            readOnly
+            disabled
+            style={{
+              ...inputStyle,
+              background: "var(--adm-bg-elevated)",
+              color: "var(--adm-text-muted)",
+              borderColor: "var(--adm-border)",
+              cursor: "default",
+              opacity: 0.85,
+            }}
+          />
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <Label>Novo e-mail</Label>
+          <input
+            type="email"
+            value={novoEmail}
+            onChange={(e) => setNovoEmail(e.target.value)}
+            placeholder="Digite o novo e-mail"
+            autoComplete="off"
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <Label>Confirmar novo e-mail</Label>
+          <input
+            type="email"
+            value={confirmaEmail}
+            onChange={(e) => setConfirmaEmail(e.target.value)}
+            placeholder="Repita o novo e-mail"
+            autoComplete="off"
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <Label>Senha atual</Label>
+          <PasswordField
+            value={senha}
+            onChange={setSenha}
+            placeholder="Digite sua senha atual"
+            visible={showSenha}
+            onToggleVisible={() => setShowSenha((v) => !v)}
+            autoComplete="current-password"
+            ariaLabelToggle={showSenha ? "Ocultar senha" : "Mostrar senha"}
+          />
+        </div>
+
+        {erro && (
+          <div style={{ marginBottom: 12, fontSize: 13, color: "#e11d48" }}>{erro}</div>
+        )}
+
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={saving}
+            style={{
+              background: "transparent",
+              border: `1.5px solid ${COLORS.border}`,
+              color: COLORS.textPrimary,
+              borderRadius: 10, height: 46, padding: "0 18px",
+              fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: FONT,
+            }}
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={saving}
+            style={{ ...saveBtn, padding: "0 20px", opacity: saving ? 0.6 : 1 }}
+          >
+            {saving ? "Enviando..." : "Enviar confirmação"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
