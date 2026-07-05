@@ -85,10 +85,11 @@ function BismeAdminPage() {
 
   if (!sessionReady || statusQ.isLoading) return <FullCenter><Loader2 className="animate-spin" /></FullCenter>;
 
-  // Não autenticado (middleware lança Unauthorized) → login
-  if (statusQ.isError) return <LoginScreen onLogged={() => qc.invalidateQueries({ queryKey: ["master-status"] })} />;
+  // Não autenticado → login
+  if (statusQ.isError || !statusQ.data?.authenticated)
+    return <LoginScreen onLogged={() => qc.invalidateQueries({ queryKey: ["master-status"] })} />;
 
-  if (!statusQ.data?.isMaster) return <BlockedScreen email={statusQ.data?.email} />;
+  if (!statusQ.data.isMaster) return <BlockedScreen email={statusQ.data.email} />;
 
   return <MasterPanel adminEmail={statusQ.data.email} />;
 }
