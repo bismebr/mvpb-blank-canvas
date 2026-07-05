@@ -298,6 +298,7 @@ export function SistemaTela() {
   }
 
   return (
+    <>
     <div style={{ padding: "30px 16px 8px", maxWidth: 880, margin: "0 auto", fontFamily: FONT, color: COLORS.textPrimary }}>
       <PageHeader
         title="Configurações do seu sistema"
