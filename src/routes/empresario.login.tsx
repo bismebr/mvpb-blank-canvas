@@ -77,7 +77,7 @@ function LoginEmpresario() {
   return (
     <AuthScreen
       mode="login"
-      title="Bem-vindo novamente"
+      title="Entrar na conta"
       buttonText="Entrar com e-mail"
       showPassword
       submitting={loading}
