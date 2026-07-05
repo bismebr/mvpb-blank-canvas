@@ -40,20 +40,40 @@ async function assertMaster(userId: string, claimEmail?: unknown) {
 }
 
 /* ---------- Status: quem é o usuário atual? ---------- */
-export const getMasterStatus = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ authenticated: true; isMaster: boolean; email: string }> => {
+// Sem middleware: não deve lançar quando o visitante não está logado
+// (isso geraria tela em branco). Lê o token opcionalmente e responde
+// { authenticated: false } quando não há sessão válida.
+export const getMasterStatus = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{ authenticated: boolean; isMaster: boolean; email: string }> => {
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const authHeader = getRequestHeader("authorization");
+    const notAuthed = { authenticated: false, isMaster: false, email: "" };
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) return notAuthed;
+    const token = authHeader.slice("Bearer ".length);
+    if (token.split(".").length !== 3) return notAuthed;
+
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    });
+
+    const { data, error } = await supabase.auth.getClaims(token);
+    const claims = data?.claims as { sub?: string; email?: string } | undefined;
+    if (error || !claims?.sub) return notAuthed;
+
     const raw = process.env.BISME_MASTER_ADMIN_EMAILS || "";
     const allow = raw.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
-    const claimEmail = (context.claims as { email?: string })?.email;
-    let email = typeof claimEmail === "string" ? claimEmail.toLowerCase() : "";
+    let email = typeof claims.email === "string" ? claims.email.toLowerCase() : "";
     if (!email) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data } = await supabaseAdmin.auth.admin.getUserById(context.userId);
-      email = (data?.user?.email || "").toLowerCase();
+      const { data: u } = await supabaseAdmin.auth.admin.getUserById(claims.sub);
+      email = (u?.user?.email || "").toLowerCase();
     }
     return { authenticated: true, isMaster: allow.includes(email), email };
-  });
+  },
+);
 
 /* ---------- Visão geral ---------- */
 export const getMasterOverview = createServerFn({ method: "GET" })
