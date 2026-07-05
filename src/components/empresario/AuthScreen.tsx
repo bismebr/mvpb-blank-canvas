@@ -395,6 +395,29 @@ const linkStyle: CSSProperties = {
   fontFamily: FONT,
 };
 
+const altDivider: CSSProperties = {
+  width: "100%",
+  height: 1,
+  background: COLORS.border,
+  margin: "20px 0 0",
+  border: "none",
+};
+
+const altTextStyle: CSSProperties = {
+  margin: "14px 0 0",
+  textAlign: "center",
+  fontSize: 13.5,
+  color: COLORS.textMuted,
+  fontFamily: FONT,
+};
+
+const altLinkStyle: CSSProperties = {
+  color: "#5690f5",
+  textDecoration: "underline",
+  fontWeight: 600,
+  fontFamily: FONT,
+};
+
 function GoogleIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
