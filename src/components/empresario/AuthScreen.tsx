@@ -179,6 +179,26 @@ export function AuthScreen(props: Props) {
               Política de Privacidade
             </Link>
           </p>
+
+          <div style={altDivider} />
+
+          <p style={altTextStyle}>
+            {mode === "login" ? (
+              <>
+                Não tem uma conta?{" "}
+                <Link to="/empresario/cadastro" style={altLinkStyle}>
+                  Cadastre-se
+                </Link>
+              </>
+            ) : (
+              <>
+                Já tem uma conta?{" "}
+                <Link to="/empresario/login" style={altLinkStyle}>
+                  Entrar
+                </Link>
+              </>
+            )}
+          </p>
         </div>
       </main>
 
