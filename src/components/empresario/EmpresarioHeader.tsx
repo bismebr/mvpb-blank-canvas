@@ -17,24 +17,13 @@ export function EmpresarioHeader(
   return (
     <header style={headerStyle}>
       <div style={inner}>
-        <div style={logoWrap}>
-          <img
-            src={headerLogoAsset}
-            alt="Bisme"
-            className="h-9 md:h-10 w-auto object-contain"
-            style={logoStyle}
-          />
-        </div>
-        <p className="bisme-tagline" style={tagline}>
-          Tenha mais controle sobre sua agenda, seus clientes e sua gestão.
-          Cadastre-se agora e comece a transformar seu negócio.
-        </p>
+        <img
+          src={headerLogoAsset}
+          alt="Bisme"
+          className="h-9 md:h-10 w-auto object-contain"
+          style={logoStyle}
+        />
       </div>
-      <style>{`
-        @media (max-width: 420px) {
-          .bisme-tagline { font-size: 11.5px !important; }
-        }
-      `}</style>
     </header>
   );
 }
@@ -49,30 +38,15 @@ const headerStyle: CSSProperties = {
 const inner: CSSProperties = {
   maxWidth: 1200,
   margin: "0 auto",
-  padding: "10px 7px 12px",
+  padding: "6px 7px",
   display: "flex",
   flexDirection: "column",
-  alignItems: "stretch",
+  alignItems: "flex-start",
   gap: 0,
 };
 
 const logoStyle: CSSProperties = {
   display: "block",
-  margin: "0 auto 4px",
-};
-
-const logoWrap: CSSProperties = {
   margin: 0,
-  display: "block",
-};
-
-const tagline: CSSProperties = {
-  margin: 0,
-  textAlign: "center",
-  fontSize: 12.5,
-  fontWeight: 500,
-  lineHeight: 1.35,
-  color: "#1a1a1a",
-  width: "100%",
 };
 
