@@ -25,6 +25,7 @@ import { Route as EmpresarioRedefinirSenhaRouteImport } from './routes/empresari
 import { Route as EmpresarioOnboardingRouteImport } from './routes/empresario.onboarding'
 import { Route as EmpresarioLoginRouteImport } from './routes/empresario.login'
 import { Route as EmpresarioEsqueciSenhaRouteImport } from './routes/empresario.esqueci-senha'
+import { Route as EmpresarioEmailAlteradoRouteImport } from './routes/empresario.email-alterado'
 import { Route as EmpresarioCadastroRouteImport } from './routes/empresario.cadastro'
 import { Route as ClienteRedefinirSenhaRouteImport } from './routes/cliente.redefinir-senha'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
@@ -110,6 +111,11 @@ const EmpresarioEsqueciSenhaRoute = EmpresarioEsqueciSenhaRouteImport.update({
   path: '/empresario/esqueci-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmpresarioEmailAlteradoRoute = EmpresarioEmailAlteradoRouteImport.update({
+  id: '/empresario/email-alterado',
+  path: '/empresario/email-alterado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmpresarioCadastroRoute = EmpresarioCadastroRouteImport.update({
   id: '/empresario/cadastro',
   path: '/empresario/cadastro',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/venda': typeof VendaRoute
   '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
+  '/empresario/email-alterado': typeof EmpresarioEmailAlteradoRoute
   '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
   '/empresario/onboarding': typeof EmpresarioOnboardingRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/venda': typeof VendaRoute
   '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
+  '/empresario/email-alterado': typeof EmpresarioEmailAlteradoRoute
   '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
   '/empresario/onboarding': typeof EmpresarioOnboardingRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/venda': typeof VendaRoute
   '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
+  '/empresario/email-alterado': typeof EmpresarioEmailAlteradoRoute
   '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
   '/empresario/login': typeof EmpresarioLoginRoute
   '/empresario/onboarding': typeof EmpresarioOnboardingRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/venda'
     | '/cliente/redefinir-senha'
     | '/empresario/cadastro'
+    | '/empresario/email-alterado'
     | '/empresario/esqueci-senha'
     | '/empresario/login'
     | '/empresario/onboarding'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/venda'
     | '/cliente/redefinir-senha'
     | '/empresario/cadastro'
+    | '/empresario/email-alterado'
     | '/empresario/esqueci-senha'
     | '/empresario/login'
     | '/empresario/onboarding'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/venda'
     | '/cliente/redefinir-senha'
     | '/empresario/cadastro'
+    | '/empresario/email-alterado'
     | '/empresario/esqueci-senha'
     | '/empresario/login'
     | '/empresario/onboarding'
@@ -271,6 +283,7 @@ export interface RootRouteChildren {
   VendaRoute: typeof VendaRoute
   ClienteRedefinirSenhaRoute: typeof ClienteRedefinirSenhaRoute
   EmpresarioCadastroRoute: typeof EmpresarioCadastroRoute
+  EmpresarioEmailAlteradoRoute: typeof EmpresarioEmailAlteradoRoute
   EmpresarioEsqueciSenhaRoute: typeof EmpresarioEsqueciSenhaRoute
   EmpresarioLoginRoute: typeof EmpresarioLoginRoute
   EmpresarioOnboardingRoute: typeof EmpresarioOnboardingRoute
@@ -392,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmpresarioEsqueciSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/empresario/email-alterado': {
+      id: '/empresario/email-alterado'
+      path: '/empresario/email-alterado'
+      fullPath: '/empresario/email-alterado'
+      preLoaderRoute: typeof EmpresarioEmailAlteradoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/empresario/cadastro': {
       id: '/empresario/cadastro'
       path: '/empresario/cadastro'
@@ -431,6 +451,7 @@ const rootRouteChildren: RootRouteChildren = {
   VendaRoute: VendaRoute,
   ClienteRedefinirSenhaRoute: ClienteRedefinirSenhaRoute,
   EmpresarioCadastroRoute: EmpresarioCadastroRoute,
+  EmpresarioEmailAlteradoRoute: EmpresarioEmailAlteradoRoute,
   EmpresarioEsqueciSenhaRoute: EmpresarioEsqueciSenhaRoute,
   EmpresarioLoginRoute: EmpresarioLoginRoute,
   EmpresarioOnboardingRoute: EmpresarioOnboardingRoute,
