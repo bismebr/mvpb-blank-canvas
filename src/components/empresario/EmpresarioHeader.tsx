@@ -17,24 +17,13 @@ export function EmpresarioHeader(
   return (
     <header style={headerStyle}>
       <div style={inner}>
-        <div style={logoWrap}>
-          <img
-            src={headerLogoAsset}
-            alt="Bisme"
-            className="h-9 md:h-10 w-auto object-contain"
-            style={logoStyle}
-          />
-        </div>
-        <p className="bisme-tagline" style={tagline}>
-          Tenha mais controle sobre sua agenda, seus clientes e sua gestão.
-          Cadastre-se agora e comece a transformar seu negócio.
-        </p>
+        <img
+          src={headerLogoAsset}
+          alt="Bisme"
+          className="h-9 md:h-10 w-auto object-contain"
+          style={logoStyle}
+        />
       </div>
-      <style>{`
-        @media (max-width: 420px) {
-          .bisme-tagline { font-size: 11.5px !important; }
-        }
-      `}</style>
     </header>
   );
 }
