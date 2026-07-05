@@ -594,7 +594,10 @@ function EmailChangeModal({
       });
       if (reErr) { setErro("Senha atual incorreta."); setSaving(false); return; }
 
-      const { error } = await supabase.auth.updateUser({ email });
+      const { error } = await supabase.auth.updateUser(
+        { email },
+        { emailRedirectTo: `${window.location.origin}/empresario/email-alterado` },
+      );
       if (error) {
         const msg = error.message || "";
         if (/already|registered|in use|exists/i.test(msg)) {
