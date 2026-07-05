@@ -38,30 +38,15 @@ const headerStyle: CSSProperties = {
 const inner: CSSProperties = {
   maxWidth: 1200,
   margin: "0 auto",
-  padding: "10px 7px 12px",
+  padding: "6px 7px",
   display: "flex",
   flexDirection: "column",
-  alignItems: "stretch",
+  alignItems: "flex-start",
   gap: 0,
 };
 
 const logoStyle: CSSProperties = {
   display: "block",
-  margin: "0 auto 4px",
-};
-
-const logoWrap: CSSProperties = {
   margin: 0,
-  display: "block",
-};
-
-const tagline: CSSProperties = {
-  margin: 0,
-  textAlign: "center",
-  fontSize: 12.5,
-  fontWeight: 500,
-  lineHeight: 1.35,
-  color: "#1a1a1a",
-  width: "100%",
 };
 
