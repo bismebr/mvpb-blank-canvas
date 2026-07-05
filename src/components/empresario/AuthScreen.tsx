@@ -80,26 +80,6 @@ export function AuthScreen(props: Props) {
       <EmpresarioHeader />
       <main className="bisme-auth-main" style={mainStyle}>
         <div className="bisme-auth-card" style={cardStyle}>
-          {/* Tabs cápsula */}
-          <div style={tabsWrap}>
-            <div style={tabsContainer}>
-              <button
-                type="button"
-                onClick={() => go("/empresario/login")}
-                style={tabStyle(mode === "login")}
-              >
-                Entrar
-              </button>
-              <button
-                type="button"
-                onClick={() => go("/empresario/cadastro")}
-                style={tabStyle(mode === "signup")}
-              >
-                Cadastre-se
-              </button>
-            </div>
-          </div>
-
           <h1 style={titleStyle}>{props.title}</h1>
 
           <form onSubmit={handleSubmit} noValidate style={{ width: "100%" }}>
