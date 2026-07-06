@@ -64,15 +64,12 @@ function CadastroEmpresario() {
   return (
     <AuthScreen
       mode="signup"
-      title="Criar uma conta"
-      buttonText="Continuar com e-mail"
       showPassword
       showPasswordRequirements
       submitting={loading}
       serverError={erro}
       onSubmit={handleSubmit}
       onGoogle={handleGoogle}
-      agreementText="Ao inscrever-se, você concorda com"
     />
   );
 }

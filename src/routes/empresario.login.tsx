@@ -77,14 +77,11 @@ function LoginEmpresario() {
   return (
     <AuthScreen
       mode="login"
-      title="Entrar na conta"
-      buttonText="Entrar com e-mail"
       showPassword
       submitting={loading}
       serverError={erro}
       onSubmit={handleSubmit}
       onGoogle={handleGoogle}
-      agreementText="Ao continuar, você concorda com"
     />
   );
 }
