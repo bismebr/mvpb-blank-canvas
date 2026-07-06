@@ -296,7 +296,7 @@ export function InfoBlock({
                 gap: 6,
               }}
             >
-              <span style={{ color: "var(--site-primary, #5690f5)", fontWeight: 400 }}>
+              <span style={{ color: "var(--site-primary, #5690f5)", fontWeight: 700 }}>
                 Aberto agora
               </span>
               <span
