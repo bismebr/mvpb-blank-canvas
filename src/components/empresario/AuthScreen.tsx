@@ -1,17 +1,15 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
+import { useState, type CSSProperties, type FormEvent } from "react";
 import { Mail } from "lucide-react";
 import { EmpresarioHeader } from "./EmpresarioHeader";
+import { AuthI18nProvider, LanguageSelector, useAuthI18n } from "./authI18n";
 
 export type AuthMode = "login" | "signup";
 
 interface Props {
   mode: AuthMode;
-  title: string;
-  buttonText: string;
   showPassword: boolean;
   showPasswordRequirements?: boolean;
-  agreementText: ReactNode;
   onSubmit: (data: { email: string; senha: string }) => Promise<void> | void;
   onGoogle: () => void;
   submitting?: boolean;
@@ -34,8 +32,17 @@ const COLORS = {
 };
 
 export function AuthScreen(props: Props) {
+  return (
+    <AuthI18nProvider>
+      <AuthScreenInner {...props} />
+    </AuthI18nProvider>
+  );
+}
+
+function AuthScreenInner(props: Props) {
   const navigate = useNavigate();
   const { mode } = props;
+  const { t } = useAuthI18n();
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -67,20 +74,26 @@ export function AuthScreen(props: Props) {
     await props.onSubmit({ email, senha });
   }
 
-  function go(to: "/empresario/login" | "/empresario/cadastro") {
+  // Preserved for compatibility with earlier flows that navigate via tabs.
+  function _go(to: "/empresario/login" | "/empresario/cadastro") {
     if (
       (to === "/empresario/login" && mode === "login") ||
       (to === "/empresario/cadastro" && mode === "signup")
     ) return;
     navigate({ to });
   }
+  void _go;
+
+  const title = mode === "signup" ? t("signup.title") : t("login.title");
+  const buttonText = mode === "signup" ? t("signup.button") : t("login.button");
+  const agreementLead = mode === "signup" ? t("agreement.signup") : t("agreement.login");
 
   return (
     <div style={pageStyle}>
-      <EmpresarioHeader />
+      <EmpresarioHeader right={<LanguageSelector />} />
       <main className="bisme-auth-main" style={mainStyle}>
         <div className="bisme-auth-card" style={cardStyle}>
-          <h1 style={titleStyle}>{props.title}</h1>
+          <h1 style={titleStyle}>{title}</h1>
 
           <form onSubmit={handleSubmit} noValidate style={{ width: "100%" }}>
             <div style={{ marginBottom: 10 }}>
@@ -90,12 +103,12 @@ export function AuthScreen(props: Props) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onFocus={() => { setEmailFocused(true); }}
-                onBlur={() => { setEmailFocused(false); setTouched((t) => ({ ...t, email: true })); }}
-                placeholder="Endereço de e-mail"
+                onBlur={() => { setEmailFocused(false); setTouched((tt) => ({ ...tt, email: true })); }}
+                placeholder={t("form.email")}
                 style={inputStyle(!!emailError)}
                 aria-invalid={!!emailError}
               />
-              {emailError && <div style={errorMsg}>Informe um endereço de e-mail válido</div>}
+              {emailError && <div style={errorMsg}>{t("form.emailInvalid")}</div>}
             </div>
 
             {props.showPassword && (
@@ -105,8 +118,8 @@ export function AuthScreen(props: Props) {
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, senha: true }))}
-                  placeholder="Senha"
+                  onBlur={() => setTouched((tt) => ({ ...tt, senha: true }))}
+                  placeholder={t("form.password")}
                   style={{ ...inputStyle(!!senhaError), paddingRight: 80 }}
                   aria-invalid={!!senhaError}
                 />
@@ -114,17 +127,17 @@ export function AuthScreen(props: Props) {
                   type="button"
                   onClick={() => setShowPass((s) => !s)}
                   style={eyeBtn}
-                  aria-label={showPass ? "Ocultar senha" : "Exibir senha"}
+                  aria-label={showPass ? t("form.hide") : t("form.show")}
                 >
-                  {showPass ? "OCULTAR" : "EXIBIR"}
+                  {showPass ? t("form.hide") : t("form.show")}
                 </button>
                 {props.showPasswordRequirements && (
                   <div style={reqWrap}>
-                    <div style={reqTitle}>A senha deve conter:</div>
+                    <div style={reqTitle}>{t("req.title")}</div>
                     <ul style={reqList}>
-                      <ReqItem ok={reqLetter} label="ao menos uma letra" />
-                      <ReqItem ok={reqDigit} label="ao menos um dígito" />
-                      <ReqItem ok={reqLength} label="8 caracteres ou mais" />
+                      <ReqItem ok={reqLetter} label={t("req.letter")} />
+                      <ReqItem ok={reqDigit} label={t("req.digit")} />
+                      <ReqItem ok={reqLength} label={t("req.length")} />
                     </ul>
                   </div>
                 )}
@@ -139,7 +152,7 @@ export function AuthScreen(props: Props) {
                         fontFamily: FONT,
                       }}
                     >
-                      Esqueci minha senha
+                      {t("login.forgot")}
                     </Link>
                   </div>
                 )}
@@ -154,29 +167,29 @@ export function AuthScreen(props: Props) {
 
             <button type="submit" disabled={props.submitting} style={primaryBtn(props.submitting)}>
               <Mail size={18} strokeWidth={2.2} style={{ display: "block" }} />
-              <span style={{ lineHeight: 1 }}>{props.submitting ? "Aguarde..." : props.buttonText}</span>
+              <span style={{ lineHeight: 1 }}>{props.submitting ? t("form.wait") : buttonText}</span>
             </button>
           </form>
 
           <div style={dividerWrap}>
             <div style={dividerLine} />
-            <span style={dividerText}>OU</span>
+            <span style={dividerText}>{t("form.or")}</span>
             <div style={dividerLine} />
           </div>
 
           <button type="button" onClick={props.onGoogle} style={googleBtn}>
             <GoogleIcon />
-            <span>Continuar com o Google</span>
+            <span>{t("form.google")}</span>
           </button>
 
           <p style={agreementStyle}>
-            {props.agreementText}{" "}
+            {agreementLead}{" "}
             <Link to="/termos-de-servico" style={linkStyle}>
-              Termos de Serviço
+              {t("agreement.terms")}
             </Link>{" "}
-            e{" "}
+            {t("agreement.and")}{" "}
             <Link to="/politica-privacidade" style={linkStyle}>
-              Política de Privacidade
+              {t("agreement.privacy")}
             </Link>
           </p>
 
@@ -185,16 +198,16 @@ export function AuthScreen(props: Props) {
           <p style={altTextStyle}>
             {mode === "login" ? (
               <>
-                Não tem uma conta?{" "}
+                {t("login.altQuestion")}{" "}
                 <Link to="/empresario/cadastro" style={altLinkStyle}>
-                  Cadastre-se
+                  {t("login.altLink")}
                 </Link>
               </>
             ) : (
               <>
-                Já tem uma conta?{" "}
+                {t("signup.altQuestion")}{" "}
                 <Link to="/empresario/login" style={altLinkStyle}>
-                  Entrar
+                  {t("signup.altLink")}
                 </Link>
               </>
             )}
@@ -241,39 +254,6 @@ const cardStyle: CSSProperties = {
   alignItems: "center",
   boxSizing: "border-box",
 };
-
-// add className via wrapping in render — instead just set on mainStyle div via style; we use inline JSX class above
-(mainStyle as Record<string, unknown>);
-
-const tabsWrap: CSSProperties = {
-  display: "flex",
-  justifyContent: "center",
-  width: "100%",
-  marginBottom: 18,
-};
-
-const tabsContainer: CSSProperties = {
-  display: "inline-flex",
-  padding: 3,
-  background: COLORS.tabBg,
-  borderRadius: 999,
-};
-
-function tabStyle(active: boolean): CSSProperties {
-  return {
-    border: "none",
-    cursor: "pointer",
-    padding: "8px 22px",
-    borderRadius: 999,
-    fontSize: 13.5,
-    fontWeight: active ? 700 : 500,
-    color: active ? COLORS.text : COLORS.textMuted,
-    background: active ? "#FFFFFF" : "transparent",
-    boxShadow: active ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
-    fontFamily: FONT,
-    transition: "all 150ms",
-  };
-}
 
 const titleStyle: CSSProperties = {
   margin: "4px 0 18px",
