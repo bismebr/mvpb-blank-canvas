@@ -124,14 +124,41 @@ export function BookingScreen({ open, initialServicoId, initialFuncionarioId, in
   useEffect(() => {
     if (!open) return;
     setItems([{ servicoId: initialServicoId, funcionarioId: initialFuncionarioId ?? undefined }]);
-    setDia(null);
     setHorario(null);
     setObservacao("");
     setWhatsapp(maskBrPhone(initialWhatsapp));
     setWhatsappTouched(false);
-    const d = new Date(); d.setDate(1); d.setHours(0,0,0,0); setMonthAnchor(d);
     setAddOpen(false);
     setAlterarIdx(null);
+    // Reseta as marcas de escolha manual/aplicação de initialDay ANTES de
+    // calcular a data inicial, para não depender do useEffect separado
+    // rodar em outra passada.
+    hasUserSelectedDayRef.current = false;
+    lastAppliedInitialDayRef.current = null;
+
+    // Escolhe a data inicial de forma síncrona (sem depender do
+    // auto-select em outro useEffect). Evita ficar preso em "Carregando
+    // horários…" quando o dia da sessão anterior fica em cache.
+    const srv = servicos.find((s) => s.id === initialServicoId) ?? null;
+    const ctxLocal = { agendamentos, bloqueios, pausas, funcionarios, horarios, servicos };
+    const funcIdLocal = initialFuncionarioId ?? null;
+    const nowLocal = new Date();
+    let diaInicial: string | null = null;
+    if (initialDay) {
+      diaInicial = initialDay;
+      lastAppliedInitialDayRef.current = initialDay;
+    } else if (srv) {
+      const hojeIso = fmtDate(new Date());
+      if (dayHasAvailability({ service: srv, dateIso: hojeIso, professionalId: funcIdLocal, ctx: ctxLocal, now: nowLocal })) {
+        diaInicial = hojeIso;
+      } else {
+        diaInicial = nextAvailableDay({ service: srv, fromIso: hojeIso, professionalId: funcIdLocal, ctx: ctxLocal, now: nowLocal });
+      }
+    }
+    setDia(diaInicial);
+    const anchor = diaInicial ? parseDate(diaInicial) : new Date();
+    anchor.setDate(1); anchor.setHours(0, 0, 0, 0);
+    setMonthAnchor(anchor);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialServicoId]);
 
