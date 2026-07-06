@@ -267,6 +267,26 @@ export function BookingScreen({ open, initialServicoId, initialFuncionarioId, in
 
   const horariosHoje = useMemo(() => slotsHoje.filter((s) => s.available).map((s) => s.time), [slotsHoje]);
 
+  /** Agrupa horários disponíveis por período do dia (apenas visual). */
+  const groupedSlots = useMemo(() => {
+    const timeToMin = (t: string) => {
+      const [h, m] = t.split(":").map(Number);
+      return (h || 0) * 60 + (m || 0);
+    };
+    const dia: string[] = [];
+    const tarde: string[] = [];
+    const noite: string[] = [];
+    const madrugada: string[] = [];
+    for (const t of horariosHoje) {
+      const m = timeToMin(t);
+      if (m >= 360 && m <= 720) dia.push(t);
+      else if (m >= 725 && m <= 1080) tarde.push(t);
+      else if (m === 0 || (m >= 1085 && m <= 1440)) noite.push(t);
+      else if (m >= 5 && m <= 355) madrugada.push(t);
+    }
+    return { dia, tarde, noite, madrugada };
+  }, [horariosHoje]);
+
   // Quando data muda e o horário não é mais válido, limpa
   useEffect(() => {
     if (horario && (!dia || !horariosHoje.includes(horario))) setHorario(null);
