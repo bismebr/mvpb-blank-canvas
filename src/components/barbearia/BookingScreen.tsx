@@ -638,35 +638,43 @@ export function BookingScreen({ open, initialServicoId, initialFuncionarioId, in
                 >Próximo dia</button>
               </div>
             )}
-            <div
-              ref={slotsRowRef}
-              style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, padding: "0 16px 4px" }}
-            >
-              {slotsHoje.map((s) => {
-                const sel = horario === s.time;
-                const dis = !s.available;
+            <div ref={slotsRowRef}>
+              {([
+                { key: "dia", label: "Dia" },
+                { key: "tarde", label: "Tarde" },
+                { key: "noite", label: "Noite" },
+                { key: "madrugada", label: "Madrugada" },
+              ] as const).map(({ key, label }) => {
+                const list = groupedSlots[key];
+                if (list.length === 0) return null;
                 return (
-                  <button
-                    key={s.time}
-                    data-slot={s.time}
-                    onClick={() => { if (!dis) setHorario(s.time); }}
-                    disabled={dis}
-                    aria-disabled={dis}
-                    title={dis ? (s.reason === "passado" ? "Horário já passou" : s.reason === "fora-horario" ? "Fora do horário de funcionamento" : "Horário indisponível") : undefined}
-                    style={{
-                      padding: "10px 4px",
-                      borderRadius: 12,
-                      border: sel ? `2px solid ${PRIMARY}` : "1.5px solid transparent",
-                      background: sel ? `color-mix(in oklab, ${PRIMARY} 12%, white)` : (dis ? "#F7F7F6" : "#f2f1f6"),
-                      color: dis ? "#BDBDBD" : "#1A1A1A",
-                      fontWeight: 700,
-                      fontSize: 13,
-                      cursor: dis ? "not-allowed" : "pointer",
-                      opacity: dis ? 0.55 : 1,
-                      textDecoration: dis ? "line-through" : "none",
-                      pointerEvents: dis ? "none" : "auto",
-                    }}
-                  >{s.time}</button>
+                  <div key={key} style={{ marginBottom: 10 }}>
+                    <div style={{ padding: "0 16px 6px", fontSize: 12, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                      {label}
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, padding: "0 16px 4px" }}>
+                      {list.map((t) => {
+                        const sel = horario === t;
+                        return (
+                          <button
+                            key={t}
+                            data-slot={t}
+                            onClick={() => setHorario(t)}
+                            style={{
+                              padding: "10px 4px",
+                              borderRadius: 12,
+                              border: sel ? `2px solid ${PRIMARY}` : "1.5px solid transparent",
+                              background: sel ? `color-mix(in oklab, ${PRIMARY} 12%, white)` : "#f2f1f6",
+                              color: "#1A1A1A",
+                              fontWeight: 700,
+                              fontSize: 13,
+                              cursor: "pointer",
+                            }}
+                          >{t}</button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 );
               })}
             </div>
