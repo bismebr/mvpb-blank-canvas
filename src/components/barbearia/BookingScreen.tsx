@@ -387,7 +387,7 @@ export function BookingScreen({ open, initialServicoId, initialFuncionarioId, in
       setMonthAnchor(m);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, servicoAtual, funcionarioAtualId, availCtx, now, initialDay]);
+  }, [open, servicoAtual, funcionarioAtualId, availCtx, now, initialDay, dia]);
 
   // Profissionais disponíveis para um serviço, na data e horário escolhidos.
   function funcionariosDisponiveis(servicoId: string): FuncionarioAdmin[] {
