@@ -484,23 +484,26 @@ function FlagBR({ size = 22 }: { size?: number }) {
       <defs><clipPath id="fbr"><circle cx="12" cy="12" r="12" /></clipPath></defs>
       <g clipPath="url(#fbr)">
         <rect width="24" height="24" fill="#009c3b" />
-        <polygon points="12,3.5 20.5,12 12,20.5 3.5,12" fill="#ffdf00" />
-        <circle cx="12" cy="12" r="3.6" fill="#002776" />
+        <polygon points="12,4 20,12 12,20 4,12" fill="#ffdf00" />
+        <circle cx="12" cy="12" r="3.4" fill="#002776" />
+        <path d="M9.2 12.4a5 5 0 0 1 5.6-0.9" stroke="#ffffff" strokeWidth="0.55" fill="none" />
       </g>
+      <circle cx="12" cy="12" r="11.6" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8" />
     </svg>
   );
 }
-function FlagUS({ size = 22 }: { size?: number }) {
+function FlagGB({ size = 22 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <defs><clipPath id="fus"><circle cx="12" cy="12" r="12" /></clipPath></defs>
-      <g clipPath="url(#fus)">
-        <rect width="24" height="24" fill="#fff" />
-        {[0, 2, 4, 6, 8, 10, 12].map((y) => (
-          <rect key={y} y={y * (24 / 13)} width="24" height={24 / 13} fill="#b22234" />
-        ))}
-        <rect width="11" height={24 * (7 / 13)} fill="#3c3b6e" />
+    <svg width={size} height={size} viewBox="0 0 60 60" aria-hidden="true">
+      <defs><clipPath id="fgb"><circle cx="30" cy="30" r="30" /></clipPath></defs>
+      <g clipPath="url(#fgb)">
+        <rect width="60" height="60" fill="#012169" />
+        <path d="M0,0 L60,60 M60,0 L0,60" stroke="#fff" strokeWidth="12" />
+        <path d="M0,0 L60,60 M60,0 L0,60" stroke="#C8102E" strokeWidth="5" />
+        <path d="M30,0 V60 M0,30 H60" stroke="#fff" strokeWidth="18" />
+        <path d="M30,0 V60 M0,30 H60" stroke="#C8102E" strokeWidth="10" />
       </g>
+      <circle cx="30" cy="30" r="29" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="1.5" />
     </svg>
   );
 }
@@ -512,6 +515,7 @@ function FlagES({ size = 22 }: { size?: number }) {
         <rect width="24" height="24" fill="#c60b1e" />
         <rect y="6" width="24" height="12" fill="#ffc400" />
       </g>
+      <circle cx="12" cy="12" r="11.6" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8" />
     </svg>
   );
 }
@@ -524,6 +528,7 @@ function FlagFR({ size = 22 }: { size?: number }) {
         <rect x="8" width="8" height="24" fill="#fff" />
         <rect x="16" width="8" height="24" fill="#EF4135" />
       </g>
+      <circle cx="12" cy="12" r="11.6" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8" />
     </svg>
   );
 }
@@ -536,13 +541,14 @@ function FlagIT({ size = 22 }: { size?: number }) {
         <rect x="8" width="8" height="24" fill="#F4F5F0" />
         <rect x="16" width="8" height="24" fill="#CD212A" />
       </g>
+      <circle cx="12" cy="12" r="11.6" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8" />
     </svg>
   );
 }
 function FlagFor({ code, size = 22 }: { code: Lang; size?: number }) {
   switch (code) {
     case "pt-BR": return <FlagBR size={size} />;
-    case "en": return <FlagUS size={size} />;
+    case "en": return <FlagGB size={size} />;
     case "es": return <FlagES size={size} />;
     case "fr": return <FlagFR size={size} />;
     case "it": return <FlagIT size={size} />;
