@@ -1154,7 +1154,7 @@ function DiaTimeline({ ags, servicos, funcionarios, horario, profSel, onOpen, no
             return (
               <div key={i} style={{
                 position: "absolute", left: 0, right: 0, top: i * STEP_PX,
-                height: 0, borderTop: `1px solid ${COLORS.divider ?? "rgba(127,127,127,0.15)"}`,
+                height: 0, borderTop: `1px solid rgba(127,127,127,0.15)`,
                 pointerEvents: "none",
               }}>
                 {showLabel && (
