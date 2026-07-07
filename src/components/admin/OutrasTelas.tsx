@@ -1142,7 +1142,7 @@ function FormBloqueio({ funcionarios, onClose, onSave }: { funcionarios: Funcion
   const [funcionarioId, setFuncionarioId] = useState<string>("");
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <div><Label>Dia</Label><input style={inputStyle} type={data ? "date" : "text"} placeholder="Selecione o dia" onFocus={(e) => { e.currentTarget.type = "date"; try { (e.currentTarget as any).showPicker?.(); } catch {} }} onBlur={(e) => { if (!e.currentTarget.value) e.currentTarget.type = "text"; }} value={data} onChange={(e) => setData(e.target.value)} /></div>
+      <div><Label>Dia</Label><input style={inputStyle} type="date" value={data} onChange={(e) => setData(e.target.value)} onClick={(e) => { try { (e.currentTarget as HTMLInputElement & { showPicker?: () => void }).showPicker?.(); } catch { /* ignore */ } }} /></div>
       <div style={{ opacity: diaInteiro ? 0.4 : 1, pointerEvents: diaInteiro ? "none" : "auto", display: "flex", gap: 10 }}>
         <div style={{ flex: 1 }}><Label>Início</Label><input style={inputStyle} type="time" value={ini} onChange={(e) => setIni(e.target.value)} /></div>
         <div style={{ flex: 1 }}><Label>Fim</Label><input style={inputStyle} type="time" value={fim} onChange={(e) => setFim(e.target.value)} /></div>
@@ -1151,26 +1151,28 @@ function FormBloqueio({ funcionarios, onClose, onSave }: { funcionarios: Funcion
         <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Fechar dia inteiro</span>
         <Toggle on={diaInteiro} onChange={setDiaInteiro} />
       </div>
-      <div>
-        <Label>Aplicar bloqueio para</Label>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <label className={escopo === "negocio" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
-            <input type="radio" name="escopo-bloq" checked={escopo === "negocio"} onChange={() => { setEscopo("negocio"); setFuncionarioId(""); }} style={{ display: "none" }} />
-            <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              {escopo === "negocio" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Para o negócio todo</span>
-          </label>
-          <label className={escopo === "funcionario" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
-            <input type="radio" name="escopo-bloq" checked={escopo === "funcionario"} onChange={() => setEscopo("funcionario")} style={{ display: "none" }} />
-            <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              {escopo === "funcionario" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Apenas para um funcionário específico</span>
-          </label>
+      {funcionarios.length >= 2 && (
+        <div>
+          <Label>Aplicar bloqueio para</Label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <label className={escopo === "negocio" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
+              <input type="radio" name="escopo-bloq" checked={escopo === "negocio"} onChange={() => { setEscopo("negocio"); setFuncionarioId(""); }} style={{ display: "none" }} />
+              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {escopo === "negocio" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Para o negócio todo</span>
+            </label>
+            <label className={escopo === "funcionario" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
+              <input type="radio" name="escopo-bloq" checked={escopo === "funcionario"} onChange={() => setEscopo("funcionario")} style={{ display: "none" }} />
+              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {escopo === "funcionario" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Apenas para um funcionário específico</span>
+            </label>
+          </div>
         </div>
-      </div>
-      {escopo === "funcionario" && (
+      )}
+      {funcionarios.length >= 2 && escopo === "funcionario" && (
         <div>
           <Label>Funcionário</Label>
           <select style={inputStyle} value={funcionarioId} onChange={(e) => setFuncionarioId(e.target.value)}>
@@ -1179,6 +1181,7 @@ function FormBloqueio({ funcionarios, onClose, onSave }: { funcionarios: Funcion
           </select>
         </div>
       )}
+
       <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
         <button onClick={onClose} className="bisme-light-border" style={{ ...secondaryBtn, flex: 1 }}>Cancelar</button>
         <button
