@@ -13,10 +13,10 @@ import { isPhoneValid } from "@/components/barbearia/phoneMask";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Barbearia Sr. Eli — Timon, MA" },
-      { name: "description", content: "Barbearia Sr. Eli em Timon, MA. Cortes, barba e combos com Eliaquim Santos. Agende seu horário online." },
-      { property: "og:title", content: "Barbearia Sr. Eli — Timon, MA" },
-      { property: "og:description", content: "Cortes, barba e combos com qualidade. Agende seu horário online." },
+      { title: "Lovable App" },
+      { name: "description", content: "A simple web page displaying the text \"mvpb\"." },
+      { property: "og:title", content: "Lovable App" },
+      { property: "og:description", content: "A simple web page displaying the text \"mvpb\"." },
     ],
   }),
   component: IndexRouteComponent,
