@@ -1001,18 +1001,10 @@ function ProfStrip({ profs, value, onChange }: {
 }
 
 /* ------------------------------------------------------------------ */
-/* Timeline (visão Dia) — grade estilo calendário iOS                 */
+/* Timeline (visão Dia) — grade dinâmica baseada na menor duração     */
 /* ------------------------------------------------------------------ */
 
-const TIME_GUTTER = 64; // px
-
-// Paleta de status para a timeline (barra/bg/nome do cliente)
-const TL_STATUS: Record<DisplayStatus, { bar: string; bg: string; name: string }> = {
-  agendado:      { bar: "#34aadc", bg: "#00b3ff33", name: "#34aadc" },
-  concluido:     { bar: "#10B981", bg: "#10B98133", name: "#047857" },
-  cancelado:     { bar: "#EF4444", bg: "#EF444433", name: "#B91C1C" },
-  naoCompareceu: { bar: "#F59E0B", bg: "#F59E0B33", name: "#B45309" },
-};
+const TIME_GUTTER = 56; // px
 
 function DiaTimeline({ ags, servicos, funcionarios, horario, profSel, onOpen, now, dateLabel }: {
   ags: AgendamentoAdmin[];
@@ -1024,251 +1016,170 @@ function DiaTimeline({ ags, servicos, funcionarios, horario, profSel, onOpen, no
   now: Date;
   dateLabel: string;
 }) {
+  // profSel define se mostramos "com {profissional}" ao lado do nome do cliente.
   const mostrarProfNome = profSel === "todos";
+  void horario;
 
-  // ---- Determina início/fim da grade ----
-  // Se um profissional específico está selecionado, usa entrada/saida dele.
-  // Caso contrário, usa o horário de funcionamento do dia.
-  const profSelObj = profSel !== "todos" ? funcionarios.find((f) => f.id === profSel) ?? null : null;
-  let startMin = 8 * 60;
-  let endMin = 18 * 60;
-  if (profSelObj && profSelObj.entrada && profSelObj.saida) {
-    startMin = toMin(profSelObj.entrada);
-    endMin = toMin(profSelObj.saida);
-  } else if (horario && horario.aberto) {
-    startMin = toMin(horario.abre);
-    endMin = toMin(horario.fecha);
-  }
-
-  // Se algum agendamento ficou fora da janela (edge case), estende a grade.
-  for (const a of ags) {
-    const s = toMin(a.horario);
-    const svc = servicos.find((x) => x.id === a.servicoId);
-    const dur = svc?.duracao_minutos ?? 30;
-    if (s < startMin) startMin = Math.floor(s / 60) * 60;
-    if (s + dur > endMin) endMin = Math.ceil((s + dur) / 60) * 60;
-  }
-  if (endMin <= startMin) endMin = startMin + 60;
-
-  // ---- Passo da grade: menor duração relevante ----
-  const durs = servicos.map((s) => s.duracao_minutos).filter((n) => n && n > 0);
-  let step = durs.length ? Math.min(...durs) : 30;
-  if (step < 5) step = 5;
-  if (step > 60) step = 60;
-
-  // Altura visual por passo
-  const STEP_PX = step <= 10 ? 28 : step <= 15 ? 36 : step <= 30 ? 56 : 72;
-  const totalSteps = Math.ceil((endMin - startMin) / step);
-  const totalHeight = totalSteps * STEP_PX;
-
-  // ---- Empilha cards sobrepostos em colunas (algoritmo guloso) ----
-  const agsOrdenados = useMemo(
-    () => [...ags].sort((a, b) => a.horario.localeCompare(b.horario)),
+  // Agendamentos que ocupam agenda (cancelados não bloqueiam)
+  const agsAtivos = useMemo(
+    () => [...ags].filter((a) => a.status !== "cancelado").sort((a, b) => a.horario.localeCompare(b.horario)),
     [ags],
   );
+  const cancelados = useMemo(() => ags.filter((a) => a.status === "cancelado"), [ags]);
 
-  type Placed = {
-    ag: AgendamentoAdmin;
-    startM: number;
-    endM: number;
-    col: number;
-    colsTotal: number;
-  };
-
-  const placed: Placed[] = useMemo(() => {
-    // Agrupa em clusters de sobreposição para determinar colsTotal por cluster
-    const items = agsOrdenados.map((a) => {
-      const svc = servicos.find((x) => x.id === a.servicoId);
-      const dur = svc?.duracao_minutos ?? 30;
-      const s = toMin(a.horario);
-      return { ag: a, startM: s, endM: s + dur };
-    });
-    const out: Placed[] = [];
-    let cluster: typeof items = [];
-    let clusterEnd = -1;
-    const flush = () => {
-      if (cluster.length === 0) return;
-      // Atribui coluna: para cada item, encontra a primeira coluna cujo fim ≤ startM
-      const colEnds: number[] = [];
-      const assigns: number[] = [];
-      for (const it of cluster) {
-        let col = colEnds.findIndex((e) => e <= it.startM);
-        if (col === -1) { col = colEnds.length; colEnds.push(it.endM); }
-        else { colEnds[col] = it.endM; }
-        assigns.push(col);
-      }
-      const colsTotal = colEnds.length;
-      cluster.forEach((it, i) => out.push({ ...it, col: assigns[i]!, colsTotal }));
-      cluster = [];
-      clusterEnd = -1;
-    };
-    for (const it of items) {
-      if (cluster.length === 0 || it.startM < clusterEnd) {
-        cluster.push(it);
-        clusterEnd = Math.max(clusterEnd, it.endM);
-      } else {
-        flush();
-        cluster.push(it);
-        clusterEnd = it.endM;
-      }
-    }
-    flush();
-    return out;
-  }, [agsOrdenados, servicos]);
-
-  // ---- Linha do "agora" ----
-  const hojeStr = fmtDate(now);
-  const dataAtualStr = fmtDate(agsOrdenados[0] ? parseDate(agsOrdenados[0].data) : now);
-  const isHoje = dataLabelIncludesToday(dateLabel) || hojeStr === dataAtualStr;
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const showNowLine = isHoje && nowMinutes >= startMin && nowMinutes <= endMin;
-  const nowTop = ((nowMinutes - startMin) / step) * STEP_PX;
-
-  // ---- Labels da lateral (apenas passos "cheios": múltiplos de max(step, 15|30|60))
-  // Para não poluir, mostramos label a cada intervalo que faz sentido.
-  const labelEvery = step >= 30 ? 1 : step >= 15 ? 2 : step >= 10 ? 3 : 4;
+  if (ags.length === 0) {
+    return (
+      <div style={{ fontFamily: FONT }}>
+        <div className="agenda-section" style={{ background: COLORS.bgSurface, padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ padding: "10px 4px 4px", fontSize: 12.5, fontWeight: 600, color: COLORS.textMuted, fontFamily: FONT }}>
+            {dateLabel}
+          </div>
+          <div style={{ padding: "32px 16px", textAlign: "center", color: COLORS.textMuted, fontSize: 13 }}>
+            Nenhum agendamento neste dia
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ fontFamily: FONT }}>
-      <div className="agenda-section" style={{ background: COLORS.bgSurface, padding: "4px 12px 32px", display: "flex", flexDirection: "column", gap: 10 }}>
+      <div className="agenda-section" style={{ background: COLORS.bgSurface, padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 10 }}>
         <div style={{ padding: "10px 4px 4px", fontSize: 12.5, fontWeight: 600, color: COLORS.textMuted, fontFamily: FONT }}>
           {dateLabel}
         </div>
 
-        {ags.length === 0 ? (
-          <div style={{ padding: "32px 16px", textAlign: "center", color: COLORS.textMuted, fontSize: 13 }}>
-            Nenhum agendamento neste dia
-          </div>
-        ) : null}
-
-        {/* Grade sempre visível, mesmo sem agendamentos: dá contexto de horários */}
-        <div style={{
-          position: "relative",
-          height: totalHeight,
-          marginTop: 4,
-        }}>
-          {/* Linhas horizontais + labels */}
-          {Array.from({ length: totalSteps + 1 }).map((_, i) => {
-            const minutes = startMin + i * step;
-            const showLabel = i % labelEvery === 0 && i < totalSteps + 1;
-            return (
-              <div key={i} style={{
-                position: "absolute", left: 0, right: 0, top: i * STEP_PX,
-                height: 0, borderTop: `1px solid rgba(127,127,127,0.15)`,
-                pointerEvents: "none",
-              }}>
-                {showLabel && (
-                  <div style={{
-                    position: "absolute", left: 0, top: -8,
-                    width: TIME_GUTTER - 8,
-                    fontSize: 11, fontWeight: 500, color: COLORS.textMuted,
-                    textAlign: "right", paddingRight: 8,
-                    fontVariantNumeric: "tabular-nums",
-                    background: COLORS.bgSurface,
-                  }}>
-                    {fmtHora(minutes)}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {/* Linha "agora" */}
-          {showNowLine && (
-            <div style={{
-              position: "absolute", left: TIME_GUTTER, right: 4, top: nowTop,
-              height: 0, borderTop: "2px solid #EF4444", zIndex: 3,
-              pointerEvents: "none",
-            }}>
+        {agsAtivos.map((a) => {
+          const svc = servicos.find((x) => x.id === a.servicoId);
+          const status = displayStatus(a, now);
+          const meta = STATUS_META[status];
+          const func = a.funcionarioId ? funcionarios.find((f) => f.id === a.funcionarioId) ?? null : null;
+          const cliente = shortName(a.nome);
+          const profNome = func ? shortName(func.nome) : null;
+          const dur = svc ? fmtDuracao(svc.duracao_minutos) : "";
+          return (
+            <button
+              key={a.id}
+              className="agenda-card"
+              onClick={() => onOpen(a.id)}
+              style={{
+                background: "#f9f9f9",
+                border: "none",
+                borderRadius: 9,
+                padding: 0,
+                cursor: "pointer",
+                fontFamily: FONT,
+                width: "100%",
+                minWidth: 0,
+                color: COLORS.textPrimary,
+                display: "grid",
+                gridTemplateColumns: "56px 3px minmax(0,1fr)",
+                alignItems: "stretch",
+                overflow: "hidden",
+                minHeight: 64,
+                textAlign: "left",
+              }}
+            >
               <div style={{
-                position: "absolute", left: -5, top: -5,
-                width: 10, height: 10, borderRadius: 999, background: "#EF4444",
-              }} />
-            </div>
-          )}
-
-          {/* Cards de agendamento */}
-          {placed.map((p) => {
-            const a = p.ag;
-            const svc = servicos.find((x) => x.id === a.servicoId);
-            const status = displayStatus(a, now);
-            const tl = TL_STATUS[status];
-            const func = a.funcionarioId ? funcionarios.find((f) => f.id === a.funcionarioId) ?? null : null;
-            const cliente = shortName(a.nome);
-            const profNome = func ? shortName(func.nome) : null;
-            const durMin = p.endM - p.startM;
-            const horaFim = addMinutesToTime(a.horario, durMin);
-            const isCancelado = status === "cancelado";
-
-            const top = ((p.startM - startMin) / step) * STEP_PX;
-            const height = Math.max(STEP_PX - 2, (durMin / step) * STEP_PX - 2);
-            const trackLeft = TIME_GUTTER;
-            const trackRight = 4;
-            const colWidthPct = 100 / p.colsTotal;
-            const leftPct = p.col * colWidthPct;
-
-            return (
-              <button
-                key={a.id}
-                className="agenda-card"
-                onClick={() => onOpen(a.id)}
-                style={{
-                  position: "absolute",
-                  top,
-                  height,
-                  left: `calc(${trackLeft}px + ${leftPct}% - ${(trackLeft * leftPct) / 100}px)`,
-                  width: `calc(${colWidthPct}% - ${(trackLeft + trackRight) / p.colsTotal}px - 4px)`,
-                  marginLeft: p.col === 0 ? 0 : 2,
-                  background: tl.bg,
-                  border: "none",
-                  borderRadius: 8,
-                  padding: 0,
-                  cursor: "pointer",
-                  fontFamily: FONT,
-                  color: COLORS.textPrimary,
-                  display: "grid",
-                  gridTemplateColumns: "3px minmax(0,1fr)",
-                  alignItems: "stretch",
-                  overflow: "hidden",
-                  textAlign: "left",
-                  opacity: isCancelado ? 0.85 : 1,
-                  zIndex: 2,
-                }}
-                title={`${cliente} — ${a.horario} às ${horaFim}`}
-              >
-                <div style={{ background: tl.bar }} />
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 13, fontWeight: 700, color: COLORS.textPrimary,
+                fontVariantNumeric: "tabular-nums",
+                padding: "12px 0",
+              }}>
+                {a.horario}
+              </div>
+              <div style={{ background: meta.dot, margin: "10px 0" }} />
+              <div style={{
+                display: "flex", flexDirection: "column", gap: 4,
+                padding: "12px 14px", minWidth: 0,
+              }}>
                 <div style={{
-                  display: "flex", flexDirection: "column",
-                  padding: "6px 8px", minWidth: 0, gap: 2,
+                  fontSize: 14, fontWeight: 700, color: COLORS.textPrimary,
+                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0,
                 }}>
+                  {cliente}{mostrarProfNome && profNome ? <span style={{ fontWeight: 400, color: COLORS.textMuted }}>{` com ${profNome}`}</span> : ""}
+                </div>
+                <div style={{
+                  fontSize: 12.5, fontWeight: 500, color: COLORS.textMuted,
+                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  minWidth: 0,
+                }}>
+                  {svc?.nome ?? "—"}{dur ? ` - ${dur}` : ""}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+
+        {cancelados.length > 0 && (
+          <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{
+              fontSize: 11, fontWeight: 700, color: COLORS.textMuted,
+              textTransform: "uppercase", letterSpacing: 0.4, padding: "0 4px",
+            }}>
+              Cancelados
+            </div>
+            {cancelados.map((a) => {
+              const svc = servicos.find((x) => x.id === a.servicoId);
+              const func = a.funcionarioId ? funcionarios.find((f) => f.id === a.funcionarioId) ?? null : null;
+              const meta = STATUS_META.cancelado;
+              const cliente = shortName(a.nome);
+              const profNome = func ? shortName(func.nome) : null;
+              const dur = svc ? fmtDuracao(svc.duracao_minutos) : "";
+              return (
+                <button
+                  key={a.id}
+                  className="agenda-card"
+                  onClick={() => onOpen(a.id)}
+                  style={{
+                    background: "#f9f9f9",
+                    border: "none",
+                    borderRadius: 9,
+                    padding: 0,
+                    cursor: "pointer",
+                    fontFamily: FONT,
+                    width: "100%",
+                    minWidth: 0,
+                    color: COLORS.textPrimary,
+                    display: "grid",
+                    gridTemplateColumns: "56px 3px minmax(0,1fr)",
+                    alignItems: "stretch",
+                    overflow: "hidden",
+                    opacity: 0.85,
+                    textAlign: "left",
+                  }}
+                >
                   <div style={{
-                    fontSize: 12.5, fontWeight: 700, color: tl.name,
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                    textDecoration: isCancelado ? "line-through" : "none",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 13, fontWeight: 700, color: COLORS.textMuted,
+                    fontVariantNumeric: "tabular-nums", padding: "10px 0",
                   }}>
-                    {cliente}{mostrarProfNome && profNome ? <span style={{ fontWeight: 500, color: COLORS.textMuted }}>{` · ${profNome}`}</span> : ""}
+                    {a.horario}
                   </div>
-                  {height >= 32 && (
+                  <div style={{ background: meta.dot, margin: "8px 0" }} />
+                  <div style={{ padding: "10px 14px", minWidth: 0 }}>
                     <div style={{
-                      fontSize: 11.5, fontWeight: 500, color: COLORS.textMuted,
+                      fontSize: 13.5, fontWeight: 700,
+                      textDecoration: "line-through", color: COLORS.textPrimary,
                       overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                     }}>
-                      {(svc?.nome ?? "—")} - {a.horario} às {horaFim}
+                      {cliente}{mostrarProfNome && profNome ? <span style={{ fontWeight: 400, color: COLORS.textMuted }}>{` com ${profNome}`}</span> : ""}
                     </div>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                    <div style={{
+                      fontSize: 12, fontWeight: 500, color: COLORS.textMuted,
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}>
+                      {svc?.nome ?? "—"}{dur ? ` - ${dur}` : ""}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
-}
-
-function dataLabelIncludesToday(_label: string) {
-  // Placeholder: a comparação real usa fmtDate no chamador.
-  return false;
 }
 
 
