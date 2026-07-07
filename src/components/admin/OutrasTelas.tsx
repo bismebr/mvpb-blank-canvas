@@ -577,48 +577,53 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
         </div>
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginTop: 4 }}>Funcionários que realizam</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {([
-          { v: "todos", l: "Todos os funcionários realizam" },
-          { v: "exceto", l: "Todos, exceto os selecionados" },
-          { v: "apenas", l: "Apenas funcionários específicos" },
-        ] as { v: ServicoFuncMode; l: string }[]).map((o) => {
-          const on = funcMode === o.v;
-          return (
-            <label key={o.v} className={on ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${on ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
+      {funcionarios.length >= 2 && (
+        <>
+          <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginTop: 4 }}>Funcionários que realizam</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {([
+              { v: "todos", l: "Todos os funcionários realizam" },
+              { v: "exceto", l: "Todos, exceto os selecionados" },
+              { v: "apenas", l: "Apenas funcionários específicos" },
+            ] as { v: ServicoFuncMode; l: string }[]).map((o) => {
+              const on = funcMode === o.v;
+              return (
+                <label key={o.v} className={on ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${on ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
 
-              <input type="radio" name="funcMode" checked={on} onChange={() => { setFuncMode(o.v); setErroFunc(false); }} style={{ display: "none" }} />
-              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                {on && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
-              </span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.textPrimary }}>{o.l}</span>
-            </label>
-          );
-        })}
-        {funcMode !== "todos" && (
-          <div>
-            <div style={{ fontSize: 12, color: COLORS.textMuted, margin: "6px 0" }}>
-              {funcMode === "exceto" ? "Selecione quem NÃO realiza:" : "Selecione quem realiza:"}
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {funcionarios.length === 0 && <span style={{ fontSize: 12.5, color: COLORS.textMuted }}>Cadastre funcionários primeiro.</span>}
-              {funcionarios.map((f) => {
-                const on = funcIds.includes(f.id);
-                return (
-                  <button key={f.id} type="button" onClick={() => toggleFunc(f.id)} className={on ? undefined : "bisme-light-border"} style={{
-                    padding: "8px 12px", borderRadius: 16, fontSize: 12.5, fontWeight: 600, cursor: "pointer", fontFamily: FONT,
-                    background: on ? COLORS.accentLight : COLORS.bgElevated,
-                    color: on ? "#fff" : COLORS.textPrimary,
-                    border: `1px solid ${on ? COLORS.accentLight : COLORS.border}`,
-                  }}>{f.nome}</button>
-                );
-              })}
-            </div>
-            {erroFunc && <div style={{ fontSize: 12, color: COLORS.danger, marginTop: 6 }}>Selecione ao menos um funcionário.</div>}
+                  <input type="radio" name="funcMode" checked={on} onChange={() => { setFuncMode(o.v); setErroFunc(false); }} style={{ display: "none" }} />
+                  <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {on && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.textPrimary }}>{o.l}</span>
+                </label>
+              );
+            })}
+            {funcMode !== "todos" && (
+              <div>
+                <div style={{ fontSize: 12, color: COLORS.textMuted, margin: "6px 0" }}>
+                  {funcMode === "exceto" ? "Selecione quem NÃO realiza:" : "Selecione quem realiza:"}
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {funcionarios.length === 0 && <span style={{ fontSize: 12.5, color: COLORS.textMuted }}>Cadastre funcionários primeiro.</span>}
+                  {funcionarios.map((f) => {
+                    const on = funcIds.includes(f.id);
+                    return (
+                      <button key={f.id} type="button" onClick={() => toggleFunc(f.id)} className={on ? undefined : "bisme-light-border"} style={{
+                        padding: "8px 12px", borderRadius: 16, fontSize: 12.5, fontWeight: 600, cursor: "pointer", fontFamily: FONT,
+                        background: on ? COLORS.accentLight : COLORS.bgElevated,
+                        color: on ? "#fff" : COLORS.textPrimary,
+                        border: `1px solid ${on ? COLORS.accentLight : COLORS.border}`,
+                      }}>{f.nome}</button>
+                    );
+                  })}
+                </div>
+                {erroFunc && <div style={{ fontSize: 12, color: COLORS.danger, marginTop: 6 }}>Selecione ao menos um funcionário.</div>}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
+
 
       {onDelete && (
         <button onClick={onDelete} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: 12, fontSize: 14, fontWeight: 600, cursor: "pointer", minHeight: 44, fontFamily: FONT }}>Excluir</button>
