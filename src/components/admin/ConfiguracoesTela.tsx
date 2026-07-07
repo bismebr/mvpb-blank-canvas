@@ -1057,13 +1057,13 @@ function CongratsModal({ onClose, onGoToLink }: { onClose: () => void; onGoToLin
             height: 50,
             borderRadius: 12,
             border: "none",
-            background: COLORS.accent,
+            background: "#5690f5",
             color: "#fff",
             fontWeight: 800,
             fontSize: 15,
             cursor: "pointer",
             fontFamily: FONT,
-            boxShadow: `0 8px 20px -8px ${COLORS.accent}90`,
+            boxShadow: "0 8px 20px -8px rgba(86,144,245,0.7)",
           }}
         >
           Ir para Meu Link
