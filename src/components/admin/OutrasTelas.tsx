@@ -399,9 +399,9 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
   const precoDisplay =
     precoDigits === ""
       ? initialPreco > 0
-        ? formatBRL(initialPreco)
+        ? brl(initialPreco)
         : ""
-      : formatBRL((parseInt(precoDigits, 10) || 0));
+      : brl(parseInt(precoDigits, 10) || 0);
   const initialHours = initial ? Math.floor(initial.duracao_minutos / 60) : 0;
   const initialMinutes = initial ? initial.duracao_minutos % 60 : 30;
   const [durHoras, setDurHoras] = useState<string>(initialHours ? String(initialHours) : "");
@@ -530,7 +530,7 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
           </div>
         </div>
         {totalMin > 0 && (
-          <div style={{ marginTop: 6, fontSize: 12, color: COLORS.textMuted }}>Total: {humanDuration(totalMin)}</div>
+          <div style={{ marginTop: 6, fontSize: 12, color: COLORS.textMuted }}>Total: {formatDuracaoExtenso(totalMin)}</div>
         )}
       </div>
       <div>
