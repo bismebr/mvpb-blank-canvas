@@ -657,7 +657,7 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
             onSave({
               id: initial?.id ?? crypto.randomUUID(),
               nome: nome.trim(),
-              preco: parseFloat(preco) || 0,
+              preco: precoDigits === "" ? initialPreco : (parseInt(precoDigits, 10) || 0),
               duracao_minutos: totalMin,
               imagemUrl,
               categoriaId: categoriaId || undefined,
