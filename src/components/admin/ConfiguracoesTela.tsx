@@ -484,13 +484,23 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
     !!draft.aboutText.trim() &&
     draft.workGallery.length >= 1;
 
-  // Quando ficar completo pela primeira vez, abre o modal e marca como concluído.
+  // Quando ficar completo pela primeira vez (por empresa), abre o modal
+  // e persiste a flag em localStorage escopada por company_id — apenas
+  // para controlar a exibição visual desta experiência inicial.
   useEffect(() => {
-    if (isSiteComplete && !draft.siteCompleted) {
-      setCongratsOpen(true);
-      updateConfig({ siteCompleted: true });
+    if (!siteHydrated) return;
+    if (!companyId) return;
+    if (modalSeen) return;
+    if (!isSiteComplete) return;
+    setCongratsOpen(true);
+    setModalSeen(true);
+    try {
+      localStorage.setItem(READY_MODAL_KEY_PREFIX + companyId, "1");
+    } catch {
+      // ignore
     }
-  }, [isSiteComplete, draft.siteCompleted, updateConfig]);
+    updateConfig({ siteCompleted: true });
+  }, [siteHydrated, companyId, modalSeen, isSiteComplete, updateConfig]);
 
   // Bloqueia rolagem do fundo enquanto o modal de parabenização está aberto
   useEffect(() => {
