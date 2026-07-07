@@ -530,7 +530,7 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
           </div>
         </div>
         {totalMin > 0 && (
-          <div style={{ marginTop: 6, fontSize: 12, color: COLORS.textMuted }}>Total: {totalMin} min</div>
+          <div style={{ marginTop: 6, fontSize: 12, color: COLORS.textMuted }}>Total: {humanDuration(totalMin)}</div>
         )}
       </div>
       <div>
