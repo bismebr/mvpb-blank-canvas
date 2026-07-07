@@ -152,6 +152,8 @@ function AddImageButton({
   );
 }
 
+const READY_MODAL_KEY_PREFIX = "bisme_meu_site_ready_modal_seen_";
+
 export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } = {}) {
   const { config, updateConfig } = useSiteConfig();
   const draft = config;
@@ -161,6 +163,8 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
 
   // ----- Supabase: hydrate "Meu Site" + auto-save deltas -----
   const [siteHydrated, setSiteHydrated] = useState(false);
+  const [companyId, setCompanyId] = useState<string | null>(null);
+  const [modalSeen, setModalSeen] = useState(false);
   const companyIdRef = useRef<string | null>(null);
   const lastSavedRef = useRef<Record<string, string>>({});
   const saveTimerRef = useRef<number | null>(null);
