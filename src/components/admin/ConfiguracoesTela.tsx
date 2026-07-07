@@ -1014,7 +1014,7 @@ function CongratsModal({ onClose, onGoToLink }: { onClose: () => void; onGoToLin
         <div aria-hidden style={{
           position: "absolute", top: -120, left: "50%", transform: "translateX(-50%)",
           width: 360, height: 240,
-          background: `radial-gradient(ellipse at center, ${COLORS.accent}22 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse at center, #5690f522 0%, transparent 70%)`,
           pointerEvents: "none",
         }} />
 
@@ -1022,13 +1022,13 @@ function CongratsModal({ onClose, onGoToLink }: { onClose: () => void; onGoToLin
         <div style={{ position: "relative", width: 76, height: 76, margin: "0 auto 18px" }}>
           <span aria-hidden style={{
             position: "absolute", inset: 0, borderRadius: "50%",
-            background: `${COLORS.accent}22`, animation: "bisme-ring-pulse 1.6s ease-out infinite",
+            background: "#5690f533", animation: "bisme-ring-pulse 1.6s ease-out infinite",
           }} />
           <div style={{
             position: "relative", width: 76, height: 76, borderRadius: "50%",
-            background: `linear-gradient(135deg, ${COLORS.accent}, #ff8a4d)`,
+            background: "#5690f5",
             display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: `0 10px 24px -8px ${COLORS.accent}80`,
+            boxShadow: "0 10px 24px -8px rgba(86,144,245,0.6)",
           }}>
             <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round">
               <polyline
