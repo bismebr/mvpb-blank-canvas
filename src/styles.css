@@ -519,6 +519,13 @@
 [data-admin-theme]:not([data-admin-theme="dark"]) .bisme-light-border {
   border: 1px solid #d9d9d9 !important;
 }
+/* Visible radio/option outline in light theme (the outer bolinha).
+   --adm-border resolves to white in light mode, so we override just the
+   circle outline with a subtle gray. Dark theme is unaffected. */
+[data-admin-theme="light"] .bisme-radio-outline,
+[data-admin-theme]:not([data-admin-theme="dark"]) .bisme-radio-outline {
+  border-color: #d9d9d9 !important;
+}
 /* Dashboard light-theme overrides: white background, gray cards, stronger muted text. */
 [data-admin-theme="light"] .dash-root,
 [data-admin-theme]:not([data-admin-theme="dark"]) .dash-root {
