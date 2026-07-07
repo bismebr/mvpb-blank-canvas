@@ -627,6 +627,7 @@ function EmailChangeModal({
     <div
       role="dialog"
       aria-modal="true"
+      data-bisme-modal-open="true"
       onClick={onClose}
       style={{
         position: "fixed", inset: 0, zIndex: 1000,
@@ -680,17 +681,7 @@ function EmailChangeModal({
           />
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <Label>Confirmar novo e-mail</Label>
-          <input
-            type="email"
-            value={confirmaEmail}
-            onChange={(e) => setConfirmaEmail(e.target.value)}
-            placeholder="Repita o novo e-mail"
-            autoComplete="off"
-            style={inputStyle}
-          />
-        </div>
+
 
         <div style={{ marginBottom: 12 }}>
           <Label>Senha atual</Label>
