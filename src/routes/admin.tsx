@@ -206,6 +206,29 @@ function AdminPage() {
     }
   }, [blocked, tela, setTela]);
 
+  // Bloqueio global de rolagem: enquanto houver qualquer modal/sheet aberto
+  // (BottomSheet, dialog com role="dialog"/aria-modal="true", ou marcado via
+  // data-bisme-modal-open="true"), impede scroll do fundo do painel.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const cls = "bisme-no-scroll";
+    const update = () => {
+      const openCount = document.querySelectorAll(
+        "[data-bisme-modal-open='true'], [role='dialog'][aria-modal='true']",
+      ).length;
+      if (openCount > 0) document.body.classList.add(cls);
+      else document.body.classList.remove(cls);
+    };
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-bisme-modal-open", "aria-modal", "role"] });
+    return () => {
+      observer.disconnect();
+      document.body.classList.remove(cls);
+    };
+  }, []);
+
+
   useEffect(() => {
     let cancelled = false;
     async function check() {

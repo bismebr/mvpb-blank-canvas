@@ -569,22 +569,30 @@ function EmailChangeModal({
   onSuccess: (msg: string) => void;
 }) {
   const [novoEmail, setNovoEmail] = useState("");
-  const [confirmaEmail, setConfirmaEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [showSenha, setShowSenha] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // Bloqueia rolagem do fundo enquanto o modal estiver aberto
+  useEffect(() => {
+    const cls = "bisme-no-scroll";
+    document.body.classList.add(cls);
+    return () => {
+      const stillOpen = document.querySelectorAll("[data-bisme-modal-open='true']").length;
+      if (stillOpen <= 1) document.body.classList.remove(cls);
+    };
+  }, []);
+
   async function handleSubmit() {
     setErro(null);
     const email = novoEmail.trim().toLowerCase();
-    const confirma = confirmaEmail.trim().toLowerCase();
     if (!EMAIL_RE.test(email)) { setErro("Digite um e-mail válido."); return; }
     if (email === currentEmail.trim().toLowerCase()) {
       setErro("O novo e-mail precisa ser diferente do e-mail atual."); return;
     }
-    if (email !== confirma) { setErro("Os e-mails não coincidem."); return; }
     if (senha.trim().length === 0) { setErro("Informe sua senha atual."); return; }
+
 
     setSaving(true);
     try {
@@ -619,6 +627,7 @@ function EmailChangeModal({
     <div
       role="dialog"
       aria-modal="true"
+      data-bisme-modal-open="true"
       onClick={onClose}
       style={{
         position: "fixed", inset: 0, zIndex: 1000,
@@ -672,17 +681,7 @@ function EmailChangeModal({
           />
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <Label>Confirmar novo e-mail</Label>
-          <input
-            type="email"
-            value={confirmaEmail}
-            onChange={(e) => setConfirmaEmail(e.target.value)}
-            placeholder="Repita o novo e-mail"
-            autoComplete="off"
-            style={inputStyle}
-          />
-        </div>
+
 
         <div style={{ marginBottom: 12 }}>
           <Label>Senha atual</Label>

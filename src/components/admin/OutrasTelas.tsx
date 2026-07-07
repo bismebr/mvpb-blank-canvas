@@ -577,48 +577,53 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
         </div>
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginTop: 4 }}>Funcionários que realizam</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {([
-          { v: "todos", l: "Todos os funcionários realizam" },
-          { v: "exceto", l: "Todos, exceto os selecionados" },
-          { v: "apenas", l: "Apenas funcionários específicos" },
-        ] as { v: ServicoFuncMode; l: string }[]).map((o) => {
-          const on = funcMode === o.v;
-          return (
-            <label key={o.v} className={on ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${on ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
+      {funcionarios.length >= 2 && (
+        <>
+          <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginTop: 4 }}>Funcionários que realizam</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {([
+              { v: "todos", l: "Todos os funcionários realizam" },
+              { v: "exceto", l: "Todos, exceto os selecionados" },
+              { v: "apenas", l: "Apenas funcionários específicos" },
+            ] as { v: ServicoFuncMode; l: string }[]).map((o) => {
+              const on = funcMode === o.v;
+              return (
+                <label key={o.v} className={on ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${on ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
 
-              <input type="radio" name="funcMode" checked={on} onChange={() => { setFuncMode(o.v); setErroFunc(false); }} style={{ display: "none" }} />
-              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                {on && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
-              </span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.textPrimary }}>{o.l}</span>
-            </label>
-          );
-        })}
-        {funcMode !== "todos" && (
-          <div>
-            <div style={{ fontSize: 12, color: COLORS.textMuted, margin: "6px 0" }}>
-              {funcMode === "exceto" ? "Selecione quem NÃO realiza:" : "Selecione quem realiza:"}
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {funcionarios.length === 0 && <span style={{ fontSize: 12.5, color: COLORS.textMuted }}>Cadastre funcionários primeiro.</span>}
-              {funcionarios.map((f) => {
-                const on = funcIds.includes(f.id);
-                return (
-                  <button key={f.id} type="button" onClick={() => toggleFunc(f.id)} className={on ? undefined : "bisme-light-border"} style={{
-                    padding: "8px 12px", borderRadius: 16, fontSize: 12.5, fontWeight: 600, cursor: "pointer", fontFamily: FONT,
-                    background: on ? COLORS.accentLight : COLORS.bgElevated,
-                    color: on ? "#fff" : COLORS.textPrimary,
-                    border: `1px solid ${on ? COLORS.accentLight : COLORS.border}`,
-                  }}>{f.nome}</button>
-                );
-              })}
-            </div>
-            {erroFunc && <div style={{ fontSize: 12, color: COLORS.danger, marginTop: 6 }}>Selecione ao menos um funcionário.</div>}
+                  <input type="radio" name="funcMode" checked={on} onChange={() => { setFuncMode(o.v); setErroFunc(false); }} style={{ display: "none" }} />
+                  <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {on && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.textPrimary }}>{o.l}</span>
+                </label>
+              );
+            })}
+            {funcMode !== "todos" && (
+              <div>
+                <div style={{ fontSize: 12, color: COLORS.textMuted, margin: "6px 0" }}>
+                  {funcMode === "exceto" ? "Selecione quem NÃO realiza:" : "Selecione quem realiza:"}
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {funcionarios.length === 0 && <span style={{ fontSize: 12.5, color: COLORS.textMuted }}>Cadastre funcionários primeiro.</span>}
+                  {funcionarios.map((f) => {
+                    const on = funcIds.includes(f.id);
+                    return (
+                      <button key={f.id} type="button" onClick={() => toggleFunc(f.id)} className={on ? undefined : "bisme-light-border"} style={{
+                        padding: "8px 12px", borderRadius: 16, fontSize: 12.5, fontWeight: 600, cursor: "pointer", fontFamily: FONT,
+                        background: on ? COLORS.accentLight : COLORS.bgElevated,
+                        color: on ? "#fff" : COLORS.textPrimary,
+                        border: `1px solid ${on ? COLORS.accentLight : COLORS.border}`,
+                      }}>{f.nome}</button>
+                    );
+                  })}
+                </div>
+                {erroFunc && <div style={{ fontSize: 12, color: COLORS.danger, marginTop: 6 }}>Selecione ao menos um funcionário.</div>}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
+
 
       {onDelete && (
         <button onClick={onDelete} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: 12, fontSize: 14, fontWeight: 600, cursor: "pointer", minHeight: 44, fontFamily: FONT }}>Excluir</button>
@@ -685,7 +690,7 @@ export function HorariosTela() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bloqOpen, setBloqOpen] = useState(false);
-  const [listOpen, setListOpen] = useState(false);
+  
   const [pausaOpen, setPausaOpen] = useState(false);
   const [pausaEdit, setPausaEdit] = useState<PausaAdmin | null>(null);
   const saveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
@@ -915,58 +920,99 @@ export function HorariosTela() {
         subtitle="Defina os dias e horários de atendimento"
       />
 
-      {/* Ações rápidas: Bloquear e Pausa */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10, marginBottom: 16 }}>
-        <button
-          type="button"
-          onClick={() => setBloqOpen(true)}
-          className="bisme-action-btn"
-          style={{
-            display: "flex", alignItems: "center", gap: 12, width: "100%",
-            background: COLORS.bgSurface, border: `1.5px solid ${COLORS.border}`,
-            borderLeft: `4px solid ${COLORS.accentLight}`,
-            borderRadius: 12, padding: "14px 14px", cursor: "pointer",
-            fontFamily: FONT, textAlign: "left", minHeight: 56,
-            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-            transition: "background 150ms ease, transform 80ms ease, box-shadow 150ms ease",
-          }}
-        >
-          <div style={{ width: 38, height: 38, borderRadius: 10, background: COLORS.accentLight, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }} aria-hidden>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>Bloquear horário do dia</div>
-            <div style={{ fontSize: 12, color: COLORS.textMuted }}>{bloqueios.length} {bloqueios.length === 1 ? "bloqueio ativo" : "bloqueios ativos"}</div>
-          </div>
+      {/* Ações rápidas: Bloquear (com lista inline) e Pausa (com lista inline) */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => setBloqOpen(true)}
+            className="bisme-action-btn"
+            style={{
+              display: "flex", alignItems: "center", gap: 12, width: "100%",
+              background: COLORS.bgSurface, border: `1.5px solid ${COLORS.border}`,
+              borderLeft: `4px solid ${COLORS.accentLight}`,
+              borderRadius: 12, padding: "14px 14px", cursor: "pointer",
+              fontFamily: FONT, textAlign: "left", minHeight: 56,
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+              transition: "background 150ms ease, transform 80ms ease, box-shadow 150ms ease",
+            }}
+          >
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: COLORS.accentLight, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }} aria-hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>Bloquear horário do dia</div>
+              <div style={{ fontSize: 12, color: COLORS.textMuted }}>{bloqueios.length} {bloqueios.length === 1 ? "bloqueio ativo" : "bloqueios ativos"}</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
           {bloqueios.length > 0 && (
-            <span onClick={(e) => { e.stopPropagation(); setListOpen(true); }} style={{ background: "transparent", border: `1px solid ${COLORS.accentLight}`, color: COLORS.accentLight, borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>Ver</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {bloqueios.map((b) => {
+                const escopo = b.funcionarioId ? (funcionarios.find((f) => f.id === b.funcionarioId)?.nome ?? "Funcionário") : "Negócio todo";
+                return (
+                  <div key={b.id} style={{ ...cardStyle, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>{b.data}</div>
+                      <div style={{ fontSize: 12, color: COLORS.textMuted }}>
+                        {b.diaInteiro ? "Dia inteiro" : `${b.inicio ?? "—"} – ${b.fim ?? "—"}`} · {escopo}
+                      </div>
+                    </div>
+                    <button onClick={() => handleRemoveBloqueio(b.id)} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>Remover</button>
+                  </div>
+                );
+              })}
+            </div>
           )}
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button
-          type="button"
-          onClick={() => { setPausaEdit(null); setPausaOpen(true); }}
-          className="bisme-action-btn"
-          style={{
-            display: "flex", alignItems: "center", gap: 12, width: "100%",
-            background: COLORS.bgSurface, border: `1.5px solid ${COLORS.border}`,
-            borderLeft: `4px solid ${COLORS.accentLight}`,
-            borderRadius: 12, padding: "14px 14px", cursor: "pointer",
-            fontFamily: FONT, textAlign: "left", minHeight: 56,
-            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-            transition: "background 150ms ease, transform 80ms ease, box-shadow 150ms ease",
-          }}
-        >
-          <div style={{ width: 38, height: 38, borderRadius: 10, background: COLORS.accentLight, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }} aria-hidden>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>Horário de almoço ou pausa</div>
-            <div style={{ fontSize: 12, color: COLORS.textMuted }}>{pausas.length} {pausas.length === 1 ? "pausa configurada" : "pausas configuradas"}</div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => { setPausaEdit(null); setPausaOpen(true); }}
+            className="bisme-action-btn"
+            style={{
+              display: "flex", alignItems: "center", gap: 12, width: "100%",
+              background: COLORS.bgSurface, border: `1.5px solid ${COLORS.border}`,
+              borderLeft: `4px solid ${COLORS.accentLight}`,
+              borderRadius: 12, padding: "14px 14px", cursor: "pointer",
+              fontFamily: FONT, textAlign: "left", minHeight: 56,
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+              transition: "background 150ms ease, transform 80ms ease, box-shadow 150ms ease",
+            }}
+          >
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: COLORS.accentLight, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }} aria-hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>Horário de almoço ou pausa</div>
+              <div style={{ fontSize: 12, color: COLORS.textMuted }}>{pausas.length} {pausas.length === 1 ? "pausa configurada" : "pausas configuradas"}</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          {pausas.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {pausas.map((p) => {
+                const funcNome = p.funcionarioId ? (funcionarios.find((f) => f.id === p.funcionarioId)?.nome ?? "—") : "Todo o negócio";
+                const diaTxt = p.diaSemana === null ? "Todos os dias de funcionamento" : (DIAS.find((d) => d.i === p.diaSemana)?.nome ?? "—");
+                return (
+                  <div key={p.id} style={{ ...cardStyle, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>{p.inicio} – {p.fim}</div>
+                      <div style={{ fontSize: 12, color: COLORS.textMuted }}>{diaTxt} · {funcNome}</div>
+                    </div>
+                    <button onClick={() => { setPausaEdit(p); setPausaOpen(true); }} aria-label="Editar" style={{ background: "transparent", border: "none", cursor: "pointer", padding: 8 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                    </button>
+                    <button onClick={() => handleRemovePausa(p.id)} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>Remover</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
+
 
       {DIAS.map(({ i, nome }) => {
         const h = horarios.find((x) => x.diaSemana === i)!;
@@ -993,47 +1039,8 @@ export function HorariosTela() {
         <FormBloqueio funcionarios={funcionarios} onClose={() => setBloqOpen(false)} onSave={handleAddBloqueio} />
       </BottomSheet>
 
-      <BottomSheet open={listOpen} onClose={() => setListOpen(false)} title="Bloqueios ativos">
-        {bloqueios.length === 0 ? (
-          <p style={{ fontSize: 14, color: COLORS.textMuted, margin: 0 }}>Nenhum bloqueio.</p>
-        ) : bloqueios.map((b) => {
-          const escopo = b.funcionarioId ? (funcionarios.find((f) => f.id === b.funcionarioId)?.nome ?? "Funcionário") : "Negócio todo";
-          return (
-            <div key={b.id} style={{ ...cardStyle, marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>{b.data}</div>
-                <div style={{ fontSize: 12, color: COLORS.textMuted }}>
-                  {b.diaInteiro ? "Dia inteiro" : `${b.inicio ?? "—"} – ${b.fim ?? "—"}`} · {escopo}
-                </div>
-              </div>
-              <button onClick={() => handleRemoveBloqueio(b.id)} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>Remover</button>
-            </div>
-          );
-        })}
-      </BottomSheet>
 
-      {/* Lista de pausas configuradas */}
-      {pausas.length > 0 && (
-        <div style={{ marginTop: 24 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 8 }}>Pausas configuradas</div>
-          {pausas.map((p) => {
-          const funcNome = p.funcionarioId ? (funcionarios.find((f) => f.id === p.funcionarioId)?.nome ?? "—") : "Todo o negócio";
-          const diaTxt = p.diaSemana === null ? "Todos os dias de funcionamento" : (DIAS.find((d) => d.i === p.diaSemana)?.nome ?? "—");
-          return (
-            <div key={p.id} style={{ ...cardStyle, marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>{p.inicio} – {p.fim}</div>
-                <div style={{ fontSize: 12, color: COLORS.textMuted }}>{diaTxt} · {funcNome}</div>
-              </div>
-              <button onClick={() => { setPausaEdit(p); setPausaOpen(true); }} aria-label="Editar" style={{ background: "transparent", border: "none", cursor: "pointer", padding: 8 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-              </button>
-              <button onClick={() => handleRemovePausa(p.id)} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>Remover</button>
-            </div>
-          );
-          })}
-        </div>
-      )}
+
 
       <BottomSheet open={pausaOpen} onClose={() => { setPausaOpen(false); setPausaEdit(null); }} title={pausaEdit ? "Editar pausa" : "Nova pausa"}>
         <FormPausa
@@ -1084,7 +1091,7 @@ function FormPausa({ initial, funcionarios, allowFuncionario, fixedFuncionarioId
         <div style={{ flex: 1 }}><Label>Fim</Label><input style={inputStyle} type="time" value={fim} onChange={(e) => setFim(e.target.value)} /></div>
       </div>
 
-      {allowFuncionario && !fixedFuncionarioId && (
+      {allowFuncionario && !fixedFuncionarioId && funcionarios.length >= 2 && (
         <>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Aplicar para um funcionário específico</span>
@@ -1105,6 +1112,7 @@ function FormPausa({ initial, funcionarios, allowFuncionario, fixedFuncionarioId
           )}
         </>
       )}
+
 
       <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
         <button onClick={onClose} className="bisme-light-border" style={{ ...secondaryBtn, flex: 1 }}>Cancelar</button>
@@ -1136,7 +1144,7 @@ function FormBloqueio({ funcionarios, onClose, onSave }: { funcionarios: Funcion
   const [funcionarioId, setFuncionarioId] = useState<string>("");
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <div><Label>Dia</Label><input style={inputStyle} type={data ? "date" : "text"} placeholder="Selecione o dia" onFocus={(e) => { e.currentTarget.type = "date"; try { (e.currentTarget as any).showPicker?.(); } catch {} }} onBlur={(e) => { if (!e.currentTarget.value) e.currentTarget.type = "text"; }} value={data} onChange={(e) => setData(e.target.value)} /></div>
+      <div><Label>Dia</Label><input style={inputStyle} type="date" value={data} onChange={(e) => setData(e.target.value)} onClick={(e) => { try { (e.currentTarget as HTMLInputElement & { showPicker?: () => void }).showPicker?.(); } catch { /* ignore */ } }} /></div>
       <div style={{ opacity: diaInteiro ? 0.4 : 1, pointerEvents: diaInteiro ? "none" : "auto", display: "flex", gap: 10 }}>
         <div style={{ flex: 1 }}><Label>Início</Label><input style={inputStyle} type="time" value={ini} onChange={(e) => setIni(e.target.value)} /></div>
         <div style={{ flex: 1 }}><Label>Fim</Label><input style={inputStyle} type="time" value={fim} onChange={(e) => setFim(e.target.value)} /></div>
@@ -1145,26 +1153,28 @@ function FormBloqueio({ funcionarios, onClose, onSave }: { funcionarios: Funcion
         <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Fechar dia inteiro</span>
         <Toggle on={diaInteiro} onChange={setDiaInteiro} />
       </div>
-      <div>
-        <Label>Aplicar bloqueio para</Label>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <label className={escopo === "negocio" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
-            <input type="radio" name="escopo-bloq" checked={escopo === "negocio"} onChange={() => { setEscopo("negocio"); setFuncionarioId(""); }} style={{ display: "none" }} />
-            <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              {escopo === "negocio" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Para o negócio todo</span>
-          </label>
-          <label className={escopo === "funcionario" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
-            <input type="radio" name="escopo-bloq" checked={escopo === "funcionario"} onChange={() => setEscopo("funcionario")} style={{ display: "none" }} />
-            <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              {escopo === "funcionario" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Apenas para um funcionário específico</span>
-          </label>
+      {funcionarios.length >= 2 && (
+        <div>
+          <Label>Aplicar bloqueio para</Label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <label className={escopo === "negocio" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
+              <input type="radio" name="escopo-bloq" checked={escopo === "negocio"} onChange={() => { setEscopo("negocio"); setFuncionarioId(""); }} style={{ display: "none" }} />
+              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {escopo === "negocio" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Para o negócio todo</span>
+            </label>
+            <label className={escopo === "funcionario" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
+              <input type="radio" name="escopo-bloq" checked={escopo === "funcionario"} onChange={() => setEscopo("funcionario")} style={{ display: "none" }} />
+              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {escopo === "funcionario" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Apenas para um funcionário específico</span>
+            </label>
+          </div>
         </div>
-      </div>
-      {escopo === "funcionario" && (
+      )}
+      {funcionarios.length >= 2 && escopo === "funcionario" && (
         <div>
           <Label>Funcionário</Label>
           <select style={inputStyle} value={funcionarioId} onChange={(e) => setFuncionarioId(e.target.value)}>
@@ -1173,6 +1183,7 @@ function FormBloqueio({ funcionarios, onClose, onSave }: { funcionarios: Funcion
           </select>
         </div>
       )}
+
       <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
         <button onClick={onClose} className="bisme-light-border" style={{ ...secondaryBtn, flex: 1 }}>Cancelar</button>
         <button

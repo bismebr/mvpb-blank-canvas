@@ -930,15 +930,9 @@ function Kpi({ label, value, sub, delta, tone }: { label: string; value: string;
 
 function Delta({ delta, small }: { delta: number | null; small?: boolean }) {
   if (delta === null) {
-    return (
-      <span style={{
-        fontSize: small ? 10.5 : 11, fontWeight: 500,
-        color: COLORS.textMuted, letterSpacing: 0.2,
-      }}>
-        — sem comparação
-      </span>
-    );
+    return null;
   }
+
   const up = delta >= 0;
   const color = up ? GREEN : RED;
   const bg = up
