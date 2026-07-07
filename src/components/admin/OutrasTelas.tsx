@@ -14,7 +14,9 @@ const DIAS = [
 
 function pad(n: number) { return String(n).padStart(2, "0"); }
 function fmtDate(d: Date) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
-function brl(v: number) { return `R$ ${v.toFixed(2).replace(".", ",")}`; }
+function brl(v: number) {
+  return `R$ ${(v || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
 function formatDuracaoExtenso(totalMin: number): string {
   const m = Math.max(0, Math.round(totalMin || 0));
   const h = Math.floor(m / 60);
@@ -391,7 +393,17 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
 }) {
   const { funcionarios, categorias } = useApp();
   const [nome, setNome] = useState(initial?.nome ?? "");
-  const [preco, setPreco] = useState(initial?.preco.toString() ?? "");
+  const initialPreco = initial?.preco ?? 0;
+  // precoDigits: dígitos que o usuário digitou representando reais inteiros.
+  // Vazio = ainda não digitou; nesse caso mantemos o preço original ao salvar
+  // e mostramos o valor original formatado (preservando centavos existentes).
+  const [precoDigits, setPrecoDigits] = useState<string>("");
+  const precoDisplay =
+    precoDigits === ""
+      ? initialPreco > 0
+        ? brl(initialPreco)
+        : ""
+      : brl(parseInt(precoDigits, 10) || 0);
   const initialHours = initial ? Math.floor(initial.duracao_minutos / 60) : 0;
   const initialMinutes = initial ? initial.duracao_minutos % 60 : 30;
   const [durHoras, setDurHoras] = useState<string>(initialHours ? String(initialHours) : "");
@@ -424,7 +436,17 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div><Label>Nome</Label><input style={inputStyle} placeholder="Digite o nome do serviço" value={nome} onChange={(e) => setNome(e.target.value)} /></div>
-      <div><Label>Preço</Label><input style={inputStyle} type="number" placeholder="Digite o valor" value={preco} onChange={(e) => setPreco(e.target.value)} /></div>
+      <div><Label>Preço</Label><input
+        style={inputStyle}
+        type="text"
+        inputMode="numeric"
+        placeholder="Digite o valor"
+        value={precoDisplay}
+        onChange={(e) => {
+          const onlyDigits = e.target.value.replace(/\D/g, "");
+          setPrecoDigits(onlyDigits);
+        }}
+      /></div>
       <div>
         <Label>Categoria (opcional)</Label>
         <div style={{ position: "relative" }}>
@@ -477,7 +499,7 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
               }}
             >
               {Array.from({ length: 24 }, (_, i) => (
-                <option key={i} value={String(i)}>{i}h</option>
+                <option key={i} value={String(i)}>{i === 0 ? "h" : `${i}h`}</option>
               ))}
             </select>
             <span aria-hidden style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: COLORS.textMuted }}>
@@ -500,8 +522,8 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
                 fontWeight: 500,
               }}
             >
-              {Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (
-                <option key={m} value={String(m)}>{m}min</option>
+              {[0, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map((m) => (
+                <option key={m} value={String(m)}>{m === 0 ? "min" : `${m}min`}</option>
               ))}
             </select>
             <span aria-hidden style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: COLORS.textMuted }}>
@@ -510,7 +532,7 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
           </div>
         </div>
         {totalMin > 0 && (
-          <div style={{ marginTop: 6, fontSize: 12, color: COLORS.textMuted }}>Total: {totalMin} min</div>
+          <div style={{ marginTop: 6, fontSize: 12, color: COLORS.textMuted }}>Total: {formatDuracaoExtenso(totalMin)}</div>
         )}
       </div>
       <div>
@@ -591,7 +613,8 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
                 <label key={o.v} className={on ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${on ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
 
                   <input type="radio" name="funcMode" checked={on} onChange={() => { setFuncMode(o.v); setErroFunc(false); }} style={{ display: "none" }} />
-                  <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <span aria-hidden className={on ? undefined : "bisme-radio-outline"} style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+
                     {on && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
                   </span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.textPrimary }}>{o.l}</span>
@@ -637,7 +660,7 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
             onSave({
               id: initial?.id ?? crypto.randomUUID(),
               nome: nome.trim(),
-              preco: parseFloat(preco) || 0,
+              preco: precoDigits === "" ? initialPreco : (parseInt(precoDigits, 10) || 0),
               duracao_minutos: totalMin,
               imagemUrl,
               categoriaId: categoriaId || undefined,
@@ -1159,14 +1182,14 @@ function FormBloqueio({ funcionarios, onClose, onSave }: { funcionarios: Funcion
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <label className={escopo === "negocio" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
               <input type="radio" name="escopo-bloq" checked={escopo === "negocio"} onChange={() => { setEscopo("negocio"); setFuncionarioId(""); }} style={{ display: "none" }} />
-              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span aria-hidden className={escopo === "negocio" ? undefined : "bisme-radio-outline"} style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {escopo === "negocio" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
               </span>
               <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Para o negócio todo</span>
             </label>
             <label className={escopo === "funcionario" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
               <input type="radio" name="escopo-bloq" checked={escopo === "funcionario"} onChange={() => setEscopo("funcionario")} style={{ display: "none" }} />
-              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span aria-hidden className={escopo === "funcionario" ? undefined : "bisme-radio-outline"} style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {escopo === "funcionario" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
               </span>
               <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Apenas para um funcionário específico</span>
@@ -1844,7 +1867,7 @@ function FormFuncionario({ initial, servicosDisponiveis, onClose, onSave, onDele
           return (
             <label key={o.v} className={on ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${on ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
               <input type="radio" name="servMode" checked={on} onChange={() => { setServMode(o.v); setErroServ(false); }} style={{ display: "none" }} />
-              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span aria-hidden className={on ? undefined : "bisme-radio-outline"} style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {on && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
               </span>
               <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.textPrimary }}>{o.l}</span>
