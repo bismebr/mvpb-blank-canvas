@@ -14,7 +14,9 @@ const DIAS = [
 
 function pad(n: number) { return String(n).padStart(2, "0"); }
 function fmtDate(d: Date) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
-function brl(v: number) { return `R$ ${v.toFixed(2).replace(".", ",")}`; }
+function brl(v: number) {
+  return `R$ ${(v || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
 function formatDuracaoExtenso(totalMin: number): string {
   const m = Math.max(0, Math.round(totalMin || 0));
   const h = Math.floor(m / 60);
