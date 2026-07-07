@@ -989,14 +989,6 @@ function TikTokIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-function FacebookIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.7c0-.92.26-1.55 1.58-1.55H17V4.27A22 22 0 0 0 14.55 4.14c-2.43 0-4.1 1.48-4.1 4.21V10.8H7.75V14h2.7v8h3.05Z" />
-    </svg>
-  );
-}
-
 function YoutubeIcon({ size = 20 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -1007,7 +999,6 @@ function YoutubeIcon({ size = 20 }: { size?: number }) {
 
 const SOCIAL_LINKS = [
   { icon: <Instagram size={18} />, label: "Instagram", href: "https://www.instagram.com/meubisme" },
-  { icon: <FacebookIcon size={20} />, label: "Facebook", href: "https://www.facebook.com/meubisme" },
   { icon: <YoutubeIcon size={20} />, label: "YouTube", href: "https://www.youtube.com/@meubisme" },
   { icon: <TikTokIcon size={18} />, label: "TikTok", href: "https://www.tiktok.com/@meubisme?is_from_webapp=1&sender_device=pc" },
 ];
