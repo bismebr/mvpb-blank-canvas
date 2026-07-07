@@ -391,7 +391,17 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
 }) {
   const { funcionarios, categorias } = useApp();
   const [nome, setNome] = useState(initial?.nome ?? "");
-  const [preco, setPreco] = useState(initial?.preco.toString() ?? "");
+  const initialPreco = initial?.preco ?? 0;
+  // precoDigits: dígitos que o usuário digitou representando reais inteiros.
+  // Vazio = ainda não digitou; nesse caso mantemos o preço original ao salvar
+  // e mostramos o valor original formatado (preservando centavos existentes).
+  const [precoDigits, setPrecoDigits] = useState<string>("");
+  const precoDisplay =
+    precoDigits === ""
+      ? initialPreco > 0
+        ? formatBRL(initialPreco)
+        : ""
+      : formatBRL((parseInt(precoDigits, 10) || 0));
   const initialHours = initial ? Math.floor(initial.duracao_minutos / 60) : 0;
   const initialMinutes = initial ? initial.duracao_minutos % 60 : 30;
   const [durHoras, setDurHoras] = useState<string>(initialHours ? String(initialHours) : "");
