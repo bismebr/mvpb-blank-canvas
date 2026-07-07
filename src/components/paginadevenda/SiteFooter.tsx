@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Youtube } from "lucide-react";
+import { Instagram, Facebook } from "lucide-react";
 import bismeHeaderLogo from "@/assets/bisme-header-logo.svg";
 
 function TikTokIcon({ size = 18 }: { size?: number }) {
@@ -9,6 +9,15 @@ function TikTokIcon({ size = 18 }: { size?: number }) {
     </svg>
   );
 }
+
+function YoutubeIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.6 3.6 12 3.6 12 3.6s-7.6 0-9.4.5A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.8.5 9.4.5 9.4.5s7.6 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12l-6.2 3.6Z" />
+    </svg>
+  );
+}
+
 
 
 export function SiteFooter() {
@@ -28,7 +37,7 @@ export function SiteFooter() {
               {[
                 { icon: <Instagram size={20} />, label: "Instagram" },
                 { icon: <Facebook size={22} fill="currentColor" strokeWidth={0} />, label: "Facebook" },
-                { icon: <Youtube size={20} />, label: "YouTube" },
+                { icon: <YoutubeIcon size={20} />, label: "YouTube" },
                 { icon: <TikTokIcon size={20} />, label: "TikTok" },
               ].map((s) => (
                 <button
