@@ -690,7 +690,7 @@ export function HorariosTela() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bloqOpen, setBloqOpen] = useState(false);
-  const [listOpen, setListOpen] = useState(false);
+  
   const [pausaOpen, setPausaOpen] = useState(false);
   const [pausaEdit, setPausaEdit] = useState<PausaAdmin | null>(null);
   const saveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
