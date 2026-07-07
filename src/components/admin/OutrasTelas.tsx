@@ -613,7 +613,7 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
                 <label key={o.v} className={on ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${on ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
 
                   <input type="radio" name="funcMode" checked={on} onChange={() => { setFuncMode(o.v); setErroFunc(false); }} style={{ display: "none" }} />
-                  <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <span aria-hidden className={(on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     {on && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
                   </span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.textPrimary }}>{o.l}</span>
@@ -1181,14 +1181,14 @@ function FormBloqueio({ funcionarios, onClose, onSave }: { funcionarios: Funcion
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <label className={escopo === "negocio" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
               <input type="radio" name="escopo-bloq" checked={escopo === "negocio"} onChange={() => { setEscopo("negocio"); setFuncionarioId(""); }} style={{ display: "none" }} />
-              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span aria-hidden className={(escopo === "negocio" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {escopo === "negocio" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
               </span>
               <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Para o negócio todo</span>
             </label>
             <label className={escopo === "funcionario" ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
               <input type="radio" name="escopo-bloq" checked={escopo === "funcionario"} onChange={() => setEscopo("funcionario")} style={{ display: "none" }} />
-              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span aria-hidden className={(escopo === "funcionario" ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {escopo === "funcionario" && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
               </span>
               <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Apenas para um funcionário específico</span>
@@ -1866,7 +1866,7 @@ function FormFuncionario({ initial, servicosDisponiveis, onClose, onSave, onDele
           return (
             <label key={o.v} className={on ? undefined : "bisme-light-border"} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", border: `1.5px solid ${on ? COLORS.accentLight : COLORS.border}`, borderRadius: 8, cursor: "pointer", background: COLORS.bgSurface }}>
               <input type="radio" name="servMode" checked={on} onChange={() => { setServMode(o.v); setErroServ(false); }} style={{ display: "none" }} />
-              <span aria-hidden style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span aria-hidden className={(on ? COLORS.accentLight : COLORS.border}`, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {on && <span style={{ width: 10, height: 10, borderRadius: "50%", background: COLORS.accentLight }} />}
               </span>
               <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.textPrimary }}>{o.l}</span>
