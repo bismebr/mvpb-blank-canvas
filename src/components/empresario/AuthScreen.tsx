@@ -257,7 +257,7 @@ const cardStyle: CSSProperties = {
 
 const titleStyle: CSSProperties = {
   margin: "4px 0 18px",
-  fontSize: 20,
+  fontSize: 22,
   fontWeight: 700,
   color: COLORS.text,
   textAlign: "center",
