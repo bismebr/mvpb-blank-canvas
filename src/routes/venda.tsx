@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Menu, X, ChevronDown, Star, ArrowLeft, ArrowRight, Instagram, Youtube, Check } from "lucide-react";
+import { Menu, X, ChevronDown, Star, ArrowLeft, ArrowRight, Instagram, Check } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
