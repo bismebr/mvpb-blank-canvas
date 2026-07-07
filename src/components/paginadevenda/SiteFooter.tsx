@@ -37,7 +37,7 @@ export function SiteFooter() {
               {[
                 { icon: <Instagram size={20} />, label: "Instagram" },
                 { icon: <Facebook size={22} fill="currentColor" strokeWidth={0} />, label: "Facebook" },
-                { icon: <Youtube size={20} />, label: "YouTube" },
+                { icon: <YoutubeIcon size={20} />, label: "YouTube" },
                 { icon: <TikTokIcon size={20} />, label: "TikTok" },
               ].map((s) => (
                 <button
