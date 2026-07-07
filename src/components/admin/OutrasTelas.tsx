@@ -1089,7 +1089,7 @@ function FormPausa({ initial, funcionarios, allowFuncionario, fixedFuncionarioId
         <div style={{ flex: 1 }}><Label>Fim</Label><input style={inputStyle} type="time" value={fim} onChange={(e) => setFim(e.target.value)} /></div>
       </div>
 
-      {allowFuncionario && !fixedFuncionarioId && (
+      {allowFuncionario && !fixedFuncionarioId && funcionarios.length >= 2 && (
         <>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 14, fontWeight: 600, color: COLORS.textPrimary }}>Aplicar para um funcionário específico</span>
@@ -1110,6 +1110,7 @@ function FormPausa({ initial, funcionarios, allowFuncionario, fixedFuncionarioId
           )}
         </>
       )}
+
 
       <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
         <button onClick={onClose} className="bisme-light-border" style={{ ...secondaryBtn, flex: 1 }}>Cancelar</button>
