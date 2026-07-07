@@ -1039,47 +1039,8 @@ export function HorariosTela() {
         <FormBloqueio funcionarios={funcionarios} onClose={() => setBloqOpen(false)} onSave={handleAddBloqueio} />
       </BottomSheet>
 
-      <BottomSheet open={listOpen} onClose={() => setListOpen(false)} title="Bloqueios ativos">
-        {bloqueios.length === 0 ? (
-          <p style={{ fontSize: 14, color: COLORS.textMuted, margin: 0 }}>Nenhum bloqueio.</p>
-        ) : bloqueios.map((b) => {
-          const escopo = b.funcionarioId ? (funcionarios.find((f) => f.id === b.funcionarioId)?.nome ?? "Funcionário") : "Negócio todo";
-          return (
-            <div key={b.id} style={{ ...cardStyle, marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>{b.data}</div>
-                <div style={{ fontSize: 12, color: COLORS.textMuted }}>
-                  {b.diaInteiro ? "Dia inteiro" : `${b.inicio ?? "—"} – ${b.fim ?? "—"}`} · {escopo}
-                </div>
-              </div>
-              <button onClick={() => handleRemoveBloqueio(b.id)} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>Remover</button>
-            </div>
-          );
-        })}
-      </BottomSheet>
 
-      {/* Lista de pausas configuradas */}
-      {pausas.length > 0 && (
-        <div style={{ marginTop: 24 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 8 }}>Pausas configuradas</div>
-          {pausas.map((p) => {
-          const funcNome = p.funcionarioId ? (funcionarios.find((f) => f.id === p.funcionarioId)?.nome ?? "—") : "Todo o negócio";
-          const diaTxt = p.diaSemana === null ? "Todos os dias de funcionamento" : (DIAS.find((d) => d.i === p.diaSemana)?.nome ?? "—");
-          return (
-            <div key={p.id} style={{ ...cardStyle, marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>{p.inicio} – {p.fim}</div>
-                <div style={{ fontSize: 12, color: COLORS.textMuted }}>{diaTxt} · {funcNome}</div>
-              </div>
-              <button onClick={() => { setPausaEdit(p); setPausaOpen(true); }} aria-label="Editar" style={{ background: "transparent", border: "none", cursor: "pointer", padding: 8 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-              </button>
-              <button onClick={() => handleRemovePausa(p.id)} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>Remover</button>
-            </div>
-          );
-          })}
-        </div>
-      )}
+
 
       <BottomSheet open={pausaOpen} onClose={() => { setPausaOpen(false); setPausaEdit(null); }} title={pausaEdit ? "Editar pausa" : "Nova pausa"}>
         <FormPausa
