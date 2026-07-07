@@ -152,6 +152,8 @@ function AddImageButton({
   );
 }
 
+const READY_MODAL_KEY_PREFIX = "bisme_meu_site_ready_modal_seen_";
+
 export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } = {}) {
   const { config, updateConfig } = useSiteConfig();
   const draft = config;
@@ -161,6 +163,8 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
 
   // ----- Supabase: hydrate "Meu Site" + auto-save deltas -----
   const [siteHydrated, setSiteHydrated] = useState(false);
+  const [companyId, setCompanyId] = useState<string | null>(null);
+  const [modalSeen, setModalSeen] = useState(false);
   const companyIdRef = useRef<string | null>(null);
   const lastSavedRef = useRef<Record<string, string>>({});
   const saveTimerRef = useRef<number | null>(null);
@@ -174,6 +178,13 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
         return;
       }
       companyIdRef.current = cid;
+      setCompanyId(cid);
+      try {
+        const seen = localStorage.getItem(READY_MODAL_KEY_PREFIX + cid) === "1";
+        if (seen) setModalSeen(true);
+      } catch {
+        // ignore
+      }
       const loaded = await loadCompanySite(cid);
       if (cancelled || !loaded) {
         setSiteHydrated(true);
@@ -473,13 +484,23 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
     !!draft.aboutText.trim() &&
     draft.workGallery.length >= 1;
 
-  // Quando ficar completo pela primeira vez, abre o modal e marca como concluído.
+  // Quando ficar completo pela primeira vez (por empresa), abre o modal
+  // e persiste a flag em localStorage escopada por company_id — apenas
+  // para controlar a exibição visual desta experiência inicial.
   useEffect(() => {
-    if (isSiteComplete && !draft.siteCompleted) {
-      setCongratsOpen(true);
-      updateConfig({ siteCompleted: true });
+    if (!siteHydrated) return;
+    if (!companyId) return;
+    if (modalSeen) return;
+    if (!isSiteComplete) return;
+    setCongratsOpen(true);
+    setModalSeen(true);
+    try {
+      localStorage.setItem(READY_MODAL_KEY_PREFIX + companyId, "1");
+    } catch {
+      // ignore
     }
-  }, [isSiteComplete, draft.siteCompleted, updateConfig]);
+    updateConfig({ siteCompleted: true });
+  }, [siteHydrated, companyId, modalSeen, isSiteComplete, updateConfig]);
 
   // Bloqueia rolagem do fundo enquanto o modal de parabenização está aberto
   useEffect(() => {
@@ -490,6 +511,24 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
       document.body.style.overflow = prev;
     };
   }, [congratsOpen]);
+
+  if (!siteHydrated) {
+    return (
+      <div style={{ padding: "30px 16px 8px", maxWidth: 880, margin: "0 auto", fontFamily: FONT }}>
+        <style>{`
+          @keyframes bisme-skel-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } }
+          .bisme-skel { background: ${COLORS.bgElevated}; border-radius: 10px; animation: bisme-skel-pulse 1.4s ease-in-out infinite; }
+        `}</style>
+        <div className="bisme-skel" style={{ height: 28, width: "70%", marginBottom: 12 }} />
+        <div className="bisme-skel" style={{ height: 14, width: "90%", marginBottom: 28 }} />
+        <div className="bisme-skel" style={{ height: 220, width: "100%", marginBottom: 20 }} />
+        <div className="bisme-skel" style={{ height: 48, width: "100%", marginBottom: 12 }} />
+        <div className="bisme-skel" style={{ height: 48, width: "100%", marginBottom: 12 }} />
+        <div className="bisme-skel" style={{ height: 48, width: "100%", marginBottom: 12 }} />
+        <div className="bisme-skel" style={{ height: 48, width: "100%" }} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: "30px 16px 8px", maxWidth: 880, margin: "0 auto", fontFamily: FONT }}>
@@ -511,10 +550,12 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
         onChange={(e) => readFile(e, "work", replaceIndex.current ?? undefined)}
       />
 
-      <PageHeader
-        title="Seu site de agendamentos próprio está quase pronto!"
-        subtitle="Preencha as informações abaixo para deixar seu site completo e pronto para receber seus clientes."
-      />
+      {!modalSeen && (
+        <PageHeader
+          title="Seu site de agendamentos próprio está quase pronto!"
+          subtitle="Preencha as informações abaixo para deixar seu site completo e pronto para receber seus clientes."
+        />
+      )}
 
 
       <div style={{ marginTop: 4, marginBottom: 20 }}>
@@ -973,7 +1014,7 @@ function CongratsModal({ onClose, onGoToLink }: { onClose: () => void; onGoToLin
         <div aria-hidden style={{
           position: "absolute", top: -120, left: "50%", transform: "translateX(-50%)",
           width: 360, height: 240,
-          background: `radial-gradient(ellipse at center, ${COLORS.accent}22 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse at center, #5690f522 0%, transparent 70%)`,
           pointerEvents: "none",
         }} />
 
@@ -981,13 +1022,13 @@ function CongratsModal({ onClose, onGoToLink }: { onClose: () => void; onGoToLin
         <div style={{ position: "relative", width: 76, height: 76, margin: "0 auto 18px" }}>
           <span aria-hidden style={{
             position: "absolute", inset: 0, borderRadius: "50%",
-            background: `${COLORS.accent}22`, animation: "bisme-ring-pulse 1.6s ease-out infinite",
+            background: "#5690f533", animation: "bisme-ring-pulse 1.6s ease-out infinite",
           }} />
           <div style={{
             position: "relative", width: 76, height: 76, borderRadius: "50%",
-            background: `linear-gradient(135deg, ${COLORS.accent}, #ff8a4d)`,
+            background: "#5690f5",
             display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: `0 10px 24px -8px ${COLORS.accent}80`,
+            boxShadow: "0 10px 24px -8px rgba(86,144,245,0.6)",
           }}>
             <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round">
               <polyline
@@ -1016,13 +1057,13 @@ function CongratsModal({ onClose, onGoToLink }: { onClose: () => void; onGoToLin
             height: 50,
             borderRadius: 12,
             border: "none",
-            background: COLORS.accent,
+            background: "#5690f5",
             color: "#fff",
             fontWeight: 800,
             fontSize: 15,
             cursor: "pointer",
             fontFamily: FONT,
-            boxShadow: `0 8px 20px -8px ${COLORS.accent}90`,
+            boxShadow: "0 8px 20px -8px rgba(86,144,245,0.7)",
           }}
         >
           Ir para Meu Link
