@@ -434,7 +434,17 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div><Label>Nome</Label><input style={inputStyle} placeholder="Digite o nome do serviço" value={nome} onChange={(e) => setNome(e.target.value)} /></div>
-      <div><Label>Preço</Label><input style={inputStyle} type="number" placeholder="Digite o valor" value={preco} onChange={(e) => setPreco(e.target.value)} /></div>
+      <div><Label>Preço</Label><input
+        style={inputStyle}
+        type="text"
+        inputMode="numeric"
+        placeholder="Digite o valor"
+        value={precoDisplay}
+        onChange={(e) => {
+          const onlyDigits = e.target.value.replace(/\D/g, "");
+          setPrecoDigits(onlyDigits);
+        }}
+      /></div>
       <div>
         <Label>Categoria (opcional)</Label>
         <div style={{ position: "relative" }}>
