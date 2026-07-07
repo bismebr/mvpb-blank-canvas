@@ -512,6 +512,24 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
     };
   }, [congratsOpen]);
 
+  if (!siteHydrated) {
+    return (
+      <div style={{ padding: "30px 16px 8px", maxWidth: 880, margin: "0 auto", fontFamily: FONT }}>
+        <style>{`
+          @keyframes bisme-skel-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } }
+          .bisme-skel { background: ${COLORS.bgElevated}; border-radius: 10px; animation: bisme-skel-pulse 1.4s ease-in-out infinite; }
+        `}</style>
+        <div className="bisme-skel" style={{ height: 28, width: "70%", marginBottom: 12 }} />
+        <div className="bisme-skel" style={{ height: 14, width: "90%", marginBottom: 28 }} />
+        <div className="bisme-skel" style={{ height: 220, width: "100%", marginBottom: 20 }} />
+        <div className="bisme-skel" style={{ height: 48, width: "100%", marginBottom: 12 }} />
+        <div className="bisme-skel" style={{ height: 48, width: "100%", marginBottom: 12 }} />
+        <div className="bisme-skel" style={{ height: 48, width: "100%", marginBottom: 12 }} />
+        <div className="bisme-skel" style={{ height: 48, width: "100%" }} />
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: "30px 16px 8px", maxWidth: 880, margin: "0 auto", fontFamily: FONT }}>
       <style>{`
@@ -532,10 +550,12 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
         onChange={(e) => readFile(e, "work", replaceIndex.current ?? undefined)}
       />
 
-      <PageHeader
-        title="Seu site de agendamentos próprio está quase pronto!"
-        subtitle="Preencha as informações abaixo para deixar seu site completo e pronto para receber seus clientes."
-      />
+      {!modalSeen && (
+        <PageHeader
+          title="Seu site de agendamentos próprio está quase pronto!"
+          subtitle="Preencha as informações abaixo para deixar seu site completo e pronto para receber seus clientes."
+        />
+      )}
 
 
       <div style={{ marginTop: 4, marginBottom: 20 }}>
