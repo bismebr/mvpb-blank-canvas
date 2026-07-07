@@ -989,7 +989,7 @@ function TikTokIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-function FacebookIcon({ size = 18 }: { size?: number }) {
+function FacebookIcon({ size = 20 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.7c0-.92.26-1.55 1.58-1.55H17V4.27A22 22 0 0 0 14.55 4.14c-2.43 0-4.1 1.48-4.1 4.21V10.8H7.75V14h2.7v8h3.05Z" />
@@ -997,12 +997,21 @@ function FacebookIcon({ size = 18 }: { size?: number }) {
   );
 }
 
+function YoutubeIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.6 3.6 12 3.6 12 3.6s-7.6 0-9.4.5A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.8.5 9.4.5 9.4.5s7.6 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12l-6.2 3.6Z" />
+    </svg>
+  );
+}
+
 const SOCIAL_LINKS = [
   { icon: <Instagram size={18} />, label: "Instagram", href: "https://www.instagram.com/meubisme" },
-  { icon: <FacebookIcon size={18} />, label: "Facebook", href: "https://www.facebook.com/meubisme" },
-  { icon: <Youtube size={18} />, label: "YouTube", href: "https://www.youtube.com/@meubisme" },
+  { icon: <FacebookIcon size={20} />, label: "Facebook", href: "https://www.facebook.com/meubisme" },
+  { icon: <YoutubeIcon size={20} />, label: "YouTube", href: "https://www.youtube.com/@meubisme" },
   { icon: <TikTokIcon size={18} />, label: "TikTok", href: "https://www.tiktok.com/@meubisme?is_from_webapp=1&sender_device=pc" },
 ];
+
 
 function Footer() {
   const { t } = useI18n();
