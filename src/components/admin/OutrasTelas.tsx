@@ -497,7 +497,7 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
               }}
             >
               {Array.from({ length: 24 }, (_, i) => (
-                <option key={i} value={String(i)}>{i}h</option>
+                <option key={i} value={String(i)}>{i === 0 ? "h" : `${i}h`}</option>
               ))}
             </select>
             <span aria-hidden style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: COLORS.textMuted }}>
@@ -520,8 +520,8 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
                 fontWeight: 500,
               }}
             >
-              {Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (
-                <option key={m} value={String(m)}>{m}min</option>
+              {[0, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map((m) => (
+                <option key={m} value={String(m)}>{m === 0 ? "min" : `${m}min`}</option>
               ))}
             </select>
             <span aria-hidden style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: COLORS.textMuted }}>
