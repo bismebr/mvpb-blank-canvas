@@ -11,10 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { AppProvider } from "../components/admin/AppContext";
-import { AvaliacoesProvider } from "../components/admin/AvaliacoesContext";
-import { SiteConfigProvider } from "../components/admin/SiteConfigContext";
-import { ClientUserProvider } from "../components/barbearia/ClientUserContext";
 
 function NotFoundComponent() {
   return (
@@ -82,17 +78,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lovable App" },
-      { name: "description", content: "A simple landing page displaying \"mvpb\"." },
+      { name: "description", content: "Lovable Generated Project" },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "A simple landing page displaying \"mvpb\"." },
+      { property: "og:description", content: "Lovable Generated Project" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "A simple landing page displaying \"mvpb\"." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/46c761df-a1f1-48d0-b50e-9b8d024a646a/id-preview-b0026393--749b2811-ca05-4189-aec0-6f6cd72fb1db.lovable.app-1783445196267.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/46c761df-a1f1-48d0-b50e-9b8d024a646a/id-preview-b0026393--749b2811-ca05-4189-aec0-6f6cd72fb1db.lovable.app-1783445196267.png" },
     ],
     links: [
       {
@@ -127,16 +119,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteConfigProvider>
-        <AppProvider>
-          <AvaliacoesProvider>
-            <ClientUserProvider>
-              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-              <Outlet />
-            </ClientUserProvider>
-          </AvaliacoesProvider>
-        </AppProvider>
-      </SiteConfigProvider>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
     </QueryClientProvider>
   );
 }
