@@ -920,58 +920,99 @@ export function HorariosTela() {
         subtitle="Defina os dias e horários de atendimento"
       />
 
-      {/* Ações rápidas: Bloquear e Pausa */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10, marginBottom: 16 }}>
-        <button
-          type="button"
-          onClick={() => setBloqOpen(true)}
-          className="bisme-action-btn"
-          style={{
-            display: "flex", alignItems: "center", gap: 12, width: "100%",
-            background: COLORS.bgSurface, border: `1.5px solid ${COLORS.border}`,
-            borderLeft: `4px solid ${COLORS.accentLight}`,
-            borderRadius: 12, padding: "14px 14px", cursor: "pointer",
-            fontFamily: FONT, textAlign: "left", minHeight: 56,
-            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-            transition: "background 150ms ease, transform 80ms ease, box-shadow 150ms ease",
-          }}
-        >
-          <div style={{ width: 38, height: 38, borderRadius: 10, background: COLORS.accentLight, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }} aria-hidden>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>Bloquear horário do dia</div>
-            <div style={{ fontSize: 12, color: COLORS.textMuted }}>{bloqueios.length} {bloqueios.length === 1 ? "bloqueio ativo" : "bloqueios ativos"}</div>
-          </div>
+      {/* Ações rápidas: Bloquear (com lista inline) e Pausa (com lista inline) */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => setBloqOpen(true)}
+            className="bisme-action-btn"
+            style={{
+              display: "flex", alignItems: "center", gap: 12, width: "100%",
+              background: COLORS.bgSurface, border: `1.5px solid ${COLORS.border}`,
+              borderLeft: `4px solid ${COLORS.accentLight}`,
+              borderRadius: 12, padding: "14px 14px", cursor: "pointer",
+              fontFamily: FONT, textAlign: "left", minHeight: 56,
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+              transition: "background 150ms ease, transform 80ms ease, box-shadow 150ms ease",
+            }}
+          >
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: COLORS.accentLight, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }} aria-hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>Bloquear horário do dia</div>
+              <div style={{ fontSize: 12, color: COLORS.textMuted }}>{bloqueios.length} {bloqueios.length === 1 ? "bloqueio ativo" : "bloqueios ativos"}</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
           {bloqueios.length > 0 && (
-            <span onClick={(e) => { e.stopPropagation(); setListOpen(true); }} style={{ background: "transparent", border: `1px solid ${COLORS.accentLight}`, color: COLORS.accentLight, borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>Ver</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {bloqueios.map((b) => {
+                const escopo = b.funcionarioId ? (funcionarios.find((f) => f.id === b.funcionarioId)?.nome ?? "Funcionário") : "Negócio todo";
+                return (
+                  <div key={b.id} style={{ ...cardStyle, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>{b.data}</div>
+                      <div style={{ fontSize: 12, color: COLORS.textMuted }}>
+                        {b.diaInteiro ? "Dia inteiro" : `${b.inicio ?? "—"} – ${b.fim ?? "—"}`} · {escopo}
+                      </div>
+                    </div>
+                    <button onClick={() => handleRemoveBloqueio(b.id)} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>Remover</button>
+                  </div>
+                );
+              })}
+            </div>
           )}
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button
-          type="button"
-          onClick={() => { setPausaEdit(null); setPausaOpen(true); }}
-          className="bisme-action-btn"
-          style={{
-            display: "flex", alignItems: "center", gap: 12, width: "100%",
-            background: COLORS.bgSurface, border: `1.5px solid ${COLORS.border}`,
-            borderLeft: `4px solid ${COLORS.accentLight}`,
-            borderRadius: 12, padding: "14px 14px", cursor: "pointer",
-            fontFamily: FONT, textAlign: "left", minHeight: 56,
-            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-            transition: "background 150ms ease, transform 80ms ease, box-shadow 150ms ease",
-          }}
-        >
-          <div style={{ width: 38, height: 38, borderRadius: 10, background: COLORS.accentLight, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }} aria-hidden>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>Horário de almoço ou pausa</div>
-            <div style={{ fontSize: 12, color: COLORS.textMuted }}>{pausas.length} {pausas.length === 1 ? "pausa configurada" : "pausas configuradas"}</div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => { setPausaEdit(null); setPausaOpen(true); }}
+            className="bisme-action-btn"
+            style={{
+              display: "flex", alignItems: "center", gap: 12, width: "100%",
+              background: COLORS.bgSurface, border: `1.5px solid ${COLORS.border}`,
+              borderLeft: `4px solid ${COLORS.accentLight}`,
+              borderRadius: 12, padding: "14px 14px", cursor: "pointer",
+              fontFamily: FONT, textAlign: "left", minHeight: 56,
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+              transition: "background 150ms ease, transform 80ms ease, box-shadow 150ms ease",
+            }}
+          >
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: COLORS.accentLight, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }} aria-hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>Horário de almoço ou pausa</div>
+              <div style={{ fontSize: 12, color: COLORS.textMuted }}>{pausas.length} {pausas.length === 1 ? "pausa configurada" : "pausas configuradas"}</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          {pausas.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {pausas.map((p) => {
+                const funcNome = p.funcionarioId ? (funcionarios.find((f) => f.id === p.funcionarioId)?.nome ?? "—") : "Todo o negócio";
+                const diaTxt = p.diaSemana === null ? "Todos os dias de funcionamento" : (DIAS.find((d) => d.i === p.diaSemana)?.nome ?? "—");
+                return (
+                  <div key={p.id} style={{ ...cardStyle, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.textPrimary }}>{p.inicio} – {p.fim}</div>
+                      <div style={{ fontSize: 12, color: COLORS.textMuted }}>{diaTxt} · {funcNome}</div>
+                    </div>
+                    <button onClick={() => { setPausaEdit(p); setPausaOpen(true); }} aria-label="Editar" style={{ background: "transparent", border: "none", cursor: "pointer", padding: 8 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={COLORS.textMuted} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                    </button>
+                    <button onClick={() => handleRemovePausa(p.id)} style={{ color: COLORS.danger, background: COLORS.dangerBg, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>Remover</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
+
 
       {DIAS.map(({ i, nome }) => {
         const h = horarios.find((x) => x.diaSemana === i)!;
