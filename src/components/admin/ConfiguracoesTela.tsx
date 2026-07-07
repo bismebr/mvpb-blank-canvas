@@ -178,6 +178,13 @@ export function ConfiguracoesTela({ onGoToLinks }: { onGoToLinks?: () => void } 
         return;
       }
       companyIdRef.current = cid;
+      setCompanyId(cid);
+      try {
+        const seen = localStorage.getItem(READY_MODAL_KEY_PREFIX + cid) === "1";
+        if (seen) setModalSeen(true);
+      } catch {
+        // ignore
+      }
       const loaded = await loadCompanySite(cid);
       if (cancelled || !loaded) {
         setSiteHydrated(true);
