@@ -480,18 +480,15 @@ function useI18n(): I18nCtx {
 
 function FlagBR({ size = 22 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <defs><clipPath id="fbr"><circle cx="12" cy="12" r="12" /></clipPath></defs>
-      <g clipPath="url(#fbr)">
-        <rect width="24" height="24" fill="#009c3b" />
-        <polygon points="12,4 20,12 12,20 4,12" fill="#ffdf00" />
-        <circle cx="12" cy="12" r="3.4" fill="#002776" />
-        <path d="M9.2 12.4a5 5 0 0 1 5.6-0.9" stroke="#ffffff" strokeWidth="0.55" fill="none" />
-      </g>
-      <circle cx="12" cy="12" r="11.6" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="0.8" />
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="20" height="20" rx="10" fill="#009B3A" />
+      <path d="m10.001 2.947 8.805 7.052-8.805 7.053-8.805-7.053 8.805-7.052Z" fill="#FEDF00" />
+      <circle cx="10.001" cy="9.998" r="4.12" transform="rotate(3.323 10.001 9.998)" fill="#002776" />
+      <path d="M14.094 10.49a12.533 12.533 0 0 0-6.38-2.176 12.725 12.725 0 0 0-1.472 0c-.133.295-.231.609-.291.937.56-.049 1.13-.058 1.708-.024 2.325.135 4.452.942 6.203 2.22.113-.303.193-.623.232-.957Z" fill="#fff" />
     </svg>
   );
 }
+
 function FlagGB({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 60 60" aria-hidden="true">
