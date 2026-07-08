@@ -9,367 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VendaRouteImport } from './routes/venda'
-import { Route as TermosDeServicoRouteImport } from './routes/termos-de-servico'
-import { Route as SobreRouteImport } from './routes/sobre'
-import { Route as QuemSomosRouteImport } from './routes/quem-somos'
-import { Route as PoliticaPrivacidadeRouteImport } from './routes/politica-privacidade'
-import { Route as PlanosRouteImport } from './routes/planos'
-import { Route as MeusAgendamentosRouteImport } from './routes/meus-agendamentos'
-import { Route as BismeAdminRouteImport } from './routes/bisme-admin'
-import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as EmpresarioRedefinirSenhaRouteImport } from './routes/empresario.redefinir-senha'
-import { Route as EmpresarioOnboardingRouteImport } from './routes/empresario.onboarding'
-import { Route as EmpresarioLoginRouteImport } from './routes/empresario.login'
-import { Route as EmpresarioEsqueciSenhaRouteImport } from './routes/empresario.esqueci-senha'
-import { Route as EmpresarioEmailAlteradoRouteImport } from './routes/empresario.email-alterado'
-import { Route as EmpresarioCadastroRouteImport } from './routes/empresario.cadastro'
-import { Route as ClienteRedefinirSenhaRouteImport } from './routes/cliente.redefinir-senha'
-import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 
-const VendaRoute = VendaRouteImport.update({
-  id: '/venda',
-  path: '/venda',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermosDeServicoRoute = TermosDeServicoRouteImport.update({
-  id: '/termos-de-servico',
-  path: '/termos-de-servico',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SobreRoute = SobreRouteImport.update({
-  id: '/sobre',
-  path: '/sobre',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuemSomosRoute = QuemSomosRouteImport.update({
-  id: '/quem-somos',
-  path: '/quem-somos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PoliticaPrivacidadeRoute = PoliticaPrivacidadeRouteImport.update({
-  id: '/politica-privacidade',
-  path: '/politica-privacidade',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlanosRoute = PlanosRouteImport.update({
-  id: '/planos',
-  path: '/planos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MeusAgendamentosRoute = MeusAgendamentosRouteImport.update({
-  id: '/meus-agendamentos',
-  path: '/meus-agendamentos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BismeAdminRoute = BismeAdminRouteImport.update({
-  id: '/bisme-admin',
-  path: '/bisme-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AvaliacoesRoute = AvaliacoesRouteImport.update({
-  id: '/avaliacoes',
-  path: '/avaliacoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SlugRoute = SlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EmpresarioRedefinirSenhaRoute =
-  EmpresarioRedefinirSenhaRouteImport.update({
-    id: '/empresario/redefinir-senha',
-    path: '/empresario/redefinir-senha',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const EmpresarioOnboardingRoute = EmpresarioOnboardingRouteImport.update({
-  id: '/empresario/onboarding',
-  path: '/empresario/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmpresarioLoginRoute = EmpresarioLoginRouteImport.update({
-  id: '/empresario/login',
-  path: '/empresario/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmpresarioEsqueciSenhaRoute = EmpresarioEsqueciSenhaRouteImport.update({
-  id: '/empresario/esqueci-senha',
-  path: '/empresario/esqueci-senha',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmpresarioEmailAlteradoRoute = EmpresarioEmailAlteradoRouteImport.update({
-  id: '/empresario/email-alterado',
-  path: '/empresario/email-alterado',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmpresarioCadastroRoute = EmpresarioCadastroRouteImport.update({
-  id: '/empresario/cadastro',
-  path: '/empresario/cadastro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClienteRedefinirSenhaRoute = ClienteRedefinirSenhaRouteImport.update({
-  id: '/cliente/redefinir-senha',
-  path: '/cliente/redefinir-senha',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
-  id: '/api/public/stripe/webhook',
-  path: '/api/public/stripe/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$slug': typeof SlugRoute
-  '/admin': typeof AdminRoute
-  '/avaliacoes': typeof AvaliacoesRoute
-  '/bisme-admin': typeof BismeAdminRoute
-  '/meus-agendamentos': typeof MeusAgendamentosRoute
-  '/planos': typeof PlanosRoute
-  '/politica-privacidade': typeof PoliticaPrivacidadeRoute
-  '/quem-somos': typeof QuemSomosRoute
-  '/sobre': typeof SobreRoute
-  '/termos-de-servico': typeof TermosDeServicoRoute
-  '/venda': typeof VendaRoute
-  '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
-  '/empresario/cadastro': typeof EmpresarioCadastroRoute
-  '/empresario/email-alterado': typeof EmpresarioEmailAlteradoRoute
-  '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
-  '/empresario/login': typeof EmpresarioLoginRoute
-  '/empresario/onboarding': typeof EmpresarioOnboardingRoute
-  '/empresario/redefinir-senha': typeof EmpresarioRedefinirSenhaRoute
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$slug': typeof SlugRoute
-  '/admin': typeof AdminRoute
-  '/avaliacoes': typeof AvaliacoesRoute
-  '/bisme-admin': typeof BismeAdminRoute
-  '/meus-agendamentos': typeof MeusAgendamentosRoute
-  '/planos': typeof PlanosRoute
-  '/politica-privacidade': typeof PoliticaPrivacidadeRoute
-  '/quem-somos': typeof QuemSomosRoute
-  '/sobre': typeof SobreRoute
-  '/termos-de-servico': typeof TermosDeServicoRoute
-  '/venda': typeof VendaRoute
-  '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
-  '/empresario/cadastro': typeof EmpresarioCadastroRoute
-  '/empresario/email-alterado': typeof EmpresarioEmailAlteradoRoute
-  '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
-  '/empresario/login': typeof EmpresarioLoginRoute
-  '/empresario/onboarding': typeof EmpresarioOnboardingRoute
-  '/empresario/redefinir-senha': typeof EmpresarioRedefinirSenhaRoute
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/$slug': typeof SlugRoute
-  '/admin': typeof AdminRoute
-  '/avaliacoes': typeof AvaliacoesRoute
-  '/bisme-admin': typeof BismeAdminRoute
-  '/meus-agendamentos': typeof MeusAgendamentosRoute
-  '/planos': typeof PlanosRoute
-  '/politica-privacidade': typeof PoliticaPrivacidadeRoute
-  '/quem-somos': typeof QuemSomosRoute
-  '/sobre': typeof SobreRoute
-  '/termos-de-servico': typeof TermosDeServicoRoute
-  '/venda': typeof VendaRoute
-  '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
-  '/empresario/cadastro': typeof EmpresarioCadastroRoute
-  '/empresario/email-alterado': typeof EmpresarioEmailAlteradoRoute
-  '/empresario/esqueci-senha': typeof EmpresarioEsqueciSenhaRoute
-  '/empresario/login': typeof EmpresarioLoginRoute
-  '/empresario/onboarding': typeof EmpresarioOnboardingRoute
-  '/empresario/redefinir-senha': typeof EmpresarioRedefinirSenhaRoute
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/$slug'
-    | '/admin'
-    | '/avaliacoes'
-    | '/bisme-admin'
-    | '/meus-agendamentos'
-    | '/planos'
-    | '/politica-privacidade'
-    | '/quem-somos'
-    | '/sobre'
-    | '/termos-de-servico'
-    | '/venda'
-    | '/cliente/redefinir-senha'
-    | '/empresario/cadastro'
-    | '/empresario/email-alterado'
-    | '/empresario/esqueci-senha'
-    | '/empresario/login'
-    | '/empresario/onboarding'
-    | '/empresario/redefinir-senha'
-    | '/api/public/stripe/webhook'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/$slug'
-    | '/admin'
-    | '/avaliacoes'
-    | '/bisme-admin'
-    | '/meus-agendamentos'
-    | '/planos'
-    | '/politica-privacidade'
-    | '/quem-somos'
-    | '/sobre'
-    | '/termos-de-servico'
-    | '/venda'
-    | '/cliente/redefinir-senha'
-    | '/empresario/cadastro'
-    | '/empresario/email-alterado'
-    | '/empresario/esqueci-senha'
-    | '/empresario/login'
-    | '/empresario/onboarding'
-    | '/empresario/redefinir-senha'
-    | '/api/public/stripe/webhook'
-  id:
-    | '__root__'
-    | '/'
-    | '/$slug'
-    | '/admin'
-    | '/avaliacoes'
-    | '/bisme-admin'
-    | '/meus-agendamentos'
-    | '/planos'
-    | '/politica-privacidade'
-    | '/quem-somos'
-    | '/sobre'
-    | '/termos-de-servico'
-    | '/venda'
-    | '/cliente/redefinir-senha'
-    | '/empresario/cadastro'
-    | '/empresario/email-alterado'
-    | '/empresario/esqueci-senha'
-    | '/empresario/login'
-    | '/empresario/onboarding'
-    | '/empresario/redefinir-senha'
-    | '/api/public/stripe/webhook'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  SlugRoute: typeof SlugRoute
-  AdminRoute: typeof AdminRoute
-  AvaliacoesRoute: typeof AvaliacoesRoute
-  BismeAdminRoute: typeof BismeAdminRoute
-  MeusAgendamentosRoute: typeof MeusAgendamentosRoute
-  PlanosRoute: typeof PlanosRoute
-  PoliticaPrivacidadeRoute: typeof PoliticaPrivacidadeRoute
-  QuemSomosRoute: typeof QuemSomosRoute
-  SobreRoute: typeof SobreRoute
-  TermosDeServicoRoute: typeof TermosDeServicoRoute
-  VendaRoute: typeof VendaRoute
-  ClienteRedefinirSenhaRoute: typeof ClienteRedefinirSenhaRoute
-  EmpresarioCadastroRoute: typeof EmpresarioCadastroRoute
-  EmpresarioEmailAlteradoRoute: typeof EmpresarioEmailAlteradoRoute
-  EmpresarioEsqueciSenhaRoute: typeof EmpresarioEsqueciSenhaRoute
-  EmpresarioLoginRoute: typeof EmpresarioLoginRoute
-  EmpresarioOnboardingRoute: typeof EmpresarioOnboardingRoute
-  EmpresarioRedefinirSenhaRoute: typeof EmpresarioRedefinirSenhaRoute
-  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/venda': {
-      id: '/venda'
-      path: '/venda'
-      fullPath: '/venda'
-      preLoaderRoute: typeof VendaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/termos-de-servico': {
-      id: '/termos-de-servico'
-      path: '/termos-de-servico'
-      fullPath: '/termos-de-servico'
-      preLoaderRoute: typeof TermosDeServicoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sobre': {
-      id: '/sobre'
-      path: '/sobre'
-      fullPath: '/sobre'
-      preLoaderRoute: typeof SobreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quem-somos': {
-      id: '/quem-somos'
-      path: '/quem-somos'
-      fullPath: '/quem-somos'
-      preLoaderRoute: typeof QuemSomosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/politica-privacidade': {
-      id: '/politica-privacidade'
-      path: '/politica-privacidade'
-      fullPath: '/politica-privacidade'
-      preLoaderRoute: typeof PoliticaPrivacidadeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/planos': {
-      id: '/planos'
-      path: '/planos'
-      fullPath: '/planos'
-      preLoaderRoute: typeof PlanosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/meus-agendamentos': {
-      id: '/meus-agendamentos'
-      path: '/meus-agendamentos'
-      fullPath: '/meus-agendamentos'
-      preLoaderRoute: typeof MeusAgendamentosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bisme-admin': {
-      id: '/bisme-admin'
-      path: '/bisme-admin'
-      fullPath: '/bisme-admin'
-      preLoaderRoute: typeof BismeAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/avaliacoes': {
-      id: '/avaliacoes'
-      path: '/avaliacoes'
-      fullPath: '/avaliacoes'
-      preLoaderRoute: typeof AvaliacoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/$slug': {
-      id: '/$slug'
-      path: '/$slug'
-      fullPath: '/$slug'
-      preLoaderRoute: typeof SlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -377,87 +48,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/empresario/redefinir-senha': {
-      id: '/empresario/redefinir-senha'
-      path: '/empresario/redefinir-senha'
-      fullPath: '/empresario/redefinir-senha'
-      preLoaderRoute: typeof EmpresarioRedefinirSenhaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/empresario/onboarding': {
-      id: '/empresario/onboarding'
-      path: '/empresario/onboarding'
-      fullPath: '/empresario/onboarding'
-      preLoaderRoute: typeof EmpresarioOnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/empresario/login': {
-      id: '/empresario/login'
-      path: '/empresario/login'
-      fullPath: '/empresario/login'
-      preLoaderRoute: typeof EmpresarioLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/empresario/esqueci-senha': {
-      id: '/empresario/esqueci-senha'
-      path: '/empresario/esqueci-senha'
-      fullPath: '/empresario/esqueci-senha'
-      preLoaderRoute: typeof EmpresarioEsqueciSenhaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/empresario/email-alterado': {
-      id: '/empresario/email-alterado'
-      path: '/empresario/email-alterado'
-      fullPath: '/empresario/email-alterado'
-      preLoaderRoute: typeof EmpresarioEmailAlteradoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/empresario/cadastro': {
-      id: '/empresario/cadastro'
-      path: '/empresario/cadastro'
-      fullPath: '/empresario/cadastro'
-      preLoaderRoute: typeof EmpresarioCadastroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cliente/redefinir-senha': {
-      id: '/cliente/redefinir-senha'
-      path: '/cliente/redefinir-senha'
-      fullPath: '/cliente/redefinir-senha'
-      preLoaderRoute: typeof ClienteRedefinirSenhaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/stripe/webhook': {
-      id: '/api/public/stripe/webhook'
-      path: '/api/public/stripe/webhook'
-      fullPath: '/api/public/stripe/webhook'
-      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  SlugRoute: SlugRoute,
-  AdminRoute: AdminRoute,
-  AvaliacoesRoute: AvaliacoesRoute,
-  BismeAdminRoute: BismeAdminRoute,
-  MeusAgendamentosRoute: MeusAgendamentosRoute,
-  PlanosRoute: PlanosRoute,
-  PoliticaPrivacidadeRoute: PoliticaPrivacidadeRoute,
-  QuemSomosRoute: QuemSomosRoute,
-  SobreRoute: SobreRoute,
-  TermosDeServicoRoute: TermosDeServicoRoute,
-  VendaRoute: VendaRoute,
-  ClienteRedefinirSenhaRoute: ClienteRedefinirSenhaRoute,
-  EmpresarioCadastroRoute: EmpresarioCadastroRoute,
-  EmpresarioEmailAlteradoRoute: EmpresarioEmailAlteradoRoute,
-  EmpresarioEsqueciSenhaRoute: EmpresarioEsqueciSenhaRoute,
-  EmpresarioLoginRoute: EmpresarioLoginRoute,
-  EmpresarioOnboardingRoute: EmpresarioOnboardingRoute,
-  EmpresarioRedefinirSenhaRoute: EmpresarioRedefinirSenhaRoute,
-  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
