@@ -155,10 +155,6 @@ export function buildTemplateCss(template: SiteTemplate): string {
 .sreli-root [style*="background:#FFFFFF"],
 .sreli-root [style*="background: #ffffff"],
 .sreli-root [style*="background:#ffffff"],
-.sreli-root [style*="background: #FFF\\""],
-.sreli-root [style*="background:#FFF\\""],
-.sreli-root [style*="background: #fff\\""],
-.sreli-root [style*="background:#fff\\""],
 .sreli-root [style*="background-color: rgb(255, 255, 255)"],
 .sreli-root [style*="background-color:rgb(255, 255, 255)"],
 .sreli-root [style*="background: rgb(248, 248, 248)"],
@@ -172,8 +168,35 @@ export function buildTemplateCss(template: SiteTemplate): string {
   background-color: ${cardBg} !important;
   background-image: none !important;
 }
+.sreli-root [style*="color: rgb(26, 26, 26)"],
+.sreli-root [style*="color:rgb(26, 26, 26)"],
+.sreli-root [style*="color: #1A1A1A"],
+.sreli-root [style*="color:#1A1A1A"],
+.sreli-root [style*="color: rgb(17, 17, 17)"],
+.sreli-root [style*="color: #111111"],
+.sreli-root [style*="color: #111\\9"],
+.sreli-root [style*="color: rgb(0, 0, 0)"],
+.sreli-root [style*="color: #000000"],
+.sreli-root [style*="color: #000\\9"] {
+  color: ${onBg} !important;
+}
+.sreli-root [style*="color: rgb(102, 102, 102)"],
+.sreli-root [style*="color: rgb(136, 136, 136)"],
+.sreli-root [style*="color: rgb(68, 68, 68)"],
+.sreli-root [style*="color: #666"],
+.sreli-root [style*="color: #888"],
+.sreli-root [style*="color: #444"] {
+  color: ${onBgMuted} !important;
+}
+.sreli-root [style*="border: 1px solid rgb(238, 238, 238)"],
+.sreli-root [style*="border: 1.5px solid rgb(238, 238, 238)"],
+.sreli-root [style*="border: 1px solid rgb(240, 240, 240)"],
+.sreli-root [style*="border-color: rgb(238, 238, 238)"] {
+  border-color: ${sectionBorder} !important;
+}
 `
     : "";
+
   return `
 .sreli-root {
   --site-primary: ${primary};
