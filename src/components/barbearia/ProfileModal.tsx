@@ -13,6 +13,8 @@ export function ProfileModal({ open, onClose }: { open: boolean; onClose: () => 
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragY, setDragY] = useState(0);
   const dragRef = useRef<{ startY: number; atTop: boolean } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadErr, setUploadErr] = useState<string | null>(null);
 
   useEffect(() => {
     if (open && usuario) {
@@ -33,9 +35,6 @@ export function ProfileModal({ open, onClose }: { open: boolean; onClose: () => 
   }, [open]);
 
   if (!open || !usuario) return null;
-
-  const [uploading, setUploading] = useState(false);
-  const [uploadErr, setUploadErr] = useState<string | null>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
