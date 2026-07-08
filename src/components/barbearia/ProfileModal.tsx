@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import { useClientUser } from "./ClientUserContext";
+import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
 
 const FONT = "'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
 
@@ -33,12 +34,88 @@ export function ProfileModal({ open, onClose }: { open: boolean; onClose: () => 
 
   if (!open || !usuario) return null;
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadErr, setUploadErr] = useState<string | null>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
+    e.target.value = "";
     if (!f) return;
-    const r = new FileReader();
-    r.onload = () => setFotoUrl(String(r.result));
-    r.readAsDataURL(f);
+    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) {
+      setUploadErr("Envie um arquivo JPG, PNG ou WEBP.");
+      return;
+    }
+    if (f.size > 5 * 1024 * 1024) {
+      setUploadErr("A imagem deve ter no máximo 5MB.");
+      return;
+    }
+    setUploadErr(null);
+    setUploading(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const uid = sess.session?.user?.id;
+      if (!uid) throw new Error("Sessão expirada.");
+
+      // Redimensiona/normaliza para 512x512 webp, mesmo padrão do admin.
+      const dataUrl: string = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(String(r.result));
+        r.onerror = () => rej(new Error("Falha ao ler imagem."));
+        r.readAsDataURL(f);
+      });
+      const img = new Image();
+      img.src = dataUrl;
+      await new Promise<void>((res, rej) => {
+        img.onload = () => res();
+        img.onerror = () => rej(new Error("Falha ao carregar imagem."));
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = 512; canvas.height = 512;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Falha ao processar imagem.");
+      // cover crop centralizado
+      const s = Math.min(img.width, img.height);
+      const sx = (img.width - s) / 2;
+      const sy = (img.height - s) / 2;
+      ctx.drawImage(img, sx, sy, s, s, 0, 0, 512, 512);
+      const blob: Blob = await new Promise((res, rej) => {
+        canvas.toBlob((b) => (b ? res(b) : rej(new Error("Falha ao gerar imagem."))), "image/webp", 0.9);
+      });
+
+      const path = `${uid}/client-avatar-${Date.now()}.webp`;
+      const { error: upErr } = await supabase.storage
+        .from("profile-avatars")
+        .upload(path, blob, { contentType: "image/webp", upsert: false });
+      if (upErr) throw upErr;
+
+      // Registra o path no user_metadata (global por conta, entre navegadores/dispositivos).
+      const { error: metaErr } = await supabase.auth.updateUser({
+        data: { avatarPath: path },
+      });
+      if (metaErr) throw metaErr;
+
+      // Remove arquivos antigos do próprio usuário para não acumular.
+      try {
+        const { data: list } = await supabase.storage
+          .from("profile-avatars")
+          .list(uid, { limit: 100 });
+        const stale = (list ?? [])
+          .filter((f) => f.name.startsWith("client-avatar-") && `${uid}/${f.name}` !== path)
+          .map((f) => `${uid}/${f.name}`);
+        if (stale.length) await supabase.storage.from("profile-avatars").remove(stale);
+      } catch { /* limpeza best-effort */ }
+
+      // Signed URL para exibir agora (não é salva no banco).
+      const { data: signed } = await supabase.storage
+        .from("profile-avatars")
+        .createSignedUrl(path, 60 * 60);
+      if (signed?.signedUrl) setFotoUrl(signed.signedUrl);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha ao enviar foto.";
+      setUploadErr(msg);
+    } finally {
+      setUploading(false);
+    }
   }
 
   function salvar() {
