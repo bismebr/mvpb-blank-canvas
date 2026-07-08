@@ -199,13 +199,13 @@
 
 .sreli-login-close {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  border: 1px solid #EEEEEE;
+  top: 14px;
+  left: max(24px, calc(50% - 120px));
+  width: 28px;
+  height: 28px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -213,17 +213,18 @@
   color: #1A1A1A;
   z-index: 2;
   flex-shrink: 0;
+  padding: 0;
 }
 .sreli-login-close svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   stroke-width: 2.2;
 }
 .sreli-login-close:hover,
 .sreli-login-close:active,
 .sreli-login-close:focus,
 .sreli-login-close:focus-visible {
-  background: #FFFFFF;
+  background: transparent;
   outline: none;
 }
 
