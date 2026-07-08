@@ -243,11 +243,25 @@ export function buildTemplateCss(template: SiteTemplate): string {
   border-color: #18181b !important;
 }
 
+/* Cards de serviços (fundo + borda 1.5px brancos) → fundo #18181b */
+.sreli-root [style*="border: 1.5px solid rgb(255, 255, 255)"][style*="background: rgb(255, 255, 255)"]${NOT_LOGIN},
+.sreli-root [style*="border: 1.5px solid rgb(255, 255, 255)"][style*="background: #FFFFFF"]${NOT_LOGIN},
+.sreli-root [style*="border: 1.5px solid rgb(255, 255, 255)"][style*="background:#FFFFFF"]${NOT_LOGIN},
+.sreli-root [style*="border: 1.5px solid #FFFFFF"][style*="background: rgb(255, 255, 255)"]${NOT_LOGIN},
+.sreli-root [style*="border: 1.5px solid #FFFFFF"][style*="background: #FFFFFF"]${NOT_LOGIN},
+.sreli-root [style*="border: 1.5px solid #FFFFFF"][style*="background:#FFFFFF"]${NOT_LOGIN},
+.sreli-root [style*="border:1.5px solid #FFFFFF"][style*="background: #FFFFFF"]${NOT_LOGIN},
+.sreli-root [style*="border:1.5px solid #FFFFFF"][style*="background:#FFFFFF"]${NOT_LOGIN} {
+  background-color: #18181b !important;
+  background-image: none !important;
+}
+
 /* Borda 1.5px branca (cards de serviços com border igual ao bg) → #18181b */
 .sreli-root [style*="border: 1.5px solid rgb(255, 255, 255)"]${NOT_LOGIN},
 .sreli-root [style*="border: 1.5px solid #FFFFFF"]${NOT_LOGIN} {
   border-color: #18181b !important;
 }
+
 `
     : "";
 
