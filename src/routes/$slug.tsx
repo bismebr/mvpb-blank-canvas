@@ -190,7 +190,9 @@ function PublicSitePage() {
   }, [slug]);
 
   if (state.kind === "loading") {
-    return <LoadingOverlay slug={slug} />;
+    // Sem overlay full-screen na entrada/reload — a página renderiza normalmente
+    // assim que os dados públicos chegam. Loadings internos continuam ativos.
+    return null;
   }
 
 
