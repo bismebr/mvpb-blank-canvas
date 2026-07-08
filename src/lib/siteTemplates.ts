@@ -262,6 +262,43 @@ export function buildTemplateCss(template: SiteTemplate): string {
   border-color: #18181b !important;
 }
 
+/* Cards da aba de avaliações (resumo + itens): bg + borda 1px brancos → #18181b */
+.sreli-root [style*="border: 1px solid rgb(255, 255, 255)"]${NOT_LOGIN},
+.sreli-root [style*="border: 1px solid #FFFFFF"]${NOT_LOGIN} {
+  background-color: #18181b !important;
+  background-image: none !important;
+  border-color: #18181b !important;
+}
+
+/* Dia/horário selecionados no fluxo de agendamento (color-mix c/ primary) →
+   fundo amarelo sólido + texto branco. */
+.sreli-root [style*="color-mix"]${NOT_LOGIN} {
+  background-color: #F5B324 !important;
+  background-image: none !important;
+  color: #FFFFFF !important;
+}
+.sreli-root [style*="color-mix"]${NOT_LOGIN} * {
+  color: #FFFFFF !important;
+}
+
+/* Campo de nota do agendamento (textarea) → #18181b */
+.sreli-root .bisme-textarea,
+.sreli-root .bisme-textarea:hover,
+.sreli-root .bisme-textarea:focus,
+.sreli-root .bisme-textarea:focus-visible {
+  background: #18181b !important;
+  color: #F5F5F5 !important;
+  border-color: #2a2a2f !important;
+}
+.sreli-root .bisme-textarea::placeholder {
+  color: #B5B5B5 !important;
+}
+
+/* Setas SVG (voltar do header do fluxo + navegação de mês) → brancas */
+.sreli-root svg path[stroke="#1A1A1A"]${NOT_LOGIN} {
+  stroke: #FFFFFF !important;
+}
+
 `
     : "";
 
