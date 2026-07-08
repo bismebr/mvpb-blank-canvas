@@ -560,11 +560,11 @@ export function LoginFullScreen({
                   )}
                 </div>
                 {whatsappTouched && whatsapp.length > 0 && !isPhoneValid(whatsapp) && (
-                  <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
+                <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
                     Adicione um número de telefone válido
                   </div>
                 )}
-                <div style={{ height: 12 }} />
+                <div style={{ height: 8 }} />
               </>
             )}
 
