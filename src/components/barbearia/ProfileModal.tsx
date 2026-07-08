@@ -197,10 +197,14 @@ export function ProfileModal({ open, onClose }: { open: boolean; onClose: () => 
           <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} />
           <button
             onClick={() => fileRef.current?.click()}
-            style={{ background: "transparent", border: "none", color: "var(--site-primary, #5690f5)", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: FONT }}
+            disabled={uploading}
+            style={{ background: "transparent", border: "none", color: "var(--site-primary, #5690f5)", fontWeight: 600, fontSize: 13, cursor: uploading ? "not-allowed" : "pointer", fontFamily: FONT, opacity: uploading ? 0.6 : 1 }}
           >
-            Alterar foto de perfil
+            {uploading ? "Enviando..." : "Alterar foto de perfil"}
           </button>
+          {uploadErr && (
+            <div style={{ fontSize: 12, color: "#dc2626", fontWeight: 600 }}>{uploadErr}</div>
+          )}
         </div>
 
         <Field label="Nome">
