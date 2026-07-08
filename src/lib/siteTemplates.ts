@@ -216,18 +216,23 @@ export function buildTemplateCss(template: SiteTemplate): string {
   color: ${onBgMuted} !important;
 }
 
-/* Bordas divisórias → #2a2a2f */
-.sreli-root [style*="border: 1px solid rgb(238, 238, 238)"]${NOT_LOGIN},
-.sreli-root [style*="border: 1.5px solid rgb(238, 238, 238)"]${NOT_LOGIN},
-.sreli-root [style*="border: 1px solid rgb(240, 240, 240)"]${NOT_LOGIN},
-.sreli-root [style*="border: 1.5px solid rgb(239, 239, 239)"]${NOT_LOGIN},
-.sreli-root [style*="border: 1.5px solid rgb(224, 224, 224)"]${NOT_LOGIN},
-.sreli-root [style*="border-bottom: 1px solid rgb(238, 238, 238)"]${NOT_LOGIN},
-.sreli-root [style*="border-bottom: 1px solid rgb(240, 240, 240)"]${NOT_LOGIN},
-.sreli-root [style*="border-top: 1px solid rgb(240, 240, 240)"]${NOT_LOGIN},
-.sreli-root [style*="border-top: 1px solid rgb(238, 238, 238)"]${NOT_LOGIN},
-.sreli-root [style*="border-color: rgb(238, 238, 238)"]${NOT_LOGIN},
-.sreli-root [style*="border-color: rgb(240, 240, 240)"]${NOT_LOGIN} {
+/* Bordas divisórias → #2a2a2f
+   Fallback amplo: qualquer inline style que contenha uma cor cinza clara
+   comum tem sua border-color forçada para o divisor escuro. Cobre todas
+   as variações de shorthand (border, border-top/bottom/left/right,
+   border-color) sem depender da largura (1px / 1.5px / 2px). Necessário
+   porque no mobile alguns elementos sticky/sheet renderizam com strings
+   de estilo que não batiam nas regras específicas de largura fixa. */
+.sreli-root [style*="rgb(238, 238, 238)"]${NOT_LOGIN},
+.sreli-root [style*="rgb(239, 239, 239)"]${NOT_LOGIN},
+.sreli-root [style*="rgb(240, 240, 240)"]${NOT_LOGIN},
+.sreli-root [style*="rgb(224, 224, 224)"]${NOT_LOGIN},
+.sreli-root [style*="rgb(221, 221, 221)"]${NOT_LOGIN},
+.sreli-root [style*="rgb(228, 228, 228)"]${NOT_LOGIN},
+.sreli-root [style*="rgb(229, 229, 229)"]${NOT_LOGIN},
+.sreli-root [style*="rgb(212, 212, 216)"]${NOT_LOGIN},
+.sreli-root [style*="rgb(229, 231, 235)"]${NOT_LOGIN},
+.sreli-root [style*="rgb(229, 229, 226)"]${NOT_LOGIN} {
   border-color: ${divider} !important;
 }
 
