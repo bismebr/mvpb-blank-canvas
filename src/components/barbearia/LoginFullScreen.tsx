@@ -291,7 +291,7 @@ export function LoginFullScreen({
         </svg>
       </button>
 
-      <div className="sreli-login-content" style={{ paddingTop: 56 }}>
+      <div className="sreli-login-content" style={{ paddingTop: 20 }}>
         {mode !== "esqueci" && (
           <div
             role="tablist"
@@ -302,7 +302,7 @@ export function LoginFullScreen({
               background: "#F3F4F6",
               borderRadius: 8,
               padding: 3,
-              marginBottom: 22,
+              marginBottom: 10,
               width: "min(240px, 100%)",
               marginLeft: "auto",
               marginRight: "auto",
@@ -418,7 +418,7 @@ export function LoginFullScreen({
           <>
             {isCadastro && (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   <FloatField
                     label="Nome"
                     value={nome}
@@ -434,7 +434,7 @@ export function LoginFullScreen({
                     autoComplete="family-name"
                   />
                 </div>
-                <div style={{ height: 12 }} />
+                <div style={{ height: 8 }} />
                 <div ref={countryRef} style={{ position: "relative" }}>
                   <div
                     style={{
@@ -560,11 +560,11 @@ export function LoginFullScreen({
                   )}
                 </div>
                 {whatsappTouched && whatsapp.length > 0 && !isPhoneValid(whatsapp) && (
-                  <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
+                <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
                     Adicione um número de telefone válido
                   </div>
                 )}
-                <div style={{ height: 12 }} />
+                <div style={{ height: 8 }} />
               </>
             )}
 
@@ -576,7 +576,7 @@ export function LoginFullScreen({
               allowedDomain={emailAllowedDomain}
               validShape={emailValidShape}
             />
-            <div style={{ height: 12 }} />
+            <div style={{ height: 8 }} />
             <FloatField
               label="Senha"
               value={senha}
@@ -645,7 +645,7 @@ export function LoginFullScreen({
               {isLogin ? "Entrar" : "Continuar"}
             </button>
 
-            <div className="sreli-divider" style={{ margin: "20px 0 16px" }}>
+            <div className="sreli-divider" style={{ margin: "16px 0 12px" }}>
               <span className="sreli-divider-line" />
               <span className="sreli-divider-text" style={{ letterSpacing: 0.5 }}>Ou Continue Com</span>
               <span className="sreli-divider-line" />
@@ -657,7 +657,7 @@ export function LoginFullScreen({
                 onClick={handleGoogleClick}
                 aria-label="Continuar com Google"
                 style={{
-                  height: 48, borderRadius: 10,
+                  height: 44, borderRadius: 10,
                   background: "#FFFFFF", border: "1px solid #E5E7EB",
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   gap: 8, cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#1A1A1A",
@@ -677,7 +677,7 @@ export function LoginFullScreen({
                 onClick={handleFacebookClick}
                 aria-label="Continuar com Facebook"
                 style={{
-                  height: 48, borderRadius: 10,
+                  height: 44, borderRadius: 10,
                   background: "#FFFFFF", border: "1px solid #E5E7EB",
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   gap: 8, cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#1A1A1A",
@@ -693,7 +693,7 @@ export function LoginFullScreen({
 
             <p
               style={{
-                marginTop: 14,
+                marginTop: 12,
                 fontSize: 12,
                 color: "#6F6F6F",
                 textAlign: "center",
