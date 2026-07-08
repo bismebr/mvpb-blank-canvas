@@ -48,6 +48,19 @@ function MeusAgendamentosPage() {
     templateKey: SiteTemplateId;
   } | null>(null);
   const [siteLoading, setSiteLoading] = useState<boolean>(!!slug);
+
+  // Cache do template por slug para evitar flash branco/preto no carregamento.
+  const CACHE_PREFIX = "sreli:tpl:";
+  const cachedTemplateKey = useMemo<SiteTemplateId>(() => {
+    if (!slug) return DEFAULT_TEMPLATE_ID;
+    try {
+      const raw = typeof window !== "undefined" ? window.localStorage.getItem(CACHE_PREFIX + slug) : null;
+      return (raw as SiteTemplateId) || DEFAULT_TEMPLATE_ID;
+    } catch {
+      return DEFAULT_TEMPLATE_ID;
+    }
+  }, [slug]);
+
   useEffect(() => {
     let active = true;
     if (!slug) {
@@ -61,6 +74,9 @@ function MeusAgendamentosPage() {
       const data = await getPublicSiteBySlug(slug);
       if (!active) return;
       const tpl = (data?.site?.template_key as SiteTemplateId) || DEFAULT_TEMPLATE_ID;
+      try {
+        if (typeof window !== "undefined") window.localStorage.setItem(CACHE_PREFIX + slug, tpl);
+      } catch { /* noop */ }
       setPublicSite({
         companyId: data?.company?.id ?? null,
         showAddress: data?.site?.show_address === true,
@@ -75,9 +91,9 @@ function MeusAgendamentosPage() {
   }, [slug]);
 
   const themeCss = useMemo(() => {
-    const tpl = getTemplate(publicSite?.templateKey ?? DEFAULT_TEMPLATE_ID);
+    const tpl = getTemplate(publicSite?.templateKey ?? cachedTemplateKey);
     return buildTemplateCss(tpl);
-  }, [publicSite?.templateKey]);
+  }, [publicSite?.templateKey, cachedTemplateKey]);
 
   useEffect(() => {
     initLocalStorage();
@@ -89,7 +105,8 @@ function MeusAgendamentosPage() {
   };
 
   return (
-    <div className="sreli-root" style={{ background: "#FFFFFF", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div className="sreli-root" style={{ background: "var(--site-page-bg, #FFFFFF)", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+
       <style dangerouslySetInnerHTML={{ __html: themeCss }} />
       <header
         style={{
