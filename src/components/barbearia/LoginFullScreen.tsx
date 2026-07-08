@@ -693,7 +693,7 @@ export function LoginFullScreen({
 
             <p
               style={{
-                marginTop: 14,
+                marginTop: 12,
                 fontSize: 12,
                 color: "#6F6F6F",
                 textAlign: "center",
