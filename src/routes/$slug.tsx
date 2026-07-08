@@ -167,6 +167,14 @@ function PublicSitePage() {
           setState({ kind: "not-found" });
           return;
         }
+        // Cache visual (apenas templateId) por slug para evitar flash
+        // branco/azul no próximo carregamento/reload/retorno de outras rotas.
+        try {
+          const tpl = (data.site?.template_key as string) || "";
+          if (tpl && typeof window !== "undefined") {
+            window.localStorage.setItem("sreli:tpl:" + slug, tpl);
+          }
+        } catch { /* noop */ }
         setState({ kind: "ready", data });
       } catch (err) {
         if (cancelled) return;
@@ -182,8 +190,9 @@ function PublicSitePage() {
   }, [slug]);
 
   if (state.kind === "loading") {
-    return <LoadingOverlay message="Carregando site..." />;
+    return <LoadingOverlay slug={slug} />;
   }
+
 
   if (state.kind === "not-found") {
     return (

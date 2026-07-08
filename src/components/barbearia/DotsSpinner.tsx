@@ -10,9 +10,11 @@
 export function DotsSpinner({
   size = 32,
   count = 8,
+  color,
 }: {
   size?: number;
   count?: number;
+  color?: string;
 }) {
   const dotSize = Math.max(3, Math.round(size / 8));
   const radius = size / 2 - dotSize / 2;
@@ -50,7 +52,7 @@ export function DotsSpinner({
               marginTop: -dotSize / 2,
               marginLeft: -dotSize / 2,
               borderRadius: "50%",
-              background: "var(--site-primary, #5690f5)",
+              background: color ?? "var(--site-primary, #5690f5)",
               transform: `rotate(${angle}deg) translateY(-${radius}px)`,
               transformOrigin: "center",
               animation: "sreli-dots-fade 1.1s linear infinite",
