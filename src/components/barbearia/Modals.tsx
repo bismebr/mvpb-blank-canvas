@@ -711,7 +711,7 @@ export function SucessoModal({
               }}
             />
           )}
-          {loadingNav ? "Carregando..." : "Ir para meus agendamentos"}
+          {loadingNav ? "Ir para meus agendamentos" : "Ir para meus agendamentos"}
         </button>
         <button style={linkBtn} onClick={onClose} disabled={loadingNav}>
           Voltar para o início
