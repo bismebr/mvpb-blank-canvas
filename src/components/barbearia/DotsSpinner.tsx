@@ -10,9 +10,11 @@
 export function DotsSpinner({
   size = 32,
   count = 8,
+  color,
 }: {
   size?: number;
   count?: number;
+  color?: string;
 }) {
   const dotSize = Math.max(3, Math.round(size / 8));
   const radius = size / 2 - dotSize / 2;
