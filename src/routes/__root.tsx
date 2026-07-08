@@ -11,6 +11,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { AppProvider } from "../components/admin/AppContext";
+import { AvaliacoesProvider } from "../components/admin/AvaliacoesContext";
+import { SiteConfigProvider } from "../components/admin/SiteConfigContext";
+import { ClientUserProvider } from "../components/barbearia/ClientUserContext";
 
 function NotFoundComponent() {
   return (
@@ -78,13 +82,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { name: "description", content: "A simple web page displaying the text \"mvpb\"." },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:description", content: "A simple web page displaying the text \"mvpb\"." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Lovable App" },
+      { name: "twitter:description", content: "A simple web page displaying the text \"mvpb\"." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/61b801c2-6077-4208-9daf-7532573da200/id-preview-cda9d13b--7292a7bb-d546-4245-acc7-c8a579849e64.lovable.app-1783455614967.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/61b801c2-6077-4208-9daf-7532573da200/id-preview-cda9d13b--7292a7bb-d546-4245-acc7-c8a579849e64.lovable.app-1783455614967.png" },
     ],
     links: [
       {
@@ -119,8 +127,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <SiteConfigProvider>
+        <AppProvider>
+          <AvaliacoesProvider>
+            <ClientUserProvider>
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </ClientUserProvider>
+          </AvaliacoesProvider>
+        </AppProvider>
+      </SiteConfigProvider>
     </QueryClientProvider>
   );
 }
