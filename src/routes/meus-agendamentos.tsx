@@ -100,11 +100,23 @@ function MeusAgendamentosPage() {
     return buildTemplateCss(tpl);
   }, [publicSite?.templateKey, cachedTemplateKey]);
 
-  // Safety net: libera scroll preso caso um modal tenha sido desmontado
-  // abruptamente durante navegação antes do cleanup do seu useEffect.
+  // Safety net: libera qualquer trava de scroll deixada por modais/telas
+  // desmontados abruptamente durante navegação (BookingScreen bloqueia
+  // scroll via body.position=fixed + top=-Y + overflow=hidden em body e
+  // documentElement). Sem esse reset, entrar em Meus Agendamentos vindo
+  // da confirmação de agendamento pode chegar com body ainda travado.
   useEffect(() => {
-    if (document.body.style.overflow === "hidden") {
-      document.body.style.overflow = "";
+    const body = document.body;
+    if (body.style.position === "fixed") {
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+    }
+    if (body.style.overflow === "hidden") body.style.overflow = "";
+    if (document.documentElement.style.overflow === "hidden") {
+      document.documentElement.style.overflow = "";
     }
   }, []);
 
