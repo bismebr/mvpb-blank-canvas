@@ -615,8 +615,8 @@ export function SucessoModal({
         <div
           style={{
             position: "relative",
-            width: 72,
-            height: 72,
+            width: 96,
+            height: 96,
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
@@ -630,31 +630,44 @@ export function SucessoModal({
               inset: 0,
               borderRadius: "50%",
               background: "#16A34A",
-              opacity: 0.25,
-              animation: "sreli-ring 900ms ease-out forwards",
+              opacity: 0.2,
+              animation: "sreli-ring 1200ms ease-out forwards",
+            }}
+          />
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: "50%",
+              background: "#16A34A",
+              opacity: 0.15,
+              animation: "sreli-ring 1400ms ease-out 200ms forwards",
             }}
           />
           <div
             style={{
               position: "relative",
-              width: 72,
-              height: 72,
+              width: 76,
+              height: 76,
               borderRadius: "50%",
               background: "#DCFCE7",
               color: "#16A34A",
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              animation: "sreli-pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both",
+              boxShadow: "0 8px 24px rgba(22,163,74,0.35)",
+              animation:
+                "sreli-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both, sreli-glow 1800ms ease-in-out 600ms infinite",
             }}
           >
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path
                 d="M20 6L9 17l-5-5"
                 style={{
                   strokeDasharray: 30,
                   strokeDashoffset: 30,
-                  animation: "sreli-check 450ms ease-out 350ms forwards",
+                  animation: "sreli-check 550ms cubic-bezier(0.65, 0, 0.35, 1) 380ms forwards",
                 }}
               />
             </svg>
@@ -707,18 +720,24 @@ export function SucessoModal({
       <style>{`
         @keyframes sreli-spin { to { transform: rotate(360deg); } }
         @keyframes sreli-pop {
-          0% { transform: scale(0.8); opacity: 0; }
-          60% { transform: scale(1.06); opacity: 1; }
+          0% { transform: scale(0.5); opacity: 0; }
+          50% { transform: scale(1.12); opacity: 1; }
+          75% { transform: scale(0.96); }
           100% { transform: scale(1); opacity: 1; }
         }
         @keyframes sreli-check {
           to { stroke-dashoffset: 0; }
         }
         @keyframes sreli-ring {
-          0% { transform: scale(0.8); opacity: 0.45; }
-          100% { transform: scale(1.6); opacity: 0; }
+          0% { transform: scale(0.7); opacity: 0.5; }
+          100% { transform: scale(1.9); opacity: 0; }
+        }
+        @keyframes sreli-glow {
+          0%, 100% { box-shadow: 0 8px 24px rgba(22,163,74,0.35); }
+          50% { box-shadow: 0 10px 32px rgba(22,163,74,0.55); }
         }
       `}</style>
+
     </div>
   );
 }
