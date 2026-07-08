@@ -74,6 +74,7 @@ export function LoginFullScreen({
       setRecoveryLoading(false);
       setCountry(COUNTRIES[0]);
       setCountryOpen(false);
+      setEmailTouched(false);
     }
   }, [open, initialMode, initialWhatsapp]);
 
