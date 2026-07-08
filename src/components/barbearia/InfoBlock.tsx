@@ -327,16 +327,7 @@ export function InfoBlock({
             </span>
           )
         ) : (
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 400,
-              color: "#888888",
-              lineHeight: 1,
-            }}
-          >
-            Carregando...
-          </span>
+          <DotsSpinner size={18} />
         )}
       </div>
 

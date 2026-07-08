@@ -356,18 +356,8 @@ function Conteudo({
     <section style={{ background: "#FFFFFF", padding: "16px 16px 32px" }}>
       {cancelando && <LoadingOverlay message="Cancelando seu agendamento..." />}
       {isLoadingData ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {[0, 1].map((i) => (
-            <div
-              key={i}
-              style={{
-                background: "#F5F5F3",
-                borderRadius: 12,
-                height: 132,
-                animation: "pulse 1.4s ease-in-out infinite",
-              }}
-            />
-          ))}
+        <div style={{ display: "flex", justifyContent: "center", padding: "48px 16px" }}>
+          <DotsSpinner size={40} />
         </div>
       ) : meus.length === 0 ? (
         <div
