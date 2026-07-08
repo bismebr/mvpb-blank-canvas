@@ -406,21 +406,22 @@ export function LoginFullScreen({
           <>
             {isCadastro && (
               <>
-                <FloatField
-                  label="Nome"
-                  value={nome}
-                  onChange={(v) => setNome(sanitizeNome(v))}
-                  type="text"
-                  autoComplete="given-name"
-                />
-                <div style={{ height: 12 }} />
-                <FloatField
-                  label="Sobrenome"
-                  value={sobrenome}
-                  onChange={(v) => setSobrenome(sanitizeNome(v))}
-                  type="text"
-                  autoComplete="family-name"
-                />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <FloatField
+                    label="Nome"
+                    value={nome}
+                    onChange={(v) => setNome(sanitizeNome(v))}
+                    type="text"
+                    autoComplete="given-name"
+                  />
+                  <FloatField
+                    label="Sobrenome"
+                    value={sobrenome}
+                    onChange={(v) => setSobrenome(sanitizeNome(v))}
+                    type="text"
+                    autoComplete="family-name"
+                  />
+                </div>
                 <div style={{ height: 12 }} />
                 <div ref={countryRef} style={{ position: "relative" }}>
                   <div
