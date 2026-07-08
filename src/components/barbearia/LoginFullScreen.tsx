@@ -300,10 +300,12 @@ export function LoginFullScreen({
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               background: "#F3F4F6",
-              borderRadius: 999,
-              padding: 4,
+              borderRadius: 8,
+              padding: 3,
               marginBottom: 22,
-              width: "100%",
+              width: "min(240px, 100%)",
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
             {(["login", "cadastro"] as const).map((m) => {
@@ -316,15 +318,15 @@ export function LoginFullScreen({
                   aria-selected={active}
                   onClick={() => { setMode(m); setErro(null); }}
                   style={{
-                    height: 40,
-                    borderRadius: 999,
+                    height: 30,
+                    borderRadius: 6,
                     border: "none",
                     background: active ? "#FFFFFF" : "transparent",
                     color: active ? "#111111" : "#6F6F6F",
-                    fontWeight: 700,
-                    fontSize: 14,
+                    fontWeight: 600,
+                    fontSize: 13,
                     cursor: "pointer",
-                    boxShadow: active ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                    boxShadow: active ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
                     fontFamily: "inherit",
                     transition: "background 150ms, color 150ms",
                   }}
