@@ -323,7 +323,7 @@
   box-shadow: none;
   outline: none;
 }
-.sreli-field-error { color: #5690f5; font-size: 13px; margin-top: 6px; }
+.sreli-field-error { color: #dc2626; font-size: 13px; margin-top: 6px; font-weight: 600; }
 
 /* Reduz visualmente o tamanho das bolinhas da senha oculta sem alterar
    a altura do input, o placeholder ou o ícone de mostrar/ocultar. */
