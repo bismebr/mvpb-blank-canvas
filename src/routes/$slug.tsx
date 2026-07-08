@@ -182,8 +182,9 @@ function PublicSitePage() {
   }, [slug]);
 
   if (state.kind === "loading") {
-    return <LoadingOverlay message="Carregando site..." />;
+    return <LoadingOverlay slug={slug} />;
   }
+
 
   if (state.kind === "not-found") {
     return (
