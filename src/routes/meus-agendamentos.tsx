@@ -437,9 +437,10 @@ function Conteudo({
                       </a>
                     </div>
                   ) : null}
-                  {a.profissionalNome ? (
+                  {a.profissionalNome && (professionalsCount == null || professionalsCount >= 2) ? (
                     <div><strong style={{ color: "#1A1A1A", fontWeight: 600 }}>Profissional:</strong> {a.profissionalNome}</div>
                   ) : null}
+
                 </div>
                 {!isCanceledStatus(a.status) && !isPast(a.data, a.horario) && (
                   <button
