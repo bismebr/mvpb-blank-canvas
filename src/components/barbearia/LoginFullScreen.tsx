@@ -485,6 +485,7 @@ export function LoginFullScreen({
                         <polyline points="6 9 12 15 18 9" />
                       </svg>
                     </button>
+                    <span aria-hidden style={{ width: 1, background: "#E4E4E4", margin: "10px 0" }} />
                     <input
                       value={whatsapp}
                       onChange={(e) => setWhatsapp(maskBrPhone(e.target.value))}
