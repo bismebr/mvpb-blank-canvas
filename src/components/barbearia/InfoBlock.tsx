@@ -154,7 +154,7 @@ export function InfoBlock({
                 src={usuario.fotoUrl}
                 alt={usuario.nome}
                 className="sreli-user-avatar"
-                style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1.5px solid #FFFFFF" }}
+                style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
               />
             ) : (
               <span
