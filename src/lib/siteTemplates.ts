@@ -60,10 +60,11 @@ export const SITE_TEMPLATES: SiteTemplate[] = [
     id: "premium",
     name: "Tema Escuro",
     palette: ["#F5B324", "#1A1A1A", "#FFFFFF", "#2A2A2A"],
-    background: "#0E0E0E",
+    background: "#0f0f10",
     applyBackground: true,
-    preview: { coverBg: "linear-gradient(135deg,#1F1F1F,#3A2A10)", cardBg: "#1A1A1A", text: "#F5F5F5", textMuted: "#B5B5B5", logoBg: "#262626", chipBg: "#262626", chipText: "#F5B324", chipBorder: "#F5B324", border: "#2A2A2A" },
+    preview: { coverBg: "linear-gradient(135deg,#1F1F1F,#3A2A10)", cardBg: "#18181b", text: "#F5F5F5", textMuted: "#B5B5B5", logoBg: "#262626", chipBg: "#262626", chipText: "#F5B324", chipBorder: "#F5B324", border: "#2A2A2A" },
   },
+
   {
     // Antigo "Modelo Minimalista" — passa a usar verde #074e36
     id: "minimalista",
