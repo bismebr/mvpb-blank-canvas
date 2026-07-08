@@ -405,7 +405,7 @@ function FormServico({ initial, onClose, onSave, onDelete }: {
         : ""
       : brl(parseInt(precoDigits, 10) || 0);
   const initialHours = initial ? Math.floor(initial.duracao_minutos / 60) : 0;
-  const initialMinutes = initial ? initial.duracao_minutos % 60 : 30;
+  const initialMinutes = initial ? initial.duracao_minutos % 60 : 0;
   const [durHoras, setDurHoras] = useState<string>(initialHours ? String(initialHours) : "");
   const [durMin, setDurMin] = useState<string>(initialMinutes ? String(initialMinutes) : "");
   const [imagemUrl, setImagemUrl] = useState<string | undefined>(initial?.imagemUrl);
