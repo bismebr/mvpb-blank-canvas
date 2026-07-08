@@ -138,6 +138,14 @@ function PublicSitePage() {
     | { kind: "ready"; data: PublicSiteData }
   >({ kind: "loading" });
 
+  // Safety net: libera scroll preso caso um modal tenha sido desmontado
+  // abruptamente durante navegação antes do cleanup do seu useEffect.
+  useEffect(() => {
+    if (document.body.style.overflow === "hidden") {
+      document.body.style.overflow = "";
+    }
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     setState({ kind: "loading" });
@@ -660,8 +668,8 @@ function BookingFlow({
             info={sucessoInfo}
             onClose={() => setSucessoOpen(false)}
             onVerAgendamentos={() => {
+              setSucessoOpen(false);
               navigate({ to: "/meus-agendamentos", search: { slug } });
-              setTimeout(() => setSucessoOpen(false), 50);
             }}
           />
 
