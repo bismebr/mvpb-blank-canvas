@@ -134,12 +134,46 @@ export function buildTemplateCss(template: SiteTemplate): string {
   })();
   const onBg = isDark ? "#F5F5F5" : "#1A1A1A";
   const onBgMuted = isDark ? "#B5B5B5" : "#888888";
-  const sectionBg = isDark ? "#1A1A1A" : "#f8f8f8";
+  const sectionBg = isDark ? "#18181b" : "#f8f8f8";
   const sectionBorder = isDark ? "#2A2A2A" : "#EEEEEE";
+  const pageBg = isDark ? "#0f0f10" : "#FFFFFF";
+  const cardBg = isDark ? "#18181b" : "#FFFFFF";
+  const softBg = isDark ? "#18181b" : "#f8f8f8";
   const bgRule =
     template.applyBackground && template.background
       ? `.sreli-root { background: ${template.background} !important; }`
       : "";
+  // Rede de segurança: aplica cores escuras a QUALQUER estilo inline branco/claro
+  // remanescente dentro do modelo escuro do site de agendamento (não afeta o
+  // painel administrativo, footer, landing /venda, /admin, /bisme-admin).
+  const darkOverrides = isDark
+    ? `
+.sreli-root { color: ${onBg}; }
+.sreli-root [style*="background: rgb(255, 255, 255)"],
+.sreli-root [style*="background:rgb(255, 255, 255)"],
+.sreli-root [style*="background: #FFFFFF"],
+.sreli-root [style*="background:#FFFFFF"],
+.sreli-root [style*="background: #ffffff"],
+.sreli-root [style*="background:#ffffff"],
+.sreli-root [style*="background: #FFF\\""],
+.sreli-root [style*="background:#FFF\\""],
+.sreli-root [style*="background: #fff\\""],
+.sreli-root [style*="background:#fff\\""],
+.sreli-root [style*="background-color: rgb(255, 255, 255)"],
+.sreli-root [style*="background-color:rgb(255, 255, 255)"],
+.sreli-root [style*="background: rgb(248, 248, 248)"],
+.sreli-root [style*="background: rgb(242, 241, 246)"],
+.sreli-root [style*="background: rgb(240, 240, 240)"],
+.sreli-root [style*="background: #f8f8f8"],
+.sreli-root [style*="background:#f8f8f8"],
+.sreli-root [style*="background: #f2f1f6"],
+.sreli-root [style*="background:#f2f1f6"],
+.sreli-root [style*="background: #F0F0F0"] {
+  background-color: ${cardBg} !important;
+  background-image: none !important;
+}
+`
+    : "";
   return `
 .sreli-root {
   --site-primary: ${primary};
@@ -149,7 +183,12 @@ export function buildTemplateCss(template: SiteTemplate): string {
   --site-on-bg-muted: ${onBgMuted};
   --site-section-bg: ${sectionBg};
   --site-section-border: ${sectionBorder};
+  --site-page-bg: ${pageBg};
+  --site-card-bg: ${cardBg};
+  --site-soft-bg: ${softBg};
 }
 ${bgRule}
+${darkOverrides}
 `.trim();
 }
+
