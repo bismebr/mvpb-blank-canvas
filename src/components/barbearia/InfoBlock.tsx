@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { DotsSpinner } from "./DotsSpinner";
 import { useNavigate } from "@tanstack/react-router";
 import {
   useSiteConfig,
@@ -327,16 +328,7 @@ export function InfoBlock({
             </span>
           )
         ) : (
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 400,
-              color: "#888888",
-              lineHeight: 1,
-            }}
-          >
-            Carregando...
-          </span>
+          <DotsSpinner size={18} />
         )}
       </div>
 

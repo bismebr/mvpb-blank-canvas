@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useApp, type FuncionarioAdmin, type ServicoAdmin } from "@/components/admin/AppContext";
 import { isPhoneValid, maskBrPhone } from "./phoneMask";
+import { DotsSpinner } from "./DotsSpinner";
 import {
   dayHasAvailability,
   generateSlots,
@@ -638,7 +639,7 @@ export function BookingScreen({ open, initialServicoId, initialFuncionarioId, in
 
         {/* Time slots — sempre mostra a grade inteira; indisponíveis ficam apagados e sem clique */}
         {!dia || slotsLoading ? (
-          <div style={{ padding: "0 16px 8px", fontSize: 13, color: "#888" }}>Carregando horários…</div>
+          <div style={{ padding: "12px 16px 8px", display: "flex", justifyContent: "center" }}><DotsSpinner size={28} /></div>
 
         ) : slotsHoje.length === 0 ? (
           <div style={{ padding: "0 16px 8px" }}>
