@@ -576,7 +576,7 @@ export function LoginFullScreen({
               allowedDomain={emailAllowedDomain}
               validShape={emailValidShape}
             />
-            <div style={{ height: 12 }} />
+            <div style={{ height: 8 }} />
             <FloatField
               label="Senha"
               value={senha}
