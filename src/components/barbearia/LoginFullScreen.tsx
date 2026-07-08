@@ -457,13 +457,13 @@ export function LoginFullScreen({
                         style={{
                           width: 24,
                           height: 24,
-                          borderRadius: "50%",
+                          borderRadius: 0,
                           display: "inline-flex",
                           alignItems: "center",
                           justifyContent: "center",
                           overflow: "hidden",
-                          background: "#F3F4F6",
-                          fontSize: 18,
+                          background: "transparent",
+                          fontSize: 20,
                           lineHeight: 1,
                         }}
                       >
