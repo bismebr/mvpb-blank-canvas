@@ -723,13 +723,22 @@ export const __noop: CSSProperties = {};
 function EmailField({
   value,
   onChange,
-  valid,
+  touched,
+  onTouchedChange,
+  allowedDomain,
+  validShape,
 }: {
   value: string;
   onChange: (v: string) => void;
-  valid: boolean;
+  touched: boolean;
+  onTouchedChange: (v: boolean) => void;
+  allowedDomain: boolean;
+  validShape: boolean;
 }) {
   const hasValue = value.length > 0;
+  const showCheck = touched && hasValue && allowedDomain;
+  // silence unused-var warning for validShape (kept in API for future use)
+  void validShape;
   return (
     <label
       style={{
@@ -780,6 +789,8 @@ function EmailField({
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onFocus={() => onTouchedChange(false)}
+          onBlur={() => onTouchedChange(true)}
           type="email"
           autoComplete="email"
           style={{
@@ -794,7 +805,7 @@ function EmailField({
           }}
         />
       </div>
-      {hasValue && valid && (
+      {showCheck && (
         <span
           aria-hidden
           style={{
@@ -802,12 +813,24 @@ function EmailField({
             alignItems: "center",
             justifyContent: "center",
             padding: "0 12px",
-            color: "#16a34a",
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+          <span
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              background: "#16a34a",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#FFFFFF",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </span>
         </span>
       )}
     </label>
