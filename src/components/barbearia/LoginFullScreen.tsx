@@ -59,6 +59,8 @@ export function LoginFullScreen({
   );
 
   const emailValidShape = EMAIL_SHAPE.test(email.trim());
+  const emailAllowedDomain = EMAIL_REGEX.test(email.trim());
+  const [emailTouched, setEmailTouched] = useState(false);
 
   // reset on open
   useEffect(() => {
@@ -72,6 +74,7 @@ export function LoginFullScreen({
       setRecoveryLoading(false);
       setCountry(COUNTRIES[0]);
       setCountryOpen(false);
+      setEmailTouched(false);
     }
   }, [open, initialMode, initialWhatsapp]);
 
@@ -297,10 +300,12 @@ export function LoginFullScreen({
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               background: "#F3F4F6",
-              borderRadius: 999,
-              padding: 4,
+              borderRadius: 8,
+              padding: 3,
               marginBottom: 22,
-              width: "100%",
+              width: "min(240px, 100%)",
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
             {(["login", "cadastro"] as const).map((m) => {
@@ -313,15 +318,15 @@ export function LoginFullScreen({
                   aria-selected={active}
                   onClick={() => { setMode(m); setErro(null); }}
                   style={{
-                    height: 40,
-                    borderRadius: 999,
+                    height: 30,
+                    borderRadius: 6,
                     border: "none",
                     background: active ? "#FFFFFF" : "transparent",
                     color: active ? "#111111" : "#6F6F6F",
-                    fontWeight: 700,
-                    fontSize: 14,
+                    fontWeight: 600,
+                    fontSize: 13,
                     cursor: "pointer",
-                    boxShadow: active ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                    boxShadow: active ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
                     fontFamily: "inherit",
                     transition: "background 150ms, color 150ms",
                   }}
@@ -375,7 +380,19 @@ export function LoginFullScreen({
               </>
             ) : (
               <>
-                <EmailField value={email} onChange={setEmail} valid={emailValidShape} />
+                <EmailField
+                  value={email}
+                  onChange={setEmail}
+                  touched={emailTouched}
+                  onTouchedChange={setEmailTouched}
+                  allowedDomain={emailAllowedDomain}
+                  validShape={emailValidShape}
+                />
+                {emailTouched && email.trim().length > 0 && !emailAllowedDomain && (
+                  <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
+                    Adicione um e-mail válido
+                  </div>
+                )}
                 {erro && <div className="sreli-field-error" style={{ marginTop: 8 }}>{erro}</div>}
                 <button
                   type="button"
@@ -401,21 +418,22 @@ export function LoginFullScreen({
           <>
             {isCadastro && (
               <>
-                <FloatField
-                  label="Nome"
-                  value={nome}
-                  onChange={(v) => setNome(sanitizeNome(v))}
-                  type="text"
-                  autoComplete="given-name"
-                />
-                <div style={{ height: 12 }} />
-                <FloatField
-                  label="Sobrenome"
-                  value={sobrenome}
-                  onChange={(v) => setSobrenome(sanitizeNome(v))}
-                  type="text"
-                  autoComplete="family-name"
-                />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <FloatField
+                    label="Nome"
+                    value={nome}
+                    onChange={(v) => setNome(sanitizeNome(v))}
+                    type="text"
+                    autoComplete="given-name"
+                  />
+                  <FloatField
+                    label="Sobrenome"
+                    value={sobrenome}
+                    onChange={(v) => setSobrenome(sanitizeNome(v))}
+                    type="text"
+                    autoComplete="family-name"
+                  />
+                </div>
                 <div style={{ height: 12 }} />
                 <div ref={countryRef} style={{ position: "relative" }}>
                   <div
@@ -440,7 +458,6 @@ export function LoginFullScreen({
                         padding: "0 10px 0 12px",
                         background: "transparent",
                         border: "none",
-                        borderRight: "1px solid #E4E4E4",
                         cursor: "pointer",
                         fontSize: 18,
                         color: "#111111",
@@ -452,13 +469,13 @@ export function LoginFullScreen({
                         style={{
                           width: 24,
                           height: 24,
-                          borderRadius: "50%",
+                          borderRadius: 0,
                           display: "inline-flex",
                           alignItems: "center",
                           justifyContent: "center",
                           overflow: "hidden",
-                          background: "#F3F4F6",
-                          fontSize: 18,
+                          background: "transparent",
+                          fontSize: 20,
                           lineHeight: 1,
                         }}
                       >
@@ -551,7 +568,14 @@ export function LoginFullScreen({
               </>
             )}
 
-            <EmailField value={email} onChange={setEmail} valid={emailValidShape} />
+            <EmailField
+              value={email}
+              onChange={setEmail}
+              touched={emailTouched}
+              onTouchedChange={setEmailTouched}
+              allowedDomain={emailAllowedDomain}
+              validShape={emailValidShape}
+            />
             <div style={{ height: 12 }} />
             <FloatField
               label="Senha"
@@ -699,13 +723,22 @@ export const __noop: CSSProperties = {};
 function EmailField({
   value,
   onChange,
-  valid,
+  touched,
+  onTouchedChange,
+  allowedDomain,
+  validShape,
 }: {
   value: string;
   onChange: (v: string) => void;
-  valid: boolean;
+  touched: boolean;
+  onTouchedChange: (v: boolean) => void;
+  allowedDomain: boolean;
+  validShape: boolean;
 }) {
   const hasValue = value.length > 0;
+  const showCheck = touched && hasValue && allowedDomain;
+  // silence unused-var warning for validShape (kept in API for future use)
+  void validShape;
   return (
     <label
       style={{
@@ -756,6 +789,8 @@ function EmailField({
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onFocus={() => onTouchedChange(false)}
+          onBlur={() => onTouchedChange(true)}
           type="email"
           autoComplete="email"
           style={{
@@ -770,7 +805,7 @@ function EmailField({
           }}
         />
       </div>
-      {hasValue && valid && (
+      {showCheck && (
         <span
           aria-hidden
           style={{
@@ -778,12 +813,24 @@ function EmailField({
             alignItems: "center",
             justifyContent: "center",
             padding: "0 12px",
-            color: "#16a34a",
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+          <span
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              background: "#16a34a",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#FFFFFF",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </span>
         </span>
       )}
     </label>
