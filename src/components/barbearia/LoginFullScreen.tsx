@@ -418,7 +418,7 @@ export function LoginFullScreen({
           <>
             {isCadastro && (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   <FloatField
                     label="Nome"
                     value={nome}
@@ -434,7 +434,7 @@ export function LoginFullScreen({
                     autoComplete="family-name"
                   />
                 </div>
-                <div style={{ height: 12 }} />
+                <div style={{ height: 8 }} />
                 <div ref={countryRef} style={{ position: "relative" }}>
                   <div
                     style={{
