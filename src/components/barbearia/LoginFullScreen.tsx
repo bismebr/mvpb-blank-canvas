@@ -645,7 +645,7 @@ export function LoginFullScreen({
               {isLogin ? "Entrar" : "Continuar"}
             </button>
 
-            <div className="sreli-divider" style={{ margin: "20px 0 16px" }}>
+            <div className="sreli-divider" style={{ margin: "16px 0 12px" }}>
               <span className="sreli-divider-line" />
               <span className="sreli-divider-text" style={{ letterSpacing: 0.5 }}>Ou Continue Com</span>
               <span className="sreli-divider-line" />
@@ -657,7 +657,7 @@ export function LoginFullScreen({
                 onClick={handleGoogleClick}
                 aria-label="Continuar com Google"
                 style={{
-                  height: 48, borderRadius: 10,
+                  height: 44, borderRadius: 10,
                   background: "#FFFFFF", border: "1px solid #E5E7EB",
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   gap: 8, cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#1A1A1A",
@@ -677,7 +677,7 @@ export function LoginFullScreen({
                 onClick={handleFacebookClick}
                 aria-label="Continuar com Facebook"
                 style={{
-                  height: 48, borderRadius: 10,
+                  height: 44, borderRadius: 10,
                   background: "#FFFFFF", border: "1px solid #E5E7EB",
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   gap: 8, cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#1A1A1A",
