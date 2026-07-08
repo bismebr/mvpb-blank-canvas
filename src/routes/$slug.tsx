@@ -668,8 +668,8 @@ function BookingFlow({
             info={sucessoInfo}
             onClose={() => setSucessoOpen(false)}
             onVerAgendamentos={() => {
+              setSucessoOpen(false);
               navigate({ to: "/meus-agendamentos", search: { slug } });
-              setTimeout(() => setSucessoOpen(false), 50);
             }}
           />
 
