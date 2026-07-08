@@ -501,8 +501,12 @@ function BookingFlow({
         servico: svc?.nome ?? "Serviço",
         data: r.data,
         horario: r.horario,
-        profissional: func?.nome,
+        // Só exibe profissional ao cliente quando houve escolha real
+        // (>= 2 profissionais visíveis no site). Espelha a regra usada em
+        // BookingScreen (mostrarProfissional) e em EspecialistasSection.
+        profissional: funcionarios.length >= 2 ? func?.nome : undefined,
       });
+
 
       setConfirmando(false);
       setBookingOpen(false);

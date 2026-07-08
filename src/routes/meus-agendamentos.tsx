@@ -47,8 +47,10 @@ function MeusAgendamentosPage() {
     showAddress: boolean;
     address: string;
     templateKey: SiteTemplateId;
+    professionalsCount: number;
   } | null>(null);
   const [siteLoading, setSiteLoading] = useState<boolean>(!!slug);
+
 
   // Cache do template por slug para evitar flash branco/preto no carregamento.
   const CACHE_PREFIX = "sreli:tpl:";
@@ -83,9 +85,11 @@ function MeusAgendamentosPage() {
         showAddress: data?.site?.show_address === true,
         address: data?.site?.address ?? "",
         templateKey: tpl,
+        professionalsCount: Array.isArray(data?.professionals) ? data.professionals.length : 0,
       });
       setSiteLoading(false);
     })();
+
     return () => {
       active = false;
     };
