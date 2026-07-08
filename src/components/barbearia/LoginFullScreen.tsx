@@ -59,6 +59,8 @@ export function LoginFullScreen({
   );
 
   const emailValidShape = EMAIL_SHAPE.test(email.trim());
+  const emailAllowedDomain = EMAIL_REGEX.test(email.trim());
+  const [emailTouched, setEmailTouched] = useState(false);
 
   // reset on open
   useEffect(() => {
