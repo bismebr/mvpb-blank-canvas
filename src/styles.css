@@ -247,7 +247,7 @@
 
 .sreli-login-content {
   flex: 1;
-  padding: 4px 24px 32px;
+  padding: 4px 24px 24px;
   max-width: 440px;
   width: 100%;
   margin: 0 auto;
@@ -264,7 +264,7 @@
   font-size: 14px;
   color: #888888;
   text-align: center;
-  margin: 0 0 24px;
+  margin: 0 0 12px;
 }
 
 .sreli-social-buttons {
