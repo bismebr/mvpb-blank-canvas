@@ -157,9 +157,11 @@ function MeusAgendamentosPage() {
           companyId={publicSite?.companyId ?? null}
           abrirLogin={() => setLoginOpen(true)}
           enderecoFmt={publicSite && publicSite.showAddress ? publicSite.address : ""}
+          professionalsCount={publicSite?.professionalsCount ?? null}
           siteLoading={siteLoading}
           onBack={goBack}
         />
+
       </main>
 
 
@@ -182,6 +184,7 @@ function Conteudo({
   companyId,
   abrirLogin,
   enderecoFmt,
+  professionalsCount,
   siteLoading,
   onBack,
 }: {
@@ -190,9 +193,11 @@ function Conteudo({
   companyId: string | null;
   abrirLogin: () => void;
   enderecoFmt: string;
+  professionalsCount: number | null;
   siteLoading: boolean;
   onBack: () => void;
 }) {
+
   const [cancelandoId, setCancelandoId] = useState<string | null>(null);
   const [motivo, setMotivo] = useState<CancelMotivo | null>(null);
   const [sucessoOpen, setSucessoOpen] = useState(false);
