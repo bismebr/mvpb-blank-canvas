@@ -138,11 +138,25 @@ function PublicSitePage() {
     | { kind: "ready"; data: PublicSiteData }
   >({ kind: "loading" });
 
-  // Safety net: libera scroll preso caso um modal tenha sido desmontado
-  // abruptamente durante navegação antes do cleanup do seu useEffect.
+  // Safety net: libera qualquer trava de scroll deixada por modais/telas
+  // desmontados abruptamente durante navegação (BookingScreen bloqueia
+  // scroll via body.position=fixed + top=-Y + overflow=hidden em body e
+  // documentElement; SucessoModal/LoginFullScreen mexem em body.overflow).
+  // Sem esse reset, ao voltar de Meus Agendamentos após um fluxo de
+  // cadastro no meio do agendamento, a página fica travada (body fixed
+  // com top negativo esconde o conteúdo).
   useEffect(() => {
-    if (document.body.style.overflow === "hidden") {
-      document.body.style.overflow = "";
+    const body = document.body;
+    if (body.style.position === "fixed") {
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+    }
+    if (body.style.overflow === "hidden") body.style.overflow = "";
+    if (document.documentElement.style.overflow === "hidden") {
+      document.documentElement.style.overflow = "";
     }
   }, []);
 
