@@ -380,7 +380,19 @@ export function LoginFullScreen({
               </>
             ) : (
               <>
-                <EmailField value={email} onChange={setEmail} valid={emailValidShape} />
+                <EmailField
+                  value={email}
+                  onChange={setEmail}
+                  touched={emailTouched}
+                  onTouchedChange={setEmailTouched}
+                  allowedDomain={emailAllowedDomain}
+                  validShape={emailValidShape}
+                />
+                {emailTouched && email.trim().length > 0 && !emailAllowedDomain && (
+                  <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
+                    Adicione um e-mail válido
+                  </div>
+                )}
                 {erro && <div className="sreli-field-error" style={{ marginTop: 8 }}>{erro}</div>}
                 <button
                   type="button"
