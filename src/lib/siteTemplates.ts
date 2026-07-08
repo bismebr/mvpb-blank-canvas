@@ -60,10 +60,11 @@ export const SITE_TEMPLATES: SiteTemplate[] = [
     id: "premium",
     name: "Tema Escuro",
     palette: ["#F5B324", "#1A1A1A", "#FFFFFF", "#2A2A2A"],
-    background: "#0E0E0E",
+    background: "#0f0f10",
     applyBackground: true,
-    preview: { coverBg: "linear-gradient(135deg,#1F1F1F,#3A2A10)", cardBg: "#1A1A1A", text: "#F5F5F5", textMuted: "#B5B5B5", logoBg: "#262626", chipBg: "#262626", chipText: "#F5B324", chipBorder: "#F5B324", border: "#2A2A2A" },
+    preview: { coverBg: "linear-gradient(135deg,#1F1F1F,#3A2A10)", cardBg: "#18181b", text: "#F5F5F5", textMuted: "#B5B5B5", logoBg: "#262626", chipBg: "#262626", chipText: "#F5B324", chipBorder: "#F5B324", border: "#2A2A2A" },
   },
+
   {
     // Antigo "Modelo Minimalista" — passa a usar verde #074e36
     id: "minimalista",
@@ -133,12 +134,68 @@ export function buildTemplateCss(template: SiteTemplate): string {
   })();
   const onBg = isDark ? "#F5F5F5" : "#1A1A1A";
   const onBgMuted = isDark ? "#B5B5B5" : "#888888";
-  const sectionBg = isDark ? "#1A1A1A" : "#f8f8f8";
+  const sectionBg = isDark ? "#18181b" : "#f8f8f8";
   const sectionBorder = isDark ? "#2A2A2A" : "#EEEEEE";
+  const pageBg = isDark ? "#0f0f10" : "#FFFFFF";
+  const cardBg = isDark ? "#18181b" : "#FFFFFF";
+  const softBg = isDark ? "#18181b" : "#f8f8f8";
   const bgRule =
     template.applyBackground && template.background
       ? `.sreli-root { background: ${template.background} !important; }`
       : "";
+  // Rede de segurança: aplica cores escuras a QUALQUER estilo inline branco/claro
+  // remanescente dentro do modelo escuro do site de agendamento (não afeta o
+  // painel administrativo, footer, landing /venda, /admin, /bisme-admin).
+  const darkOverrides = isDark
+    ? `
+.sreli-root { color: ${onBg}; }
+.sreli-root [style*="background: rgb(255, 255, 255)"],
+.sreli-root [style*="background:rgb(255, 255, 255)"],
+.sreli-root [style*="background: #FFFFFF"],
+.sreli-root [style*="background:#FFFFFF"],
+.sreli-root [style*="background: #ffffff"],
+.sreli-root [style*="background:#ffffff"],
+.sreli-root [style*="background-color: rgb(255, 255, 255)"],
+.sreli-root [style*="background-color:rgb(255, 255, 255)"],
+.sreli-root [style*="background: rgb(248, 248, 248)"],
+.sreli-root [style*="background: rgb(242, 241, 246)"],
+.sreli-root [style*="background: rgb(240, 240, 240)"],
+.sreli-root [style*="background: #f8f8f8"],
+.sreli-root [style*="background:#f8f8f8"],
+.sreli-root [style*="background: #f2f1f6"],
+.sreli-root [style*="background:#f2f1f6"],
+.sreli-root [style*="background: #F0F0F0"] {
+  background-color: ${cardBg} !important;
+  background-image: none !important;
+}
+.sreli-root [style*="color: rgb(26, 26, 26)"],
+.sreli-root [style*="color:rgb(26, 26, 26)"],
+.sreli-root [style*="color: #1A1A1A"],
+.sreli-root [style*="color:#1A1A1A"],
+.sreli-root [style*="color: rgb(17, 17, 17)"],
+.sreli-root [style*="color: #111111"],
+.sreli-root [style*="color: rgb(0, 0, 0)"],
+.sreli-root [style*="color: #000000"] {
+  color: ${onBg} !important;
+}
+
+.sreli-root [style*="color: rgb(102, 102, 102)"],
+.sreli-root [style*="color: rgb(136, 136, 136)"],
+.sreli-root [style*="color: rgb(68, 68, 68)"],
+.sreli-root [style*="color: #666"],
+.sreli-root [style*="color: #888"],
+.sreli-root [style*="color: #444"] {
+  color: ${onBgMuted} !important;
+}
+.sreli-root [style*="border: 1px solid rgb(238, 238, 238)"],
+.sreli-root [style*="border: 1.5px solid rgb(238, 238, 238)"],
+.sreli-root [style*="border: 1px solid rgb(240, 240, 240)"],
+.sreli-root [style*="border-color: rgb(238, 238, 238)"] {
+  border-color: ${sectionBorder} !important;
+}
+`
+    : "";
+
   return `
 .sreli-root {
   --site-primary: ${primary};
@@ -148,7 +205,12 @@ export function buildTemplateCss(template: SiteTemplate): string {
   --site-on-bg-muted: ${onBgMuted};
   --site-section-bg: ${sectionBg};
   --site-section-border: ${sectionBorder};
+  --site-page-bg: ${pageBg};
+  --site-card-bg: ${cardBg};
+  --site-soft-bg: ${softBg};
 }
 ${bgRule}
+${darkOverrides}
 `.trim();
 }
+
