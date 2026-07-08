@@ -286,12 +286,12 @@ export function LoginFullScreen({
         aria-label="Fechar"
         type="button"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M15 18l-6-6 6-6" />
         </svg>
       </button>
 
-      <div className="sreli-login-content" style={{ paddingTop: 20 }}>
+      <div className="sreli-login-content" style={{ paddingTop: 36 }}>
         {mode !== "esqueci" && (
           <div
             role="tablist"
@@ -485,6 +485,7 @@ export function LoginFullScreen({
                         <polyline points="6 9 12 15 18 9" />
                       </svg>
                     </button>
+                    <span aria-hidden style={{ width: 1, background: "#E4E4E4", margin: "10px 0" }} />
                     <input
                       value={whatsapp}
                       onChange={(e) => setWhatsapp(maskBrPhone(e.target.value))}
@@ -576,6 +577,11 @@ export function LoginFullScreen({
               allowedDomain={emailAllowedDomain}
               validShape={emailValidShape}
             />
+            {isCadastro && emailTouched && email.trim().length > 0 && !emailAllowedDomain && (
+              <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
+                Adicione um e-mail válido
+              </div>
+            )}
             <div style={{ height: 8 }} />
             <FloatField
               label="Senha"

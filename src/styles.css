@@ -199,10 +199,10 @@
 
 .sreli-login-close {
   position: absolute;
-  top: 16px;
-  left: max(24px, calc(50% - 120px));
-  width: 28px;
-  height: 28px;
+  top: 20px;
+  left: 16px;
+  width: 32px;
+  height: 32px;
   border-radius: 0;
   background: transparent;
   border: none;
@@ -216,8 +216,8 @@
   padding: 0;
 }
 .sreli-login-close svg {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   stroke-width: 2.2;
 }
 .sreli-login-close:hover,
@@ -323,7 +323,7 @@
   box-shadow: none;
   outline: none;
 }
-.sreli-field-error { color: #5690f5; font-size: 13px; margin-top: 6px; }
+.sreli-field-error { color: #dc2626; font-size: 13px; margin-top: 6px; font-weight: 600; }
 
 /* Reduz visualmente o tamanho das bolinhas da senha oculta sem alterar
    a altura do input, o placeholder ou o ícone de mostrar/ocultar. */
