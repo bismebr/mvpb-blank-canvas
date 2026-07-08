@@ -446,7 +446,6 @@ export function LoginFullScreen({
                         padding: "0 10px 0 12px",
                         background: "transparent",
                         border: "none",
-                        borderRight: "1px solid #E4E4E4",
                         cursor: "pointer",
                         fontSize: 18,
                         color: "#111111",
