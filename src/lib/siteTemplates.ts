@@ -134,64 +134,114 @@ export function buildTemplateCss(template: SiteTemplate): string {
   })();
   const onBg = isDark ? "#F5F5F5" : "#1A1A1A";
   const onBgMuted = isDark ? "#B5B5B5" : "#888888";
-  const sectionBg = isDark ? "#18181b" : "#f8f8f8";
-  const sectionBorder = isDark ? "#2A2A2A" : "#EEEEEE";
+  const sectionBg = isDark ? "#0f0f10" : "#f8f8f8";
+  const sectionBorder = isDark ? "#2a2a2f" : "#EEEEEE";
   const pageBg = isDark ? "#0f0f10" : "#FFFFFF";
-  const cardBg = isDark ? "#18181b" : "#FFFFFF";
-  const softBg = isDark ? "#18181b" : "#f8f8f8";
+  const cardBg = isDark ? "#0f0f10" : "#FFFFFF";
+  const cardBgAlt = isDark ? "#18181b" : "#f2f1f6";
+  const softBg = isDark ? "#0f0f10" : "#f8f8f8";
+  const divider = isDark ? "#2a2a2f" : "#EEEEEE";
   const bgRule =
     template.applyBackground && template.background
       ? `.sreli-root { background: ${template.background} !important; }`
       : "";
   // Rede de segurança: aplica cores escuras a QUALQUER estilo inline branco/claro
-  // remanescente dentro do modelo escuro do site de agendamento (não afeta o
-  // painel administrativo, footer, landing /venda, /admin, /bisme-admin).
+  // remanescente dentro do modelo escuro do site de agendamento. Excluímos a
+  // tela de login/cadastro do cliente (`.sreli-login-overlay`) para preservar
+  // seu visual claro original. Não afeta painel administrativo, footer,
+  // landing /venda, /admin, /bisme-admin.
+  const NOT_LOGIN = ":not(.sreli-login-overlay *):not(.sreli-login-overlay)";
   const darkOverrides = isDark
     ? `
 .sreli-root { color: ${onBg}; }
-.sreli-root [style*="background: rgb(255, 255, 255)"],
-.sreli-root [style*="background:rgb(255, 255, 255)"],
-.sreli-root [style*="background: #FFFFFF"],
-.sreli-root [style*="background:#FFFFFF"],
-.sreli-root [style*="background: #ffffff"],
-.sreli-root [style*="background:#ffffff"],
-.sreli-root [style*="background-color: rgb(255, 255, 255)"],
-.sreli-root [style*="background-color:rgb(255, 255, 255)"],
-.sreli-root [style*="background: rgb(248, 248, 248)"],
-.sreli-root [style*="background: rgb(242, 241, 246)"],
-.sreli-root [style*="background: rgb(240, 240, 240)"],
-.sreli-root [style*="background: #f8f8f8"],
-.sreli-root [style*="background:#f8f8f8"],
-.sreli-root [style*="background: #f2f1f6"],
-.sreli-root [style*="background:#f2f1f6"],
-.sreli-root [style*="background: #F0F0F0"] {
+
+/* Fundos brancos e "off-white" → fundo escuro principal (#0f0f10) */
+.sreli-root [style*="background: rgb(255, 255, 255)"]${NOT_LOGIN},
+.sreli-root [style*="background:rgb(255, 255, 255)"]${NOT_LOGIN},
+.sreli-root [style*="background: #FFFFFF"]${NOT_LOGIN},
+.sreli-root [style*="background:#FFFFFF"]${NOT_LOGIN},
+.sreli-root [style*="background: #ffffff"]${NOT_LOGIN},
+.sreli-root [style*="background:#ffffff"]${NOT_LOGIN},
+.sreli-root [style*="background-color: rgb(255, 255, 255)"]${NOT_LOGIN},
+.sreli-root [style*="background-color:rgb(255, 255, 255)"]${NOT_LOGIN},
+.sreli-root [style*="background: rgb(248, 248, 248)"]${NOT_LOGIN},
+.sreli-root [style*="background: #f8f8f8"]${NOT_LOGIN},
+.sreli-root [style*="background:#f8f8f8"]${NOT_LOGIN} {
   background-color: ${cardBg} !important;
   background-image: none !important;
 }
-.sreli-root [style*="color: rgb(26, 26, 26)"],
-.sreli-root [style*="color:rgb(26, 26, 26)"],
-.sreli-root [style*="color: #1A1A1A"],
-.sreli-root [style*="color:#1A1A1A"],
-.sreli-root [style*="color: rgb(17, 17, 17)"],
-.sreli-root [style*="color: #111111"],
-.sreli-root [style*="color: rgb(0, 0, 0)"],
-.sreli-root [style*="color: #000000"] {
+
+/* Cinzas suaves de cards internos (resumo, horários, nota, campo desabilitado) → #18181b */
+.sreli-root [style*="background: rgb(242, 241, 246)"]${NOT_LOGIN},
+.sreli-root [style*="background: #f2f1f6"]${NOT_LOGIN},
+.sreli-root [style*="background:#f2f1f6"]${NOT_LOGIN},
+.sreli-root [style*="background: rgb(245, 245, 245)"]${NOT_LOGIN},
+.sreli-root [style*="background: #F5F5F5"]${NOT_LOGIN},
+.sreli-root [style*="background:#F5F5F5"]${NOT_LOGIN} {
+  background-color: ${cardBgAlt} !important;
+  background-image: none !important;
+}
+
+/* Divisórias horizontais (elementos usados como linha) */
+.sreli-root [style*="background: rgb(240, 240, 240)"]${NOT_LOGIN},
+.sreli-root [style*="background: #F0F0F0"]${NOT_LOGIN},
+.sreli-root [style*="background: rgb(229, 229, 226)"]${NOT_LOGIN},
+.sreli-root [style*="background: #E5E5E2"]${NOT_LOGIN},
+.sreli-root [style*="background: rgb(238, 238, 238)"]${NOT_LOGIN},
+.sreli-root [style*="background: #EEEEEE"]${NOT_LOGIN} {
+  background-color: ${divider} !important;
+}
+
+/* Textos escuros → claros */
+.sreli-root [style*="color: rgb(26, 26, 26)"]${NOT_LOGIN},
+.sreli-root [style*="color:rgb(26, 26, 26)"]${NOT_LOGIN},
+.sreli-root [style*="color: #1A1A1A"]${NOT_LOGIN},
+.sreli-root [style*="color:#1A1A1A"]${NOT_LOGIN},
+.sreli-root [style*="color: rgb(17, 17, 17)"]${NOT_LOGIN},
+.sreli-root [style*="color: #111111"]${NOT_LOGIN},
+.sreli-root [style*="color: #111"]${NOT_LOGIN},
+.sreli-root [style*="color: rgb(0, 0, 0)"]${NOT_LOGIN},
+.sreli-root [style*="color: #000000"]${NOT_LOGIN},
+.sreli-root [style*="color: #000"]${NOT_LOGIN} {
   color: ${onBg} !important;
 }
 
-.sreli-root [style*="color: rgb(102, 102, 102)"],
-.sreli-root [style*="color: rgb(136, 136, 136)"],
-.sreli-root [style*="color: rgb(68, 68, 68)"],
-.sreli-root [style*="color: #666"],
-.sreli-root [style*="color: #888"],
-.sreli-root [style*="color: #444"] {
+/* Textos "muted" → cinza claro no escuro */
+.sreli-root [style*="color: rgb(102, 102, 102)"]${NOT_LOGIN},
+.sreli-root [style*="color: rgb(136, 136, 136)"]${NOT_LOGIN},
+.sreli-root [style*="color: rgb(68, 68, 68)"]${NOT_LOGIN},
+.sreli-root [style*="color: #666"]${NOT_LOGIN},
+.sreli-root [style*="color: #888"]${NOT_LOGIN},
+.sreli-root [style*="color: #444"]${NOT_LOGIN} {
   color: ${onBgMuted} !important;
 }
-.sreli-root [style*="border: 1px solid rgb(238, 238, 238)"],
-.sreli-root [style*="border: 1.5px solid rgb(238, 238, 238)"],
-.sreli-root [style*="border: 1px solid rgb(240, 240, 240)"],
-.sreli-root [style*="border-color: rgb(238, 238, 238)"] {
-  border-color: ${sectionBorder} !important;
+
+/* Bordas divisórias → #2a2a2f */
+.sreli-root [style*="border: 1px solid rgb(238, 238, 238)"]${NOT_LOGIN},
+.sreli-root [style*="border: 1.5px solid rgb(238, 238, 238)"]${NOT_LOGIN},
+.sreli-root [style*="border: 1px solid rgb(240, 240, 240)"]${NOT_LOGIN},
+.sreli-root [style*="border: 1.5px solid rgb(239, 239, 239)"]${NOT_LOGIN},
+.sreli-root [style*="border: 1.5px solid rgb(224, 224, 224)"]${NOT_LOGIN},
+.sreli-root [style*="border-bottom: 1px solid rgb(238, 238, 238)"]${NOT_LOGIN},
+.sreli-root [style*="border-bottom: 1px solid rgb(240, 240, 240)"]${NOT_LOGIN},
+.sreli-root [style*="border-top: 1px solid rgb(240, 240, 240)"]${NOT_LOGIN},
+.sreli-root [style*="border-top: 1px solid rgb(238, 238, 238)"]${NOT_LOGIN},
+.sreli-root [style*="border-color: rgb(238, 238, 238)"]${NOT_LOGIN},
+.sreli-root [style*="border-color: rgb(240, 240, 240)"]${NOT_LOGIN} {
+  border-color: ${divider} !important;
+}
+
+/* Borda 3px branca em volta da logo/foto do negócio → #18181b */
+.sreli-root [style*="border: 3px solid rgb(255, 255, 255)"]${NOT_LOGIN},
+.sreli-root [style*="border: 3px solid #FFFFFF"]${NOT_LOGIN},
+.sreli-root [style*="border:3px solid #FFFFFF"]${NOT_LOGIN} {
+  border-color: #18181b !important;
+}
+
+/* Borda 1.5px branca (cards de serviços com border igual ao bg) → #18181b */
+.sreli-root [style*="border: 1.5px solid rgb(255, 255, 255)"]${NOT_LOGIN},
+.sreli-root [style*="border: 1.5px solid #FFFFFF"]${NOT_LOGIN} {
+  border-color: #18181b !important;
 }
 `
     : "";
@@ -213,4 +263,5 @@ ${bgRule}
 ${darkOverrides}
 `.trim();
 }
+
 
