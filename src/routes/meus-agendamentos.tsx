@@ -47,8 +47,10 @@ function MeusAgendamentosPage() {
     showAddress: boolean;
     address: string;
     templateKey: SiteTemplateId;
+    professionalsCount: number;
   } | null>(null);
   const [siteLoading, setSiteLoading] = useState<boolean>(!!slug);
+
 
   // Cache do template por slug para evitar flash branco/preto no carregamento.
   const CACHE_PREFIX = "sreli:tpl:";
@@ -83,9 +85,11 @@ function MeusAgendamentosPage() {
         showAddress: data?.site?.show_address === true,
         address: data?.site?.address ?? "",
         templateKey: tpl,
+        professionalsCount: Array.isArray(data?.professionals) ? data.professionals.length : 0,
       });
       setSiteLoading(false);
     })();
+
     return () => {
       active = false;
     };
@@ -153,9 +157,11 @@ function MeusAgendamentosPage() {
           companyId={publicSite?.companyId ?? null}
           abrirLogin={() => setLoginOpen(true)}
           enderecoFmt={publicSite && publicSite.showAddress ? publicSite.address : ""}
+          professionalsCount={publicSite?.professionalsCount ?? null}
           siteLoading={siteLoading}
           onBack={goBack}
         />
+
       </main>
 
 
@@ -178,6 +184,7 @@ function Conteudo({
   companyId,
   abrirLogin,
   enderecoFmt,
+  professionalsCount,
   siteLoading,
   onBack,
 }: {
@@ -186,9 +193,11 @@ function Conteudo({
   companyId: string | null;
   abrirLogin: () => void;
   enderecoFmt: string;
+  professionalsCount: number | null;
   siteLoading: boolean;
   onBack: () => void;
 }) {
+
   const [cancelandoId, setCancelandoId] = useState<string | null>(null);
   const [motivo, setMotivo] = useState<CancelMotivo | null>(null);
   const [sucessoOpen, setSucessoOpen] = useState(false);
@@ -428,9 +437,10 @@ function Conteudo({
                       </a>
                     </div>
                   ) : null}
-                  {a.profissionalNome ? (
+                  {a.profissionalNome && (professionalsCount == null || professionalsCount >= 2) ? (
                     <div><strong style={{ color: "#1A1A1A", fontWeight: 600 }}>Profissional:</strong> {a.profissionalNome}</div>
                   ) : null}
+
                 </div>
                 {!isCanceledStatus(a.status) && !isPast(a.data, a.horario) && (
                   <button
