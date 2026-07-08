@@ -100,6 +100,14 @@ function MeusAgendamentosPage() {
     return buildTemplateCss(tpl);
   }, [publicSite?.templateKey, cachedTemplateKey]);
 
+  // Safety net: libera scroll preso caso um modal tenha sido desmontado
+  // abruptamente durante navegação antes do cleanup do seu useEffect.
+  useEffect(() => {
+    if (document.body.style.overflow === "hidden") {
+      document.body.style.overflow = "";
+    }
+  }, []);
+
   useEffect(() => {
     initLocalStorage();
   }, []);
