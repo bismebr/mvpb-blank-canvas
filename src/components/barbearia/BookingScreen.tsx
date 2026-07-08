@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useApp, type FuncionarioAdmin, type ServicoAdmin } from "@/components/admin/AppContext";
 import { isPhoneValid, maskBrPhone } from "./phoneMask";
+import { DotsSpinner } from "./DotsSpinner";
 import {
   dayHasAvailability,
   generateSlots,

@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { LoginFullScreen } from "@/components/barbearia/LoginFullScreen";
+import { DotsSpinner } from "@/components/barbearia/DotsSpinner";
 import { initLocalStorage, type Usuario } from "@/components/barbearia/data";
 import { useClientUser } from "@/components/barbearia/ClientUserContext";
 import { type StatusAg } from "@/components/admin/AppContext";
