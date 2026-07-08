@@ -577,6 +577,11 @@ export function LoginFullScreen({
               allowedDomain={emailAllowedDomain}
               validShape={emailValidShape}
             />
+            {isCadastro && emailTouched && email.trim().length > 0 && !emailAllowedDomain && (
+              <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
+                Adicione um e-mail válido
+              </div>
+            )}
             <div style={{ height: 8 }} />
             <FloatField
               label="Senha"
