@@ -1,18 +1,27 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { type Usuario } from "./data";
-import { BISME_LOGOS } from "@/config/assets";
-const bismeLogo = BISME_LOGOS.user;
 import { LoadingOverlay } from "./LoadingOverlay";
 import { isPhoneValid, maskBrPhone } from "./phoneMask";
 import { supabasePublic as supabase } from "@/integrations/supabase/client-public";
-
-
 
 type Mode = "login" | "cadastro" | "esqueci";
 
 const NOME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
 const EMAIL_REGEX = /^[^\s@]+@(gmail\.com|hotmail\.com|outlook\.com)$/i;
+const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const sanitizeNome = (v: string) => v.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s]/g, "");
+
+type Country = { code: string; name: string; flag: string; dial: string };
+const COUNTRIES: Country[] = [
+  { code: "BR", name: "Brasil", flag: "🇧🇷", dial: "+55" },
+  { code: "US", name: "Estados Unidos", flag: "🇺🇸", dial: "+1" },
+  { code: "PT", name: "Portugal", flag: "🇵🇹", dial: "+351" },
+  { code: "ES", name: "Espanha", flag: "🇪🇸", dial: "+34" },
+  { code: "FR", name: "França", flag: "🇫🇷", dial: "+33" },
+  { code: "IT", name: "Itália", flag: "🇮🇹", dial: "+39" },
+  { code: "GB", name: "Reino Unido", flag: "🇬🇧", dial: "+44" },
+];
 
 export function LoginFullScreen({
   open,
@@ -30,6 +39,7 @@ export function LoginFullScreen({
   const [mode, setMode] = useState<Mode>(initialMode);
 
   const [nome, setNome] = useState("");
+  const [sobrenome, setSobrenome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -37,9 +47,18 @@ export function LoginFullScreen({
   const [erro, setErro] = useState<string | null>(null);
   const [loadingCadastro, setLoadingCadastro] = useState(false);
   const [whatsappTouched, setWhatsappTouched] = useState(false);
-  const [emailTouched, setEmailTouched] = useState(false);
   const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [recoverySent, setRecoverySent] = useState(false);
+  const [country, setCountry] = useState<Country>(COUNTRIES[0]);
+  const [countryOpen, setCountryOpen] = useState(false);
+  const countryRef = useRef<HTMLDivElement | null>(null);
+
+  const nomeCompleto = useMemo(
+    () => [nome.trim(), sobrenome.trim()].filter(Boolean).join(" "),
+    [nome, sobrenome],
+  );
+
+  const emailValidShape = EMAIL_SHAPE.test(email.trim());
 
   // reset on open
   useEffect(() => {
@@ -49,12 +68,23 @@ export function LoginFullScreen({
       setShowSenha(false);
       setWhatsapp(maskBrPhone(initialWhatsapp));
       setWhatsappTouched(false);
-      setEmailTouched(false);
       setRecoverySent(false);
       setRecoveryLoading(false);
+      setCountry(COUNTRIES[0]);
+      setCountryOpen(false);
     }
   }, [open, initialMode, initialWhatsapp]);
 
+  useEffect(() => {
+    if (!countryOpen) return;
+    function onDoc(e: MouseEvent) {
+      if (countryRef.current && !countryRef.current.contains(e.target as Node)) {
+        setCountryOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [countryOpen]);
 
   // body scroll lock + ESC
   useEffect(() => {
@@ -96,10 +126,6 @@ export function LoginFullScreen({
         setErro("E-mail ou senha incorretos.");
         return;
       }
-      // Bloqueia contas de empresário no login do cliente final.
-      // A checagem usa a sessão recém-criada no client público — como
-      // company_members tem RLS por auth.uid(), retorna vazio para
-      // contas que não são membros de nenhuma empresa.
       try {
         const { data: member } = await supabase
           .from("company_members")
@@ -117,7 +143,6 @@ export function LoginFullScreen({
       const meta = (data.user.user_metadata ?? {}) as Record<string, unknown>;
       const telExistente = typeof meta.telefone === "string" ? meta.telefone : "";
       let telefoneFinal = telExistente;
-      // Se veio WhatsApp do fluxo de agendamento e o usuário ainda não tem, salva no perfil.
       if (!telExistente && isPhoneValid(whatsapp)) {
         telefoneFinal = whatsapp;
         try {
@@ -139,11 +164,12 @@ export function LoginFullScreen({
       };
       onLogged(atualizado);
     } else {
-      if (!nome.trim() || !email.trim() || !senha) {
+      const nomeFinal = nomeCompleto;
+      if (!nomeFinal || !email.trim() || !senha) {
         setErro("Preencha todos os campos.");
         return;
       }
-      if (!NOME_REGEX.test(nome.trim())) {
+      if (!NOME_REGEX.test(nomeFinal)) {
         setErro("Digite um nome válido, usando apenas letras.");
         return;
       }
@@ -166,7 +192,7 @@ export function LoginFullScreen({
         options: {
           emailRedirectTo:
             typeof window !== "undefined" ? window.location.origin : undefined,
-          data: { nome: nome.trim(), telefone: whatsapp },
+          data: { nome: nomeFinal, telefone: whatsapp },
         },
       });
       if (error) {
@@ -181,19 +207,16 @@ export function LoginFullScreen({
       }
       if (!data.session) {
         setLoadingCadastro(false);
-        setErro(
-          "Cadastro criado! Confirme seu e-mail para ativar a conta e entrar.",
-        );
+        setErro("Cadastro criado! Confirme seu e-mail para ativar a conta e entrar.");
         return;
       }
       const novo: Usuario = {
-        nome: nome.trim(),
+        nome: nomeFinal,
         email: data.user?.email ?? email.trim(),
         senha: "",
         telefone: whatsapp,
         criadoEm: data.user?.created_at ?? new Date().toISOString(),
       };
-      // Mantém o loading visual original do cadastro
       setTimeout(() => {
         setLoadingCadastro(false);
         onLogged(novo);
@@ -204,7 +227,7 @@ export function LoginFullScreen({
   async function handleRecovery() {
     setErro(null);
     const emailTrim = email.trim().toLowerCase();
-    if (!emailTrim || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) {
+    if (!emailTrim || !EMAIL_SHAPE.test(emailTrim)) {
       setErro("Informe um e-mail válido.");
       return;
     }
@@ -220,6 +243,36 @@ export function LoginFullScreen({
     setRecoverySent(true);
   }
 
+  const isLogin = mode === "login";
+  const isCadastro = mode === "cadastro";
+
+  const disabledSubmit = isLogin
+    ? !email.trim() || !senha
+    : !nomeCompleto ||
+      !email.trim() ||
+      !EMAIL_REGEX.test(email.trim()) ||
+      !senha ||
+      senha.length < 6 ||
+      !isPhoneValid(whatsapp);
+
+  function handleFacebookClick() {
+    setErro("Login com Facebook estará disponível em breve.");
+  }
+
+  async function handleGoogleClick() {
+    setErro(null);
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo:
+            typeof window !== "undefined" ? window.location.origin : undefined,
+        },
+      });
+    } catch {
+      setErro("Não foi possível iniciar o login com o Google.");
+    }
+  }
 
   return (
     <div className="sreli-login-overlay" onClick={(e) => e.stopPropagation()}>
@@ -235,27 +288,64 @@ export function LoginFullScreen({
         </svg>
       </button>
 
-      <div className="sreli-login-header">
-        <div className="sreli-login-logo">
-          <img src={bismeLogo} alt="Bisme" />
-        </div>
-      </div>
-
-      <div className="sreli-login-content">
+      <div className="sreli-login-content" style={{ paddingTop: 56 }}>
+        {mode !== "esqueci" && (
+          <div
+            role="tablist"
+            aria-label="Alternar entre entrar e cadastrar"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              background: "#F3F4F6",
+              borderRadius: 999,
+              padding: 4,
+              marginBottom: 22,
+              width: "100%",
+            }}
+          >
+            {(["login", "cadastro"] as const).map((m) => {
+              const active = mode === m;
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => { setMode(m); setErro(null); }}
+                  style={{
+                    height: 40,
+                    borderRadius: 999,
+                    border: "none",
+                    background: active ? "#FFFFFF" : "transparent",
+                    color: active ? "#111111" : "#6F6F6F",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    cursor: "pointer",
+                    boxShadow: active ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                    fontFamily: "inherit",
+                    transition: "background 150ms, color 150ms",
+                  }}
+                >
+                  {m === "login" ? "Entrar" : "Cadastrar"}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         <h2 className="sreli-login-title">
-          {mode === "login"
+          {isLogin
             ? "Bem-vindo de volta"
             : mode === "esqueci"
               ? "Recuperar senha"
-              : "Bem-vindo"}
+              : "Crie sua conta"}
         </h2>
         <p className="sreli-login-subtitle">
-          {mode === "login"
-            ? "Faça login ou crie uma conta para realizar seus agendamentos"
+          {isLogin
+            ? "Entre para gerenciar seus agendamentos"
             : mode === "esqueci"
               ? "Informe seu e-mail e enviaremos um link para redefinir sua senha."
-              : "Crie uma conta para realizar seus agendamentos"}
+              : "Preencha os dados para realizar seus agendamentos"}
         </p>
 
         {mode === "esqueci" ? (
@@ -285,13 +375,7 @@ export function LoginFullScreen({
               </>
             ) : (
               <>
-                <FloatField
-                  label="E-mail"
-                  value={email}
-                  onChange={setEmail}
-                  type="email"
-                  autoComplete="email"
-                />
+                <EmailField value={email} onChange={setEmail} valid={emailValidShape} />
                 {erro && <div className="sreli-field-error" style={{ marginTop: 8 }}>{erro}</div>}
                 <button
                   type="button"
@@ -315,183 +399,295 @@ export function LoginFullScreen({
           </>
         ) : (
           <>
-        <div className="sreli-social-buttons" style={{ display: "block" }}>
-          <button
-            type="button"
-            aria-label="Entrar com o Google"
-            style={{
-              width: "100%", height: 48, borderRadius: 10,
-              background: "#ffffff", border: "1px solid #E5E7EB",
-              display: "inline-flex", alignItems: "center", justifyContent: "center",
-              gap: 10, cursor: "pointer", fontSize: 15, fontWeight: 600, color: "#1A1A1A",
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 48 48">
-              <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.65 4.66-6.08 8-11.3 8-6.63 0-12-5.37-12-12s5.37-12 12-12c3.06 0 5.84 1.16 7.96 3.04l5.66-5.66C34.05 6.05 29.27 4 24 4 12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20c0-1.34-.14-2.65-.4-3.5z" />
-              <path fill="#FF3D00" d="M6.31 14.69l6.57 4.82C14.66 15.13 18.97 12 24 12c3.06 0 5.84 1.16 7.96 3.04l5.66-5.66C34.05 6.05 29.27 4 24 4 16.32 4 9.66 8.34 6.31 14.69z" />
-              <path fill="#4CAF50" d="M24 44c5.18 0 9.86-1.98 13.41-5.2l-6.19-5.24C29.21 35.09 26.74 36 24 36c-5.2 0-9.62-3.32-11.28-7.95l-6.52 5.02C9.5 39.55 16.23 44 24 44z" />
-              <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.79 2.24-2.23 4.16-4.09 5.56l6.19 5.24C40.96 35.6 44 30.27 44 24c0-1.34-.14-2.65-.4-3.5z" />
-            </svg>
-            Entrar com o Google
-          </button>
-        </div>
-
-        <div className="sreli-divider">
-          <span className="sreli-divider-line" />
-          <span className="sreli-divider-text">OU</span>
-          <span className="sreli-divider-line" />
-        </div>
-
-        {mode === "cadastro" && (
-          <>
-            <FloatField label="Nome" value={nome} onChange={(v) => setNome(sanitizeNome(v))} type="text" autoComplete="name" />
-            <div style={{ height: 12 }} />
-            <div style={{ display: "flex", gap: 10, alignItems: "stretch" }}>
-              <div style={{ width: 110, flexShrink: 0 }}>
-                <FloatField label="País" value="🇧🇷 +55" onChange={() => {}} readOnly />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
+            {isCadastro && (
+              <>
                 <FloatField
-                  label="Número de telefone"
-                  value={whatsapp}
-                  onChange={(v) => setWhatsapp(maskBrPhone(v))}
-                  type="tel"
-                  inputMode="numeric"
-                  maxLength={15}
-                  autoComplete="tel-national"
-                  onFocus={() => setWhatsappTouched(false)}
-                  onBlur={() => setWhatsappTouched(true)}
+                  label="Nome"
+                  value={nome}
+                  onChange={(v) => setNome(sanitizeNome(v))}
+                  type="text"
+                  autoComplete="given-name"
                 />
-              </div>
-            </div>
-            {whatsappTouched && whatsapp.length > 0 && !isPhoneValid(whatsapp) && (
-              <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
-                Adicione um número de telefone válido
+                <div style={{ height: 12 }} />
+                <FloatField
+                  label="Sobrenome"
+                  value={sobrenome}
+                  onChange={(v) => setSobrenome(sanitizeNome(v))}
+                  type="text"
+                  autoComplete="family-name"
+                />
+                <div style={{ height: 12 }} />
+                <div ref={countryRef} style={{ position: "relative" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      border: "1.5px solid #E4E4E4",
+                      borderRadius: 8,
+                      background: "#FFFFFF",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setCountryOpen((v) => !v)}
+                      aria-label="Selecionar país"
+                      aria-expanded={countryOpen}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "0 10px 0 12px",
+                        background: "transparent",
+                        border: "none",
+                        borderRight: "1px solid #E4E4E4",
+                        cursor: "pointer",
+                        fontSize: 18,
+                        color: "#111111",
+                        fontFamily: "inherit",
+                      }}
+                    >
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: "50%",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          overflow: "hidden",
+                          background: "#F3F4F6",
+                          fontSize: 18,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {country.flag}
+                      </span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6F6F6F" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </button>
+                    <input
+                      value={whatsapp}
+                      onChange={(e) => setWhatsapp(maskBrPhone(e.target.value))}
+                      onBlur={() => setWhatsappTouched(true)}
+                      onFocus={() => setWhatsappTouched(false)}
+                      placeholder="Digite seu telefone"
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={15}
+                      autoComplete="tel-national"
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        border: "none",
+                        outline: "none",
+                        background: "transparent",
+                        fontSize: 16,
+                        color: "#111111",
+                        padding: "14px 14px",
+                        fontFamily: "inherit",
+                      }}
+                    />
+                  </div>
+                  {countryOpen && (
+                    <div
+                      role="listbox"
+                      style={{
+                        position: "absolute",
+                        top: "calc(100% + 6px)",
+                        left: 0,
+                        right: 0,
+                        background: "#FFFFFF",
+                        border: "1px solid #E4E4E4",
+                        borderRadius: 10,
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
+                        zIndex: 20,
+                        overflow: "hidden",
+                        maxHeight: 260,
+                        overflowY: "auto",
+                      }}
+                    >
+                      {COUNTRIES.map((c) => {
+                        const active = c.code === country.code;
+                        return (
+                          <button
+                            key={c.code}
+                            type="button"
+                            role="option"
+                            aria-selected={active}
+                            onClick={() => { setCountry(c); setCountryOpen(false); }}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 10,
+                              width: "100%",
+                              padding: "10px 14px",
+                              background: active ? "#F3F4F6" : "transparent",
+                              border: "none",
+                              cursor: "pointer",
+                              fontFamily: "inherit",
+                              fontSize: 14,
+                              color: "#111111",
+                              textAlign: "left",
+                            }}
+                          >
+                            <span style={{ fontSize: 20, lineHeight: 1 }}>{c.flag}</span>
+                            <span style={{ flex: 1, fontWeight: 500 }}>{c.name}</span>
+                            <span style={{ color: "#6F6F6F", fontVariantNumeric: "tabular-nums" }}>{c.dial}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                {whatsappTouched && whatsapp.length > 0 && !isPhoneValid(whatsapp) && (
+                  <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
+                    Adicione um número de telefone válido
+                  </div>
+                )}
+                <div style={{ height: 12 }} />
+              </>
+            )}
+
+            <EmailField value={email} onChange={setEmail} valid={emailValidShape} />
+            <div style={{ height: 12 }} />
+            <FloatField
+              label="Senha"
+              value={senha}
+              onChange={setSenha}
+              type={showSenha ? "text" : "password"}
+              autoComplete={isLogin ? "current-password" : "new-password"}
+              inputClassName="sreli-password-input"
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => setShowSenha((v) => !v)}
+                  aria-label={showSenha ? "Ocultar senha" : "Mostrar senha"}
+                  style={{
+                    background: "none", border: "none", padding: 4, cursor: "pointer",
+                    color: "#6F6F6F", display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  {showSenha ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.77 19.77 0 0 1 4.22-5.94" />
+                      <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a19.84 19.84 0 0 1-3.17 4.19" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              }
+            />
+            {isLogin && (
+              <div style={{ marginTop: 10, textAlign: "right" }}>
+                <button
+                  type="button"
+                  onClick={() => { setMode("esqueci"); setErro(null); setRecoverySent(false); }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    color: "#6F6F6F",
+                    fontSize: 13,
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  Esqueci minha senha
+                </button>
               </div>
             )}
-            <div style={{ height: 12 }} />
-          </>
-        )}
+            {erro && <div className="sreli-field-error" style={{ marginTop: 8 }}>{erro}</div>}
 
-        <FloatField
-          label="E-mail"
-          value={email}
-          onChange={setEmail}
-          type="email"
-          autoComplete="email"
-          onFocus={() => setEmailTouched(false)}
-          onBlur={() => setEmailTouched(true)}
-        />
-        {emailTouched && email.length > 0 && !EMAIL_REGEX.test(email.trim()) && (
-          <div style={{ marginTop: 6, fontSize: 12, color: "#dc2626", fontWeight: 600 }}>
-            Informe um endereço de e-mail válido
-          </div>
-        )}
-        <div style={{ height: 12 }} />
-        <FloatField
-          label="Senha"
-          value={senha}
-          onChange={setSenha}
-          type={showSenha ? "text" : "password"}
-          autoComplete={mode === "login" ? "current-password" : "new-password"}
-          inputClassName="sreli-password-input"
-          rightSlot={
             <button
               type="button"
-              onClick={() => setShowSenha((v) => !v)}
-              aria-label={showSenha ? "Ocultar senha" : "Mostrar senha"}
+              className="sreli-signin-btn"
+              onClick={handleSubmit}
+              disabled={disabledSubmit}
               style={{
-                background: "none", border: "none", padding: 4, cursor: "pointer",
-                color: "#6F6F6F", display: "inline-flex", alignItems: "center", justifyContent: "center",
+                opacity: disabledSubmit ? 0.5 : 1,
+                cursor: disabledSubmit ? "not-allowed" : "pointer",
               }}
             >
-              {showSenha ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.77 19.77 0 0 1 4.22-5.94" />
-                  <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a19.84 19.84 0 0 1-3.17 4.19" />
-                  <line x1="1" y1="1" x2="23" y2="23" />
-                </svg>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-              )}
+              {isLogin ? "Entrar" : "Continuar"}
             </button>
-          }
-        />
-        {mode === "login" && (
-          <div style={{ marginTop: 10, textAlign: "right" }}>
-            <button
-              type="button"
-              onClick={() => { setMode("esqueci"); setErro(null); setRecoverySent(false); }}
+
+            <div className="sreli-divider" style={{ margin: "20px 0 16px" }}>
+              <span className="sreli-divider-line" />
+              <span className="sreli-divider-text" style={{ letterSpacing: 0.5 }}>Ou Continue Com</span>
+              <span className="sreli-divider-line" />
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <button
+                type="button"
+                onClick={handleGoogleClick}
+                aria-label="Continuar com Google"
+                style={{
+                  height: 48, borderRadius: 10,
+                  background: "#FFFFFF", border: "1px solid #E5E7EB",
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  gap: 8, cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#1A1A1A",
+                  fontFamily: "inherit",
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden>
+                  <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.65 4.66-6.08 8-11.3 8-6.63 0-12-5.37-12-12s5.37-12 12-12c3.06 0 5.84 1.16 7.96 3.04l5.66-5.66C34.05 6.05 29.27 4 24 4 12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20c0-1.34-.14-2.65-.4-3.5z" />
+                  <path fill="#FF3D00" d="M6.31 14.69l6.57 4.82C14.66 15.13 18.97 12 24 12c3.06 0 5.84 1.16 7.96 3.04l5.66-5.66C34.05 6.05 29.27 4 24 4 16.32 4 9.66 8.34 6.31 14.69z" />
+                  <path fill="#4CAF50" d="M24 44c5.18 0 9.86-1.98 13.41-5.2l-6.19-5.24C29.21 35.09 26.74 36 24 36c-5.2 0-9.62-3.32-11.28-7.95l-6.52 5.02C9.5 39.55 16.23 44 24 44z" />
+                  <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.79 2.24-2.23 4.16-4.09 5.56l6.19 5.24C40.96 35.6 44 30.27 44 24c0-1.34-.14-2.65-.4-3.5z" />
+                </svg>
+                Google
+              </button>
+              <button
+                type="button"
+                onClick={handleFacebookClick}
+                aria-label="Continuar com Facebook"
+                style={{
+                  height: 48, borderRadius: 10,
+                  background: "#FFFFFF", border: "1px solid #E5E7EB",
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  gap: 8, cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#1A1A1A",
+                  fontFamily: "inherit",
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+                  <path fill="#1877F2" d="M24 12a12 12 0 1 0-13.88 11.85v-8.38h-3.05V12h3.05V9.36c0-3.01 1.79-4.67 4.53-4.67 1.31 0 2.68.23 2.68.23v2.95h-1.51c-1.49 0-1.95.92-1.95 1.87V12h3.32l-.53 3.47h-2.79v8.38A12 12 0 0 0 24 12z" />
+                </svg>
+                Facebook
+              </button>
+            </div>
+
+            <p
               style={{
-                background: "none",
-                border: "none",
-                padding: 0,
+                marginTop: 14,
+                fontSize: 12,
                 color: "#6F6F6F",
-                fontSize: 13,
-                fontWeight: 500,
-                cursor: "pointer",
-                textDecoration: "underline",
-                fontFamily: "inherit",
+                textAlign: "center",
+                lineHeight: 1.5,
               }}
             >
-              Esqueci minha senha
-            </button>
-          </div>
-        )}
-        {erro && <div className="sreli-field-error" style={{ marginTop: 8 }}>{erro}</div>}
-
-        <button
-          type="button"
-          className="sreli-signin-btn"
-          onClick={handleSubmit}
-          disabled={
-            mode === "login"
-              ? !email.trim() || !senha
-              : !nome.trim() || !email.trim() || !EMAIL_REGEX.test(email.trim()) || !senha || senha.length < 6 || !isPhoneValid(whatsapp)
-          }
-          style={{
-            opacity:
-              (mode === "login"
-                ? !email.trim() || !senha
-                : !nome.trim() || !email.trim() || !EMAIL_REGEX.test(email.trim()) || !senha || senha.length < 6 || !isPhoneValid(whatsapp))
-                ? 0.5
-                : 1,
-            cursor:
-              (mode === "login"
-                ? !email.trim() || !senha
-                : !nome.trim() || !email.trim() || !EMAIL_REGEX.test(email.trim()) || !senha || senha.length < 6 || !isPhoneValid(whatsapp))
-                ? "not-allowed"
-                : "pointer",
-          }}
-        >
-          {mode === "login" ? "Entrar" : "Criar conta"}
-        </button>
-
-        <div className="sreli-modal-switch-row">
-          {mode === "login" ? (
-            <>
-              Não tem uma conta ainda?{" "}
-              <strong onClick={() => { setMode("cadastro"); setErro(null); }}>
-                Cadastre-se
-              </strong>
-            </>
-          ) : (
-            <>
-              Já tem uma conta?{" "}
-              <strong onClick={() => { setMode("login"); setErro(null); }}>
-                Entrar
-              </strong>
-            </>
-          )}
-        </div>
+              Ao {isLogin ? "entrar" : "se cadastrar"}, você concorda com os{" "}
+              <Link
+                to="/termos-de-servico"
+                style={{ color: "#111111", textDecoration: "underline", fontWeight: 600 }}
+              >
+                Termos de Serviço
+              </Link>
+              .
+            </p>
           </>
         )}
       </div>
-
-
     </div>
   );
 }
@@ -499,7 +695,102 @@ export function LoginFullScreen({
 // referencing CSSProperties to avoid unused-import (kept for clarity)
 export const __noop: CSSProperties = {};
 
-/* ---------- Floating Input (matches onboarding "Sobre você") ---------- */
+/* ---------- Email field with icon, divider and green check ---------- */
+function EmailField({
+  value,
+  onChange,
+  valid,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  valid: boolean;
+}) {
+  const hasValue = value.length > 0;
+  return (
+    <label
+      style={{
+        position: "relative",
+        display: "flex",
+        alignItems: "stretch",
+        border: "1.5px solid #E4E4E4",
+        borderRadius: 8,
+        background: "#FFFFFF",
+        fontFamily: "inherit",
+        overflow: "hidden",
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 12px",
+          color: "#6F6F6F",
+        }}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <path d="M3 7l9 6 9-6" />
+        </svg>
+      </span>
+      <span
+        aria-hidden
+        style={{ width: 1, background: "#E4E4E4", margin: "10px 0" }}
+      />
+      <div style={{ position: "relative", flex: 1, minWidth: 0 }}>
+        <span
+          style={{
+            position: "absolute",
+            left: 12,
+            top: hasValue ? 6 : 14,
+            fontSize: hasValue ? 11 : 14,
+            color: "#6F6F6F",
+            transition: "all 150ms",
+            pointerEvents: "none",
+            fontWeight: hasValue ? 600 : 400,
+          }}
+        >
+          E-mail
+        </span>
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          type="email"
+          autoComplete="email"
+          style={{
+            width: "100%",
+            border: "none",
+            outline: "none",
+            background: "transparent",
+            fontSize: 16,
+            color: "#111111",
+            fontFamily: "inherit",
+            padding: hasValue ? "20px 12px 8px" : "14px 12px",
+          }}
+        />
+      </div>
+      {hasValue && valid && (
+        <span
+          aria-hidden
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 12px",
+            color: "#16a34a",
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </span>
+      )}
+    </label>
+  );
+}
+
+/* ---------- Floating Input ---------- */
 function FloatField({
   label, value, onChange, type = "text", readOnly, autoComplete,
   inputMode, maxLength, rightSlot, inputClassName, onFocus, onBlur,
