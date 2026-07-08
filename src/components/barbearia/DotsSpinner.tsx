@@ -31,8 +31,8 @@ export function DotsSpinner({
     >
       <style>{`
         @keyframes sreli-dots-fade {
-          0%, 39%, 100% { opacity: 0.18; transform: scale(0.85); }
-          40% { opacity: 1; transform: scale(1); }
+          0%, 39%, 100% { opacity: 0.2; }
+          40% { opacity: 1; }
         }
       `}</style>
       {dots.map((_, i) => {
