@@ -568,7 +568,14 @@ export function LoginFullScreen({
               </>
             )}
 
-            <EmailField value={email} onChange={setEmail} valid={emailValidShape} />
+            <EmailField
+              value={email}
+              onChange={setEmail}
+              touched={emailTouched}
+              onTouchedChange={setEmailTouched}
+              allowedDomain={emailAllowedDomain}
+              validShape={emailValidShape}
+            />
             <div style={{ height: 12 }} />
             <FloatField
               label="Senha"
