@@ -257,8 +257,9 @@ export function buildTemplateCss(template: SiteTemplate): string {
 }
 
 /* Borda 1.5px branca (cards de serviços com border igual ao bg) → #18181b.
-   Excluímos o avatar do usuário logado (`.sreli-user-avatar`) — sua borda
+   Excluímos o avatar do usuário logado (.sreli-user-avatar) — sua borda
    branca é intencional para contrastar com o botão primário. */
+
 .sreli-root [style*="border: 1.5px solid rgb(255, 255, 255)"]${NOT_LOGIN}:not(.sreli-user-avatar),
 .sreli-root [style*="border: 1.5px solid #FFFFFF"]${NOT_LOGIN}:not(.sreli-user-avatar) {
   border-color: #18181b !important;
