@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
+import { Undo2 } from "lucide-react";
 import type { FuncionarioAdmin } from "@/components/admin/AppContext";
 
 const ORANGE = "var(--site-primary, #5690f5)";
@@ -255,9 +256,12 @@ function VerTodosModal({
             padding: 4,
             fontSize: 22,
             lineHeight: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          ←
+          <Undo2 size={22} />
         </button>
         <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A", margin: 0 }}>
           Nossos Profissionais
