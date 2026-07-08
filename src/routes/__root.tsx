@@ -11,10 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { AppProvider } from "../components/admin/AppContext";
-import { AvaliacoesProvider } from "../components/admin/AvaliacoesContext";
-import { SiteConfigProvider } from "../components/admin/SiteConfigContext";
-import { ClientUserProvider } from "../components/barbearia/ClientUserContext";
 
 function NotFoundComponent() {
   return (
@@ -91,8 +87,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Lovable App" },
       { name: "twitter:description", content: "A simple web page displaying the text \"mvpb\"." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/61b801c2-6077-4208-9daf-7532573da200/id-preview-cda9d13b--7292a7bb-d546-4245-acc7-c8a579849e64.lovable.app-1783455614967.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/61b801c2-6077-4208-9daf-7532573da200/id-preview-cda9d13b--7292a7bb-d546-4245-acc7-c8a579849e64.lovable.app-1783455614967.png" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9c7a3d60-90ed-44c2-a7e3-bbab3a48b76c/id-preview-93ae1bce--7eae42c9-ffd4-4f07-b188-ea969338deb1.lovable.app-1783510092301.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9c7a3d60-90ed-44c2-a7e3-bbab3a48b76c/id-preview-93ae1bce--7eae42c9-ffd4-4f07-b188-ea969338deb1.lovable.app-1783510092301.png" },
     ],
     links: [
       {
@@ -127,16 +123,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteConfigProvider>
-        <AppProvider>
-          <AvaliacoesProvider>
-            <ClientUserProvider>
-              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-              <Outlet />
-            </ClientUserProvider>
-          </AvaliacoesProvider>
-        </AppProvider>
-      </SiteConfigProvider>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
     </QueryClientProvider>
   );
 }
