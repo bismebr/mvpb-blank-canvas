@@ -69,6 +69,7 @@ function HorarioFuncionamento() {
           return (
             <div
               key={dow}
+              className={isHoje ? "sreli-today-row" : undefined}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -80,6 +81,7 @@ function HorarioFuncionamento() {
                 position: "relative",
               }}
             >
+
               <span style={{ fontSize: 14, fontWeight: isHoje ? 700 : 500, color: "#1A1A1A" }}>
                 {DIAS_SEMANA[dow]}
               </span>

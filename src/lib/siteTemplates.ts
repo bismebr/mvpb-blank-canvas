@@ -256,9 +256,12 @@ export function buildTemplateCss(template: SiteTemplate): string {
   background-image: none !important;
 }
 
-/* Borda 1.5px branca (cards de serviços com border igual ao bg) → #18181b */
-.sreli-root [style*="border: 1.5px solid rgb(255, 255, 255)"]${NOT_LOGIN},
-.sreli-root [style*="border: 1.5px solid #FFFFFF"]${NOT_LOGIN} {
+/* Borda 1.5px branca (cards de serviços com border igual ao bg) → #18181b.
+   Excluímos o avatar do usuário logado (.sreli-user-avatar) — sua borda
+   branca é intencional para contrastar com o botão primário. */
+
+.sreli-root [style*="border: 1.5px solid rgb(255, 255, 255)"]${NOT_LOGIN}:not(.sreli-user-avatar),
+.sreli-root [style*="border: 1.5px solid #FFFFFF"]${NOT_LOGIN}:not(.sreli-user-avatar) {
   border-color: #18181b !important;
 }
 
@@ -269,6 +272,12 @@ export function buildTemplateCss(template: SiteTemplate): string {
   background-image: none !important;
   border-color: #18181b !important;
 }
+
+/* Aba Sobre — linha do dia atual em horários de funcionamento → #18181b */
+.sreli-root .sreli-today-row${NOT_LOGIN} {
+  background: #18181b !important;
+}
+
 
 /* Dia/horário selecionados no fluxo de agendamento (color-mix c/ primary) →
    fundo amarelo sólido + texto branco. */

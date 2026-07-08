@@ -153,10 +153,12 @@ export function InfoBlock({
               <img
                 src={usuario.fotoUrl}
                 alt={usuario.nome}
+                className="sreli-user-avatar"
                 style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1.5px solid #FFFFFF" }}
               />
             ) : (
               <span
+                className="sreli-user-avatar"
                 style={{
                   width: 26, height: 26, borderRadius: "50%",
                   background: "rgba(255,255,255,0.18)", color: "#FFFFFF",
@@ -168,6 +170,7 @@ export function InfoBlock({
                 <IconUserAvatar width={16} height={16} color="#FFFFFF" />
               </span>
             )}
+
             <span style={{ fontSize: 12, fontWeight: 600, color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {firstTwoNames(usuario.nome)}
             </span>
