@@ -205,6 +205,7 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
           status: mapStatus(a.status as unknown as string),
           createdAt: a.created_at ?? undefined,
           updatedAt: a.updated_at ?? undefined,
+          customerUserId: a.customer_user_id ?? undefined,
         };
       });
 
