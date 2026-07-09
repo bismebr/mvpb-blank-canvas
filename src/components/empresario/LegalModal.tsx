@@ -180,7 +180,7 @@ export function TermsContent() {
   return (
     <>
       <h3 style={{ margin: "0 0 14px", fontSize: 20, fontWeight: 700, color: "#111" }}>
-        Termos de Serviço
+        Termos de Uso
       </h3>
       <P>Estes Termos de Serviço regulam o uso da plataforma Bisme, uma solução digital para criação de sites de agendamento, organização de serviços, horários, funcionários, clientes e gestão de atendimentos.</P>
       <P>Ao criar uma conta ou utilizar o Bisme, você declara que leu, entendeu e concorda com estes Termos.</P>
