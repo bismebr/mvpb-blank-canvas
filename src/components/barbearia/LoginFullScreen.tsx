@@ -316,7 +316,7 @@ export function LoginFullScreen({
         </svg>
       </button>
 
-      <div className="sreli-login-content" style={{ paddingTop: 38 }}>
+      <div className="sreli-login-content" style={{ paddingTop: 40 }}>
         {mode !== "esqueci" && (
           <div
             role="tablist"
