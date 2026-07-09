@@ -282,11 +282,14 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
     kind: "created" | "canceled";
     at: string; // ISO
     ag: AgendamentoAdmin;
+    canceledBy?: "client" | "company" | "system";
   };
 
   // Atividades: derivadas dos agendamentos do banco.
   // - "created" ordenado por appointments.created_at
-  // - "canceled" (quando status = cancelado) ordenado por appointments.updated_at
+  // - "canceled" (quando status = cancelado) ordenado pelo momento do
+  //   cancelamento (appointment_cancellations.created_at) com fallback em
+  //   appointments.updated_at.
   // Tudo ordenado por data da AÇÃO (não pela data do agendamento), do mais
   // recente para o mais antigo.
   const activities = useMemo<ActivityItem[]>(() => {
@@ -295,13 +298,14 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
       const createdAt = a.createdAt || `${a.data}T${a.horario}:00`;
       out.push({ id: a.id, kind: "created", at: createdAt, ag: a });
       if (a.status === "cancelado") {
-        const at = a.updatedAt || a.createdAt || `${a.data}T${a.horario}:00`;
-        out.push({ id: `${a.id}:cancel`, kind: "canceled", at, ag: a });
+        const info = cancelInfo[a.id];
+        const at = info?.at || a.updatedAt || a.createdAt || `${a.data}T${a.horario}:00`;
+        out.push({ id: `${a.id}:cancel`, kind: "canceled", at, ag: a, canceledBy: info?.by });
       }
     }
     out.sort((x, y) => y.at.localeCompare(x.at));
     return out;
-  }, [agendamentos]);
+  }, [agendamentos, cancelInfo]);
   const unreadCount = activities.filter((x) => !readSet.has(x.id)).length;
 
 
