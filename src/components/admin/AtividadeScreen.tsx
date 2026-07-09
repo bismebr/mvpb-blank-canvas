@@ -128,8 +128,9 @@ export function AtividadeScreen({
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .adm-feed-item:hover { background: var(--adm-bg-elevated); }
+        .adm-feed-item:hover { background: color-mix(in srgb, var(--adm-bg-elevated) 45%, transparent); }
       `}</style>
+
 
       <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))" }}>
         <header style={{
