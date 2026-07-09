@@ -136,7 +136,7 @@ export const dict: Record<Lang, Dict> = {
     "signup.altLink": "Entrar",
     "agreement.login": "Ao continuar, você concorda com",
     "agreement.signup": "Ao inscrever-se, você concorda com",
-    "agreement.terms": "Termos de Serviço",
+    "agreement.terms": "Termos de Uso",
     "agreement.privacy": "Política de Privacidade",
     "agreement.and": "e",
     "menu.language": "Idioma",
