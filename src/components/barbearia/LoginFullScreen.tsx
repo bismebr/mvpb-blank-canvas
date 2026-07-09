@@ -738,7 +738,6 @@ export function LoginFullScreen({
               >
                 Termos de Serviço
               </Link>
-              .
             </p>
           </>
         )}
