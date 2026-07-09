@@ -290,6 +290,12 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [notifOpen, setNotifOpen] = useState(false);
 
+  // Recarrega as atividades ao abrir a aba Atividade (recalcula tempo relativo
+  // e busca novas atividades mesmo sem Realtime ativo).
+  useEffect(() => {
+    if (notifOpen) reloadRef.current();
+  }, [notifOpen]);
+
   // --- Notificações (sininho) ----------------------------------------
   const [readVersion, setReadVersion] = useState(0);
   useEffect(() => notifStore.subscribe(() => setReadVersion((v) => v + 1)), []);
