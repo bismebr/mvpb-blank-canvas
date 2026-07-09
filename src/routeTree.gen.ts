@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendaRouteImport } from './routes/venda'
-import { Route as TermosDeServicoRouteImport } from './routes/termos-de-servico'
+import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as QuemSomosRouteImport } from './routes/quem-somos'
 import { Route as PoliticaPrivacidadeRouteImport } from './routes/politica-privacidade'
@@ -35,9 +35,9 @@ const VendaRoute = VendaRouteImport.update({
   path: '/venda',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TermosDeServicoRoute = TermosDeServicoRouteImport.update({
-  id: '/termos-de-servico',
-  path: '/termos-de-servico',
+const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
+  id: '/termos-de-uso',
+  path: '/termos-de-uso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SobreRoute = SobreRouteImport.update({
@@ -143,7 +143,7 @@ export interface FileRoutesByFullPath {
   '/politica-privacidade': typeof PoliticaPrivacidadeRoute
   '/quem-somos': typeof QuemSomosRoute
   '/sobre': typeof SobreRoute
-  '/termos-de-servico': typeof TermosDeServicoRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/venda': typeof VendaRoute
   '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
@@ -165,7 +165,7 @@ export interface FileRoutesByTo {
   '/politica-privacidade': typeof PoliticaPrivacidadeRoute
   '/quem-somos': typeof QuemSomosRoute
   '/sobre': typeof SobreRoute
-  '/termos-de-servico': typeof TermosDeServicoRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/venda': typeof VendaRoute
   '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
@@ -188,7 +188,7 @@ export interface FileRoutesById {
   '/politica-privacidade': typeof PoliticaPrivacidadeRoute
   '/quem-somos': typeof QuemSomosRoute
   '/sobre': typeof SobreRoute
-  '/termos-de-servico': typeof TermosDeServicoRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/venda': typeof VendaRoute
   '/cliente/redefinir-senha': typeof ClienteRedefinirSenhaRoute
   '/empresario/cadastro': typeof EmpresarioCadastroRoute
@@ -212,7 +212,7 @@ export interface FileRouteTypes {
     | '/politica-privacidade'
     | '/quem-somos'
     | '/sobre'
-    | '/termos-de-servico'
+    | '/termos-de-uso'
     | '/venda'
     | '/cliente/redefinir-senha'
     | '/empresario/cadastro'
@@ -234,7 +234,7 @@ export interface FileRouteTypes {
     | '/politica-privacidade'
     | '/quem-somos'
     | '/sobre'
-    | '/termos-de-servico'
+    | '/termos-de-uso'
     | '/venda'
     | '/cliente/redefinir-senha'
     | '/empresario/cadastro'
@@ -256,7 +256,7 @@ export interface FileRouteTypes {
     | '/politica-privacidade'
     | '/quem-somos'
     | '/sobre'
-    | '/termos-de-servico'
+    | '/termos-de-uso'
     | '/venda'
     | '/cliente/redefinir-senha'
     | '/empresario/cadastro'
@@ -279,7 +279,7 @@ export interface RootRouteChildren {
   PoliticaPrivacidadeRoute: typeof PoliticaPrivacidadeRoute
   QuemSomosRoute: typeof QuemSomosRoute
   SobreRoute: typeof SobreRoute
-  TermosDeServicoRoute: typeof TermosDeServicoRoute
+  TermosDeUsoRoute: typeof TermosDeUsoRoute
   VendaRoute: typeof VendaRoute
   ClienteRedefinirSenhaRoute: typeof ClienteRedefinirSenhaRoute
   EmpresarioCadastroRoute: typeof EmpresarioCadastroRoute
@@ -300,11 +300,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/termos-de-servico': {
-      id: '/termos-de-servico'
-      path: '/termos-de-servico'
-      fullPath: '/termos-de-servico'
-      preLoaderRoute: typeof TermosDeServicoRouteImport
+    '/termos-de-uso': {
+      id: '/termos-de-uso'
+      path: '/termos-de-uso'
+      fullPath: '/termos-de-uso'
+      preLoaderRoute: typeof TermosDeUsoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sobre': {
@@ -447,7 +447,7 @@ const rootRouteChildren: RootRouteChildren = {
   PoliticaPrivacidadeRoute: PoliticaPrivacidadeRoute,
   QuemSomosRoute: QuemSomosRoute,
   SobreRoute: SobreRoute,
-  TermosDeServicoRoute: TermosDeServicoRoute,
+  TermosDeUsoRoute: TermosDeUsoRoute,
   VendaRoute: VendaRoute,
   ClienteRedefinirSenhaRoute: ClienteRedefinirSenhaRoute,
   EmpresarioCadastroRoute: EmpresarioCadastroRoute,

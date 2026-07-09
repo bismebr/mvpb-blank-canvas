@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FullScreenPage } from "@/components/paginadevenda/PageShell";
 import { TermsContent } from "@/components/empresario/LegalModal";
 
-export const Route = createFileRoute("/termos-de-servico")({
+export const Route = createFileRoute("/termos-de-uso")({
   head: () => ({
     meta: [
       { title: "Termos de Uso — Bisme" },
