@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, User as UserIcon } from "lucide-react";
 import type { AgendamentoAdmin, FuncionarioAdmin } from "./AppContext";
 import { COLORS, FONT } from "./ui";
