@@ -207,10 +207,13 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
       setServicos(servicosMapped);
       setFuncionarios(funcsMapped);
       setAgendamentos(agsMapped);
+      setCancelInfo(cancInfo);
 
       channel = supabase
         .channel(`admin-appts-${cid}`)
         .on("postgres_changes", { event: "*", schema: "public", table: "appointments", filter: `company_id=eq.${cid}` },
+          () => { void load(); })
+        .on("postgres_changes", { event: "*", schema: "public", table: "appointment_cancellations", filter: `company_id=eq.${cid}` },
           () => { void load(); })
         .subscribe();
     }
