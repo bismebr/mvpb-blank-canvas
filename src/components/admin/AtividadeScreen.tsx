@@ -91,7 +91,7 @@ function buildText(
 }
 
 export function AtividadeScreen({
-  activities, readSet, servicos, funcionarios, onClose, onMarkAllRead, onOpen,
+  activities, readSet, servicos, funcionarios, avatarMap, onClose, onMarkAllRead, onOpen,
 }: Props) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
