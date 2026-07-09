@@ -445,57 +445,398 @@ export function TermsContent() {
   return (
     <>
       <h3 style={{ margin: "0 0 14px", fontSize: 20, fontWeight: 700, color: "#111" }}>
-        Termos de Uso
+        Termos de Uso da Bisme
       </h3>
-      <P>Estes Termos de Serviço regulam o uso da plataforma Bisme, uma solução digital para criação de sites de agendamento, organização de serviços, horários, funcionários, clientes e gestão de atendimentos.</P>
-      <P>Ao criar uma conta ou utilizar o Bisme, você declara que leu, entendeu e concorda com estes Termos.</P>
-      <H>1. Sobre o Bisme</H>
-      <P>O Bisme é uma plataforma online que permite que empresas criem um site próprio de agendamentos, cadastrem serviços, horários, funcionários e acompanhem os agendamentos realizados por seus clientes.</P>
-      <P>O Bisme não presta os serviços cadastrados pelas empresas. A responsabilidade pela execução dos serviços, atendimento aos clientes, preços, horários, cancelamentos e informações exibidas no site de agendamento é da própria empresa cadastrada.</P>
-      <H>2. Cadastro e conta</H>
-      <P>Para utilizar o painel administrativo do Bisme, o empresário deverá criar uma conta informando dados verdadeiros, completos e atualizados.</P>
-      <P>O usuário é responsável por manter a confidencialidade de sua senha e por todas as atividades realizadas em sua conta.</P>
-      <P>O Bisme poderá suspender ou encerrar contas que apresentem informações falsas, uso indevido, violação destes Termos ou comportamento que comprometa a segurança da plataforma.</P>
-      <H>3. Uso da plataforma</H>
-      <P>O usuário se compromete a utilizar o Bisme de forma legal, ética e adequada.</P>
-      <P>É proibido utilizar a plataforma para:</P>
-      <ul style={{ margin: "0 0 14px", paddingLeft: 20 }}>
-        <li>Cadastrar informações falsas, enganosas ou ofensivas.</li>
-        <li>Oferecer serviços ilegais ou proibidos.</li>
-        <li>Violar direitos de terceiros.</li>
-        <li>Tentar acessar áreas restritas sem autorização.</li>
-        <li>Copiar, modificar ou explorar indevidamente partes da plataforma.</li>
-        <li>Praticar fraudes, abusos ou qualquer conduta que prejudique o Bisme, outros usuários ou clientes.</li>
-      </ul>
-      <H>4. Site de agendamento</H>
-      <P>Ao criar seu site de agendamento no Bisme, a empresa é responsável por manter atualizadas as informações exibidas, incluindo nome do negócio, endereço, serviços, preços, horários, funcionários, imagens, links e formas de contato.</P>
-      <P>O Bisme poderá remover, bloquear ou solicitar alteração de conteúdos que violem estes Termos, leis aplicáveis ou direitos de terceiros.</P>
-      <H>5. Agendamentos</H>
-      <P>Os agendamentos realizados pelos clientes são registrados conforme as informações configuradas pela empresa no painel administrativo.</P>
-      <P>A empresa é responsável por acompanhar seus agendamentos, cumprir os horários disponibilizados, atender seus clientes e comunicar eventuais alterações ou cancelamentos.</P>
-      <P>O Bisme apenas fornece a ferramenta tecnológica para facilitar essa organização.</P>
-      <H>6. Planos, assinatura e pagamento</H>
-      <P>O Bisme poderá oferecer planos pagos, testes gratuitos ou condições promocionais.</P>
-      <P>As informações sobre valores, período de teste, renovação, troca de plano, cancelamento e bloqueio por inadimplência serão apresentadas dentro da plataforma ou em canais oficiais do Bisme.</P>
-      <P>Caso o pagamento não seja realizado dentro do prazo definido, o acesso à plataforma e ao site de agendamento poderá ser limitado, suspenso ou bloqueado até a regularização.</P>
-      <H>7. Cancelamento</H>
-      <P>O usuário poderá solicitar o cancelamento de sua assinatura ou conta conforme as opções disponíveis na plataforma ou pelos canais oficiais de atendimento.</P>
-      <P>O cancelamento não elimina automaticamente obrigações anteriores, valores pendentes ou responsabilidades relacionadas ao uso da plataforma antes do encerramento.</P>
-      <H>8. Disponibilidade da plataforma</H>
-      <P>O Bisme buscará manter a plataforma disponível e funcionando corretamente, mas não garante que o serviço ficará livre de interrupções, instabilidades, erros ou manutenções.</P>
-      <P>Poderemos realizar atualizações, melhorias, correções ou alterações na plataforma a qualquer momento, buscando melhorar a experiência dos usuários.</P>
-      <H>9. Propriedade intelectual</H>
-      <P>A marca Bisme, o layout da plataforma, os elementos visuais, textos, funcionalidades, códigos, fluxos e demais componentes pertencem ao Bisme ou a seus respectivos titulares.</P>
-      <P>O uso da plataforma não concede ao usuário qualquer direito de propriedade sobre o Bisme ou seus componentes.</P>
-      <H>10. Limitação de responsabilidade</H>
-      <P>O Bisme não se responsabiliza por serviços prestados pelas empresas cadastradas, atrasos, cancelamentos, atendimento ao consumidor final, informações publicadas pelas empresas ou relações comerciais entre empresa e cliente.</P>
-      <P>O Bisme também não se responsabiliza por prejuízos causados por mau uso da plataforma, informações incorretas cadastradas pelo usuário, falhas de conexão, indisponibilidade de serviços de terceiros ou eventos fora de seu controle razoável.</P>
-      <H>11. Alterações nos Termos</H>
-      <P>Estes Termos poderão ser atualizados periodicamente para refletir melhorias na plataforma, mudanças operacionais ou exigências legais.</P>
-      <P>O uso contínuo do Bisme após alterações significa que o usuário concorda com a versão atualizada dos Termos.</P>
-      <H>12. Contato</H>
-      <P>Em caso de dúvidas sobre estes Termos de Serviço, entre em contato pelo e-mail:</P>
-      <P><strong>suporte@bisme.com.br</strong></P>
+      <P>Estes Termos de Uso regulam o acesso e a utilização da plataforma Bisme, incluindo o site, as páginas de agendamento, os painéis administrativos, as telas de login e cadastro, os recursos de criação de sites de agendamento, gestão de serviços, horários, profissionais, clientes, agendamentos e demais funcionalidades oferecidas pela Bisme.</P>
+      <P>Ao acessar, criar uma conta ou utilizar qualquer funcionalidade da Bisme, você declara que leu, compreendeu e concorda com estes Termos de Uso e com a Política de Privacidade da Bisme.</P>
+      <P>Caso você não concorde com estes Termos, não utilize a plataforma.</P>
+
+      <H>1. Sobre a Bisme</H>
+      <P>A Bisme é uma plataforma digital que permite que empresários, prestadores de serviços e negócios criem páginas próprias de agendamento online, cadastrem serviços, configurem horários, adicionem profissionais, recebam reservas/agendamentos e gerenciem sua operação por meio de ferramentas digitais.</P>
+      <P>A Bisme também permite que clientes finais acessem páginas de agendamento, criem contas, façam login, escolham serviços, selecionem horários disponíveis, realizem agendamentos, consultem seus próprios agendamentos e atualizem informações de perfil.</P>
+      <P>A Bisme fornece a tecnologia para facilitar a conexão entre negócios e clientes finais, mas não é responsável pela execução direta dos serviços oferecidos pelos empresários dentro da plataforma.</P>
+      <P>O contato oficial da Bisme é feito exclusivamente pelo e-mail:</P>
+      <P><A href="mailto:atendimento@bisme.com.br">atendimento@bisme.com.br</A></P>
+      <P>A Bisme não possui endereço físico fixo para atendimento ao público e não realiza atendimento oficial por WhatsApp.</P>
+
+      <H>2. Definições</H>
+      <P>Para facilitar a leitura destes Termos, usamos as seguintes definições:</P>
+      <P>“Bisme”, “plataforma”, “nós” ou “nossos serviços” significa a plataforma digital Bisme e todos os recursos relacionados.</P>
+      <P>“Usuário” significa qualquer pessoa que acesse ou utilize a Bisme, incluindo clientes finais, empresários, administradores, profissionais cadastrados ou visitantes.</P>
+      <P>“Cliente final” é a pessoa que utiliza uma página de agendamento criada na Bisme para visualizar serviços, criar conta, fazer login, realizar agendamentos ou consultar seus próprios agendamentos.</P>
+      <P>“Empresário” ou “cliente empresarial” é o usuário que utiliza a Bisme para criar, configurar e administrar uma página de agendamento, cadastrar serviços, horários, profissionais, informações comerciais e demais conteúdos do seu negócio.</P>
+      <P>“Profissional” ou “funcionário” é a pessoa cadastrada pelo empresário para realizar serviços, aparecer em agendas, receber agendamentos ou compor a operação do negócio.</P>
+      <P>“Página de agendamento” é a página pública ou compartilhável criada por um empresário dentro da Bisme para apresentar seu negócio, serviços, horários, profissionais e permitir reservas/agendamentos.</P>
+      <P>“Conteúdo do usuário” significa qualquer informação, texto, imagem, foto, logotipo, descrição, serviço, preço, horário, avaliação, observação, link, dado comercial ou material inserido, publicado ou enviado por um usuário dentro da Bisme.</P>
+
+      <H>3. Aceitação dos Termos</H>
+      <P>Ao utilizar a Bisme, você concorda em cumprir estes Termos de Uso, a Política de Privacidade e demais regras, avisos ou instruções exibidos dentro da plataforma.</P>
+      <P>Se você estiver utilizando a Bisme em nome de uma empresa, negócio, salão, barbearia, clínica, estúdio, equipe, marca ou qualquer outra organização, você declara que possui autorização para aceitar estes Termos em nome desse negócio.</P>
+      <P>Você também declara que as informações fornecidas à Bisme são verdadeiras, atualizadas e completas.</P>
+
+      <H>4. Quem pode usar a Bisme</H>
+      <P>A Bisme pode ser utilizada por pessoas capazes de praticar atos da vida civil, conforme a legislação aplicável.</P>
+      <P>Caso o usuário seja menor de idade, o uso da plataforma deve ocorrer com autorização e supervisão dos pais ou responsáveis legais.</P>
+      <P>O empresário que cria uma página de agendamento declara que possui autorização para divulgar o negócio, cadastrar profissionais, oferecer serviços, publicar imagens, definir preços, disponibilizar horários e receber agendamentos por meio da plataforma.</P>
+
+      <H>5. Conta de usuário</H>
+      <P>Para acessar determinadas funcionalidades, pode ser necessário criar uma conta ou fazer login.</P>
+      <P>O usuário é responsável por:</P>
+      <UL>
+        <LI>Fornecer informações verdadeiras e atualizadas;</LI>
+        <LI>Manter a confidencialidade de suas credenciais de acesso;</LI>
+        <LI>Não compartilhar senha ou acesso com terceiros não autorizados;</LI>
+        <LI>Comunicar a Bisme caso identifique uso indevido ou acesso não autorizado;</LI>
+        <LI>Utilizar a conta de forma responsável e de acordo com estes Termos.</LI>
+      </UL>
+      <P>A Bisme poderá restringir, suspender ou encerrar contas que apresentem indícios de uso indevido, fraude, violação destes Termos, risco à segurança da plataforma ou descumprimento da legislação aplicável.</P>
+
+      <H>6. Login por terceiros</H>
+      <P>A Bisme poderá permitir login ou cadastro por meio de provedores externos, como Google, Facebook ou outros serviços semelhantes.</P>
+      <P>Ao escolher esse tipo de acesso, o usuário entende que também poderá estar sujeito aos termos e políticas desses terceiros.</P>
+      <P>A Bisme não controla as práticas, políticas, disponibilidade ou funcionamento de plataformas externas de autenticação.</P>
+
+      <H>7. Uso permitido da plataforma</H>
+      <P>O usuário deve utilizar a Bisme de forma ética, responsável, legal e compatível com a finalidade da plataforma.</P>
+      <P>O empresário pode usar a Bisme para:</P>
+      <UL>
+        <LI>Criar uma página de agendamento para seu negócio;</LI>
+        <LI>Cadastrar serviços;</LI>
+        <LI>Informar preços, duração e descrições;</LI>
+        <LI>Configurar horários de funcionamento;</LI>
+        <LI>Adicionar profissionais ou funcionários;</LI>
+        <LI>Gerenciar disponibilidade;</LI>
+        <LI>Receber agendamentos;</LI>
+        <LI>Visualizar clientes agendados;</LI>
+        <LI>Organizar sua agenda;</LI>
+        <LI>Personalizar visualmente sua página;</LI>
+        <LI>Divulgar seu link de agendamento;</LI>
+        <LI>Apresentar informações legítimas sobre seu negócio.</LI>
+      </UL>
+      <P>O cliente final pode usar a Bisme para:</P>
+      <UL>
+        <LI>Acessar páginas de agendamento;</LI>
+        <LI>Criar conta;</LI>
+        <LI>Fazer login;</LI>
+        <LI>Visualizar serviços;</LI>
+        <LI>Selecionar datas e horários disponíveis;</LI>
+        <LI>Realizar agendamentos;</LI>
+        <LI>Consultar seus próprios agendamentos;</LI>
+        <LI>Atualizar informações de perfil;</LI>
+        <LI>Entrar em contato com o negócio pelos canais informados pelo próprio empresário, quando disponíveis.</LI>
+      </UL>
+
+      <H>8. Regras de boa convivência e bom senso</H>
+      <P>A Bisme busca oferecer um ambiente seguro, profissional e confiável para empresários e clientes finais.</P>
+      <P>Ao utilizar a plataforma, o usuário concorda em agir com bom senso, respeito, honestidade e responsabilidade.</P>
+      <P>Não é permitido utilizar a Bisme para prejudicar outras pessoas, enganar clientes, publicar conteúdo abusivo, divulgar informações falsas, violar direitos de terceiros ou usar a plataforma para finalidades incompatíveis com um ambiente profissional de agendamento.</P>
+      <P>A Bisme poderá avaliar conteúdos, páginas, contas ou comportamentos que contrariem essas regras e tomar medidas proporcionais, incluindo aviso, remoção de conteúdo, limitação de recursos, suspensão ou encerramento de conta.</P>
+
+      <H>9. Conteúdos proibidos</H>
+      <P>A Bisme não permite o uso da plataforma para publicar, divulgar, vender, reservar, promover ou facilitar conteúdos, serviços ou materiais ilegais, abusivos, enganosos ou incompatíveis com a finalidade da plataforma.</P>
+      <P>É expressamente proibido ao empresário ou a qualquer usuário publicar, enviar, cadastrar, divulgar ou utilizar na Bisme:</P>
+      <UL>
+        <LI>Conteúdo sexual explícito, pornografia, nudez explícita ou fotos pornográficas para fins de reserva, divulgação, venda, promoção ou agendamento;</LI>
+        <LI>Imagens, textos ou materiais que explorem sexualmente qualquer pessoa;</LI>
+        <LI>Qualquer conteúdo sexual envolvendo menores de idade, ainda que simulado, ilustrado ou sugerido;</LI>
+        <LI>Conteúdo que incentive violência, abuso, exploração, assédio ou humilhação;</LI>
+        <LI>Conteúdo discriminatório, ofensivo, ameaçador, difamatório ou de ódio;</LI>
+        <LI>Conteúdo que viole direitos autorais, marcas, imagem, privacidade ou outros direitos de terceiros;</LI>
+        <LI>Informações falsas, enganosas ou fraudulentas sobre serviços, preços, profissionais, horários ou condições de atendimento;</LI>
+        <LI>Golpes, fraudes, esquemas financeiros, promessas enganosas ou práticas abusivas;</LI>
+        <LI>Venda ou promoção de produtos ou serviços ilegais;</LI>
+        <LI>Uso da plataforma para atividades criminosas ou contrárias à legislação;</LI>
+        <LI>Links maliciosos, arquivos infectados, spam, automações abusivas ou tentativas de comprometer a segurança da plataforma;</LI>
+        <LI>Conteúdo que exponha dados pessoais de terceiros sem autorização;</LI>
+        <LI>Qualquer uso que possa prejudicar a Bisme, seus usuários, clientes finais, empresários, profissionais, parceiros ou terceiros.</LI>
+      </UL>
+      <P>A regra sobre conteúdo sexual explícito e pornografia é uma regra central da Bisme. A plataforma não deve ser usada para divulgar fotos explícitas de pornografia, criar páginas de reserva com esse tipo de material ou promover serviços associados a conteúdo pornográfico explícito.</P>
+      <P>A Bisme poderá remover, limitar ou bloquear conteúdos que, a seu critério razoável, violem estes Termos, apresentem risco à plataforma ou contrariem o bom senso esperado para um ambiente profissional de agendamento.</P>
+
+      <H>10. Conteúdo do empresário</H>
+      <P>O empresário é responsável por todo conteúdo que cadastrar, publicar ou disponibilizar em sua página de agendamento.</P>
+      <P>Isso inclui, entre outros:</P>
+      <UL>
+        <LI>Nome do negócio;</LI>
+        <LI>Descrição;</LI>
+        <LI>Fotos;</LI>
+        <LI>Logotipo;</LI>
+        <LI>Imagens de capa;</LI>
+        <LI>Serviços;</LI>
+        <LI>Preços;</LI>
+        <LI>Duração dos serviços;</LI>
+        <LI>Horários;</LI>
+        <LI>Profissionais;</LI>
+        <LI>Comodidades;</LI>
+        <LI>Redes sociais;</LI>
+        <LI>Informações comerciais;</LI>
+        <LI>Endereço ou localização, quando informado;</LI>
+        <LI>Links externos;</LI>
+        <LI>Qualquer outro conteúdo exibido na página.</LI>
+      </UL>
+      <P>O empresário declara que possui todos os direitos, autorizações e permissões necessárias para publicar esses conteúdos.</P>
+      <P>O empresário também se compromete a manter as informações corretas e atualizadas, principalmente informações de preço, horário, serviço, disponibilidade e condições de atendimento.</P>
+      <P>A Bisme não é obrigada a revisar previamente todo conteúdo publicado pelos empresários, mas poderá remover ou restringir conteúdos que violem estes Termos, a legislação ou direitos de terceiros.</P>
+
+      <H>11. Responsabilidade sobre serviços oferecidos</H>
+      <P>A Bisme fornece uma ferramenta tecnológica para criação de páginas de agendamento e gestão de reservas.</P>
+      <P>Os serviços oferecidos nas páginas de agendamento são de responsabilidade do respectivo empresário, negócio ou profissional.</P>
+      <P>A Bisme não executa diretamente os serviços anunciados pelos empresários e não se responsabiliza por:</P>
+      <UL>
+        <LI>Qualidade do serviço prestado pelo empresário;</LI>
+        <LI>Comparecimento ou ausência do empresário, profissional ou cliente final;</LI>
+        <LI>Cancelamentos realizados pelo negócio;</LI>
+        <LI>Atrasos;</LI>
+        <LI>Alterações de preço feitas pelo empresário;</LI>
+        <LI>Informações incorretas publicadas pelo empresário;</LI>
+        <LI>Atendimento prestado fora da plataforma;</LI>
+        <LI>Promessas, garantias ou condições comerciais oferecidas pelo empresário;</LI>
+        <LI>Relação direta entre cliente final e negócio.</LI>
+      </UL>
+      <P>O cliente final deve verificar as informações do serviço antes de concluir um agendamento.</P>
+      <P>O empresário é responsável por cumprir as condições que divulgar em sua página de agendamento.</P>
+
+      <H>12. Agendamentos</H>
+      <P>A Bisme permite que clientes finais solicitem ou realizem agendamentos conforme a disponibilidade configurada pelo empresário.</P>
+      <P>O agendamento pode incluir informações como serviço escolhido, data, horário, profissional, observações e dados de contato do cliente.</P>
+      <P>O empresário é responsável por manter sua agenda atualizada e por honrar os horários disponibilizados, salvo em casos de imprevistos, cancelamentos ou ajustes necessários.</P>
+      <P>A Bisme poderá exibir status de agendamento, como confirmado, cancelado, concluído ou outros estados definidos pela plataforma.</P>
+      <P>A existência de um agendamento dentro da Bisme não garante, por si só, a prestação do serviço caso o empresário cancele, altere ou não realize o atendimento. Nesses casos, a responsabilidade pela relação de atendimento é do respectivo empresário.</P>
+
+      <H>13. Cancelamentos, atrasos e alterações</H>
+      <P>As regras de cancelamento, atraso, remarcação, tolerância e não comparecimento podem variar conforme cada negócio.</P>
+      <P>Quando o empresário informar regras específicas em sua página, o cliente final deverá observá-las.</P>
+      <P>Na ausência de regras específicas, o cliente final e o empresário devem agir com bom senso, respeito e comunicação adequada.</P>
+      <P>A Bisme poderá futuramente disponibilizar recursos para facilitar cancelamentos, remarcações ou avisos, mas não assume responsabilidade direta pelas decisões comerciais de cada empresário.</P>
+
+      <H>14. Planos, pagamentos e cobranças</H>
+      <P>A Bisme poderá oferecer planos gratuitos, pagos, testes gratuitos, recursos premium, assinaturas ou funcionalidades adicionais.</P>
+      <P>As condições de preço, cobrança, renovação, cancelamento, período de teste e recursos incluídos serão informadas na própria plataforma ou em páginas específicas, quando aplicável.</P>
+      <P>Ao contratar um plano pago, o empresário concorda em pagar os valores informados no momento da contratação.</P>
+      <P>A ausência de pagamento, falha na cobrança ou violação destes Termos poderá resultar na limitação, suspensão ou encerramento do acesso a recursos pagos.</P>
+      <P>A Bisme poderá alterar preços, planos e funcionalidades, respeitando comunicações e regras aplicáveis.</P>
+
+      <H>15. Conteúdo público e visibilidade</H>
+      <P>Algumas informações cadastradas pelo empresário podem ficar visíveis publicamente na página de agendamento.</P>
+      <P>O empresário entende que, ao publicar informações na página, elas poderão ser acessadas por clientes finais, visitantes e outras pessoas que tenham acesso ao link.</P>
+      <P>O empresário deve evitar publicar informações privadas, sensíveis, confidenciais ou que não deseja tornar públicas.</P>
+      <P>A Bisme poderá disponibilizar opções de personalização e visibilidade, mas é responsabilidade do empresário revisar o que está sendo exibido em sua página.</P>
+
+      <H>16. Fotos, imagens e direitos de imagem</H>
+      <P>Ao enviar fotos, imagens, logotipos ou qualquer material visual para a Bisme, o usuário declara que:</P>
+      <UL>
+        <LI>Possui direito de uso sobre o material;</LI>
+        <LI>Não está violando direitos autorais, marcas, imagem ou privacidade de terceiros;</LI>
+        <LI>Possui autorização das pessoas retratadas, quando necessário;</LI>
+        <LI>Não está publicando conteúdo proibido por estes Termos;</LI>
+        <LI>Assume responsabilidade pelo conteúdo enviado.</LI>
+      </UL>
+      <P>A Bisme poderá remover imagens que violem estes Termos ou que sejam denunciadas por violação de direitos.</P>
+
+      <H>17. Licença de uso do conteúdo enviado</H>
+      <P>Ao publicar ou enviar conteúdo para a Bisme, o usuário concede à plataforma uma licença limitada, não exclusiva, gratuita e necessária para hospedar, armazenar, reproduzir, exibir, adaptar tecnicamente e disponibilizar esse conteúdo dentro da plataforma.</P>
+      <P>Essa licença existe apenas para permitir o funcionamento da Bisme, como exibir a página de agendamento, mostrar fotos, apresentar serviços, organizar informações e disponibilizar o conteúdo aos clientes finais.</P>
+      <P>O usuário continua sendo responsável e titular dos direitos que possuir sobre seu próprio conteúdo.</P>
+
+      <H>18. Moderação da plataforma</H>
+      <P>A Bisme poderá, mas não é obrigada a, analisar conteúdos, páginas, contas, denúncias ou comportamentos de usuários.</P>
+      <P>A moderação poderá ocorrer quando houver:</P>
+      <UL>
+        <LI>Denúncia de usuário;</LI>
+        <LI>Suspeita de violação destes Termos;</LI>
+        <LI>Risco à segurança da plataforma;</LI>
+        <LI>Conteúdo proibido;</LI>
+        <LI>Uso fraudulento;</LI>
+        <LI>Violação de direitos de terceiros;</LI>
+        <LI>Determinação legal ou de autoridade competente;</LI>
+        <LI>Conduta incompatível com a proposta da Bisme.</LI>
+      </UL>
+      <P>Medidas de moderação podem incluir:</P>
+      <UL>
+        <LI>Aviso ao usuário;</LI>
+        <LI>Solicitação de ajuste;</LI>
+        <LI>Remoção de conteúdo;</LI>
+        <LI>Restrição de visibilidade;</LI>
+        <LI>Bloqueio temporário de recursos;</LI>
+        <LI>Suspensão da conta;</LI>
+        <LI>Encerramento da conta;</LI>
+        <LI>Preservação de registros quando necessário;</LI>
+        <LI>Comunicação a autoridades competentes, quando exigido ou permitido por lei.</LI>
+      </UL>
+
+      <H>19. Denúncias</H>
+      <P>Usuários, clientes finais, empresários ou terceiros podem comunicar à Bisme conteúdos, páginas ou comportamentos que violem estes Termos.</P>
+      <P>As denúncias devem ser enviadas para:</P>
+      <P><A href="mailto:atendimento@bisme.com.br">atendimento@bisme.com.br</A></P>
+      <P>A denúncia deve conter, sempre que possível:</P>
+      <UL>
+        <LI>Link da página ou conteúdo;</LI>
+        <LI>Descrição do problema;</LI>
+        <LI>Prints ou evidências;</LI>
+        <LI>Nome do negócio ou usuário envolvido;</LI>
+        <LI>Motivo da denúncia;</LI>
+        <LI>Dados de contato do denunciante, quando aplicável.</LI>
+      </UL>
+      <P>A Bisme poderá analisar a denúncia e tomar as medidas que entender adequadas conforme a gravidade do caso, as evidências disponíveis e a legislação aplicável.</P>
+
+      <H>20. Suspensão e encerramento de contas</H>
+      <P>A Bisme poderá suspender, limitar ou encerrar o acesso de usuários que:</P>
+      <UL>
+        <LI>Violem estes Termos;</LI>
+        <LI>Publiquem conteúdo proibido;</LI>
+        <LI>Utilizem a plataforma para fins ilegais;</LI>
+        <LI>Pratiquem fraude;</LI>
+        <LI>Tentem comprometer a segurança da Bisme;</LI>
+        <LI>Desrespeitem outros usuários;</LI>
+        <LI>Causem prejuízo à plataforma ou a terceiros;</LI>
+        <LI>Forneçam informações falsas;</LI>
+        <LI>Utilizem a plataforma de forma abusiva;</LI>
+        <LI>Descumpram obrigações de pagamento, quando aplicável.</LI>
+      </UL>
+      <P>A suspensão ou encerramento poderá ocorrer com ou sem aviso prévio, dependendo da gravidade da situação.</P>
+      <P>Em casos graves, como conteúdo pornográfico explícito, exploração sexual, fraude, ameaça à segurança ou atividade ilegal, a Bisme poderá agir imediatamente.</P>
+
+      <H>21. Segurança da plataforma</H>
+      <P>O usuário não deve tentar acessar áreas restritas, contornar proteções, explorar falhas, realizar engenharia reversa, interferir no funcionamento da plataforma ou usar métodos automatizados abusivos.</P>
+      <P>É proibido:</P>
+      <UL>
+        <LI>Invadir contas;</LI>
+        <LI>Testar vulnerabilidades sem autorização;</LI>
+        <LI>Usar bots, scripts ou automações abusivas;</LI>
+        <LI>Copiar dados da plataforma em massa;</LI>
+        <LI>Interferir em servidores, banco de dados ou infraestrutura;</LI>
+        <LI>Tentar obter dados de outros usuários sem permissão;</LI>
+        <LI>Inserir vírus, malware ou código malicioso;</LI>
+        <LI>Utilizar a Bisme de forma que prejudique a estabilidade do serviço.</LI>
+      </UL>
+      <P>A Bisme poderá adotar medidas técnicas e jurídicas para proteger sua plataforma e seus usuários.</P>
+
+      <H>22. Privacidade e proteção de dados</H>
+      <P>O tratamento de dados pessoais realizado pela Bisme está descrito na Política de Privacidade.</P>
+      <P>Ao utilizar a plataforma, o usuário também concorda com a Política de Privacidade da Bisme.</P>
+      <P>O empresário reconhece que poderá acessar dados de clientes finais relacionados aos agendamentos recebidos e se compromete a tratar essas informações com responsabilidade, segurança, confidencialidade e de acordo com a legislação aplicável.</P>
+      <P>O empresário não deve usar dados de clientes finais para finalidades abusivas, ilegais, invasivas ou incompatíveis com o contexto do agendamento.</P>
+
+      <H>23. Comunicações</H>
+      <P>A Bisme poderá enviar comunicações relacionadas à conta, segurança, alterações nos Termos, suporte, funcionamento da plataforma, cobranças, planos, atualizações ou informações operacionais importantes.</P>
+      <P>As comunicações poderão ocorrer por e-mail, avisos dentro da plataforma ou outros meios disponibilizados oficialmente.</P>
+      <P>O canal oficial de contato da Bisme é:</P>
+      <P><A href="mailto:atendimento@bisme.com.br">atendimento@bisme.com.br</A></P>
+      <P>A Bisme não realiza atendimento oficial por WhatsApp.</P>
+
+      <H>24. Propriedade intelectual da Bisme</H>
+      <P>A Bisme, incluindo seu nome, marca, identidade visual, interface, estrutura, código, design, textos, recursos, funcionalidades, componentes, banco de dados, fluxos, elementos visuais e demais materiais próprios, pertence à Bisme ou a seus respectivos licenciadores.</P>
+      <P>O usuário não recebe qualquer direito de propriedade sobre a plataforma ao utilizá-la.</P>
+      <P>É proibido copiar, reproduzir, modificar, vender, sublicenciar, distribuir, explorar comercialmente ou criar produtos derivados da Bisme sem autorização prévia.</P>
+      <P>O usuário recebe apenas uma licença limitada, revogável, não exclusiva e intransferível para utilizar a plataforma conforme estes Termos.</P>
+
+      <H>25. Disponibilidade da plataforma</H>
+      <P>A Bisme busca manter a plataforma disponível, estável e segura, mas não garante funcionamento ininterrupto, livre de erros ou disponível em todos os momentos.</P>
+      <P>A plataforma poderá ficar temporariamente indisponível por:</P>
+      <UL>
+        <LI>Manutenção;</LI>
+        <LI>Atualizações;</LI>
+        <LI>Falhas técnicas;</LI>
+        <LI>Problemas de infraestrutura;</LI>
+        <LI>Ataques externos;</LI>
+        <LI>Casos fortuitos ou força maior;</LI>
+        <LI>Problemas em serviços de terceiros;</LI>
+        <LI>Necessidade de segurança;</LI>
+        <LI>Outros fatores fora do controle razoável da Bisme.</LI>
+      </UL>
+      <P>A Bisme poderá modificar, suspender ou descontinuar funcionalidades, desde que isso não viole obrigações legais ou contratuais aplicáveis.</P>
+
+      <H>26. Serviços e links de terceiros</H>
+      <P>A Bisme pode integrar ou permitir acesso a serviços de terceiros, como provedores de autenticação, hospedagem, armazenamento, pagamentos, mapas, redes sociais, ferramentas de análise ou links externos adicionados pelos empresários.</P>
+      <P>A Bisme não é responsável pelo conteúdo, funcionamento, segurança, disponibilidade ou políticas desses terceiros.</P>
+      <P>O uso de serviços externos pode estar sujeito aos termos e políticas próprios de cada fornecedor.</P>
+
+      <H>27. Responsabilidade do usuário</H>
+      <P>O usuário é responsável por sua conduta dentro da Bisme e por todo conteúdo que inserir, publicar, enviar ou disponibilizar.</P>
+      <P>O usuário concorda em indenizar ou ressarcir a Bisme caso sua conduta, conteúdo ou violação destes Termos gere prejuízos, reclamações, disputas, multas, condenações, custos ou responsabilidades para a plataforma.</P>
+      <P>Isso inclui, por exemplo, violação de direitos autorais, uso indevido de imagem, publicação de conteúdo proibido, fraude, informações falsas ou descumprimento da legislação aplicável.</P>
+
+      <H>28. Limitação de responsabilidade da Bisme</H>
+      <P>Na máxima medida permitida pela legislação aplicável, a Bisme não será responsável por:</P>
+      <UL>
+        <LI>Serviços prestados diretamente pelos empresários;</LI>
+        <LI>Conduta de clientes finais;</LI>
+        <LI>Conduta de profissionais cadastrados;</LI>
+        <LI>Informações publicadas pelos empresários;</LI>
+        <LI>Conteúdos enviados por usuários;</LI>
+        <LI>Atrasos, cancelamentos ou não comparecimentos;</LI>
+        <LI>Perdas decorrentes de uso indevido da conta pelo usuário;</LI>
+        <LI>Falhas causadas por terceiros;</LI>
+        <LI>Indisponibilidade temporária da plataforma;</LI>
+        <LI>Decisões comerciais tomadas pelos empresários;</LI>
+        <LI>Danos indiretos, lucros cessantes ou perdas de oportunidade, quando permitido por lei.</LI>
+      </UL>
+      <P>Nada nestes Termos exclui responsabilidades que não possam ser excluídas pela legislação aplicável.</P>
+
+      <H>29. Alterações na plataforma</H>
+      <P>A Bisme poderá alterar, melhorar, remover ou adicionar funcionalidades à plataforma.</P>
+      <P>Essas alterações podem ocorrer para melhorar a experiência do usuário, corrigir erros, reforçar segurança, adaptar a plataforma a novas necessidades, cumprir exigências legais ou desenvolver novos recursos.</P>
+      <P>Nem todas as funcionalidades estarão disponíveis para todos os usuários, planos, modelos de site ou regiões.</P>
+
+      <H>30. Alterações destes Termos</H>
+      <P>A Bisme poderá atualizar estes Termos de Uso a qualquer momento.</P>
+      <P>Quando houver alterações relevantes, poderemos comunicar os usuários por meio da plataforma, por e-mail ou pela atualização da data no início deste documento.</P>
+      <P>O uso contínuo da Bisme após a publicação de alterações significa que o usuário concorda com a versão atualizada dos Termos.</P>
+      <P>Caso não concorde com as alterações, o usuário deve interromper o uso da plataforma.</P>
+
+      <H>31. Encerramento do uso pelo usuário</H>
+      <P>O usuário pode deixar de utilizar a Bisme a qualquer momento.</P>
+      <P>Empresários podem solicitar cancelamento de conta ou encerramento de uso pelo e-mail:</P>
+      <P><A href="mailto:atendimento@bisme.com.br">atendimento@bisme.com.br</A></P>
+      <P>Alguns dados poderão ser mantidos pelo período necessário para cumprimento de obrigações legais, segurança, prevenção a fraudes, resolução de disputas ou exercício regular de direitos, conforme descrito na Política de Privacidade.</P>
+
+      <H>32. Regras específicas para empresários</H>
+      <P>Além das demais regras destes Termos, o empresário concorda em:</P>
+      <UL>
+        <LI>Cadastrar apenas informações verdadeiras sobre seu negócio;</LI>
+        <LI>Não oferecer serviços ilegais;</LI>
+        <LI>Não publicar fotos pornográficas explícitas ou conteúdo sexual explícito para reserva;</LI>
+        <LI>Não usar imagens de terceiros sem autorização;</LI>
+        <LI>Não enganar clientes sobre preço, serviço, localização, disponibilidade ou profissional;</LI>
+        <LI>Manter seus horários atualizados;</LI>
+        <LI>Atender clientes de forma respeitosa;</LI>
+        <LI>Usar dados dos clientes apenas para finalidades relacionadas ao agendamento e atendimento;</LI>
+        <LI>Não vender, expor ou compartilhar dados de clientes indevidamente;</LI>
+        <LI>Não usar a Bisme para spam, fraude ou abuso;</LI>
+        <LI>Cumprir as leis aplicáveis ao seu ramo de atividade;</LI>
+        <LI>Obter autorizações necessárias para cadastrar profissionais, funcionários, fotos e informações do negócio.</LI>
+      </UL>
+      <P>O empresário é o principal responsável pela operação do seu negócio, pelos serviços oferecidos e pelo relacionamento com seus clientes.</P>
+
+      <H>33. Regras específicas para clientes finais</H>
+      <P>Além das demais regras destes Termos, o cliente final concorda em:</P>
+      <UL>
+        <LI>Fornecer informações verdadeiras ao se cadastrar ou agendar;</LI>
+        <LI>Não realizar agendamentos falsos;</LI>
+        <LI>Não usar dados de terceiros sem autorização;</LI>
+        <LI>Não enviar mensagens ofensivas, abusivas ou ilegais;</LI>
+        <LI>Comparecer ao horário agendado ou cancelar/remarcar quando necessário;</LI>
+        <LI>Respeitar as regras informadas pelo negócio;</LI>
+        <LI>Não utilizar a plataforma para prejudicar empresários, profissionais ou outros usuários.</LI>
+      </UL>
+      <P>O cliente final entende que o atendimento, a execução do serviço e as condições comerciais são de responsabilidade do respectivo empresário.</P>
+
+      <H>34. Uso aceitável e estilo de comunidade</H>
+      <P>A Bisme funciona melhor quando todos os usuários agem com responsabilidade.</P>
+      <P>Por isso, a plataforma adota regras de comunidade semelhantes às de ambientes digitais modernos: seja verdadeiro, respeite os outros, não publique conteúdo proibido, não tente enganar pessoas, não explore a plataforma de forma abusiva e não utilize a Bisme para finalidades incompatíveis com um ambiente profissional.</P>
+      <P>A Bisme não pretende controlar a criatividade, identidade visual ou forma de apresentação dos negócios, mas poderá intervir quando houver abuso, risco, ilegalidade, nudez explícita, pornografia, fraude, violência, violação de direitos ou uso contrário ao bom senso.</P>
+
+      <H>35. Legislação aplicável</H>
+      <P>Estes Termos de Uso serão interpretados de acordo com as leis da República Federativa do Brasil.</P>
+      <P>Eventuais conflitos deverão ser resolvidos preferencialmente de forma amigável, por meio do contato:</P>
+      <P><A href="mailto:atendimento@bisme.com.br">atendimento@bisme.com.br</A></P>
+      <P>Caso não seja possível uma solução amigável, poderão ser utilizados os meios legais competentes conforme a legislação aplicável.</P>
+
+      <H>36. Disposições finais</H>
+      <P>Se qualquer parte destes Termos for considerada inválida ou inexequível, as demais disposições continuarão válidas e aplicáveis.</P>
+      <P>A eventual tolerância da Bisme quanto ao descumprimento de alguma regra não significa renúncia ao direito de exigir seu cumprimento posteriormente.</P>
+      <P>Estes Termos, juntamente com a Política de Privacidade e demais documentos aplicáveis, constituem o acordo entre o usuário e a Bisme para uso da plataforma.</P>
+      <P>Ao utilizar a Bisme, o usuário declara que leu, entendeu e concorda com estes Termos de Uso.</P>
     </>
   );
 }
