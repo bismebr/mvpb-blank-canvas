@@ -113,6 +113,10 @@ export function LoginFullScreen({
   if (!open) return null;
 
   async function handleSubmit() {
+    // Guarda de reentrância: evita disparar signUp/signIn duplicado quando
+    // o usuário clica Continuar mais de uma vez (o botão só desabilita por
+    // validação, não por loading).
+    if (loadingCadastro) return;
     setErro(null);
     if (mode === "login") {
       if (!email.trim() || !senha) {
@@ -189,8 +193,9 @@ export function LoginFullScreen({
         return;
       }
       setLoadingCadastro(true);
+      const emailNorm = email.trim().toLowerCase();
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
+        email: emailNorm,
         password: senha,
         options: {
           emailRedirectTo:
@@ -202,30 +207,50 @@ export function LoginFullScreen({
         setLoadingCadastro(false);
         const m = (error.message || "").toLowerCase();
         if (m.includes("registered") || m.includes("already")) {
-          setErro("Este e-mail já está cadastrado.");
+          setErro("Este e-mail já está cadastrado. Faça login para continuar.");
         } else {
           setErro(error.message || "Não foi possível concluir o cadastro.");
         }
         return;
       }
-      if (!data.session) {
+      // Fallback: alguns projetos retornam data.session=null mesmo com
+      // autoconfirm; tenta login imediato antes de exigir confirmação por e-mail.
+      // Isso é essencial para o fluxo de agendamento do cliente novo continuar
+      // sem interrupção após o cadastro.
+      let session = data.session;
+      let userFinal = data.user;
+      if (!session) {
+        const { data: signInData } = await supabase.auth.signInWithPassword({
+          email: emailNorm,
+          password: senha,
+        });
+        if (signInData?.session) {
+          session = signInData.session;
+          userFinal = signInData.user;
+        }
+      }
+      if (!session) {
         setLoadingCadastro(false);
-        setErro("Cadastro criado! Confirme seu e-mail para ativar a conta e entrar.");
+        setErro(
+          "Cadastro criado! Confirme seu e-mail para ativar a conta e depois retorne para concluir seu agendamento.",
+        );
         return;
       }
       const novo: Usuario = {
         nome: nomeFinal,
-        email: data.user?.email ?? email.trim(),
+        email: userFinal?.email ?? emailNorm,
         senha: "",
         telefone: whatsapp,
-        criadoEm: data.user?.created_at ?? new Date().toISOString(),
+        criadoEm: userFinal?.created_at ?? new Date().toISOString(),
       };
-      setTimeout(() => {
-        setLoadingCadastro(false);
-        onLogged(novo);
-      }, 1200);
+      // Sem setTimeout: mantém o overlay de loading até o parent fechar a
+      // tela após concluir o agendamento. O delay artificial de 1200ms
+      // podia mascarar o handoff e dar a sensação de "nada acontece".
+      setLoadingCadastro(false);
+      onLogged(novo);
     }
   }
+
 
   async function handleRecovery() {
     setErro(null);
