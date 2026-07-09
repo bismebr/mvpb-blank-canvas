@@ -20,7 +20,7 @@ export function LegalModal({ kind, onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const title = kind === "terms" ? "Termos de Serviço" : "Política de Privacidade";
+  const title = kind === "terms" ? "Termos de Uso" : "Política de Privacidade";
 
   return (
     <div
