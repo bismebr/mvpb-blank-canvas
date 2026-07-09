@@ -736,7 +736,15 @@ export function LoginFullScreen({
                 to="/termos-de-servico"
                 style={{ color: "#111111", textDecoration: "underline", fontWeight: 600 }}
               >
-                Termos de Serviço
+                Termos de Uso
+              </Link>{" "}
+              e
+              <br />
+              <Link
+                to="/politica-privacidade"
+                style={{ color: "#111111", textDecoration: "underline", fontWeight: 600 }}
+              >
+                Política de Privacidade
               </Link>
             </p>
           </>
