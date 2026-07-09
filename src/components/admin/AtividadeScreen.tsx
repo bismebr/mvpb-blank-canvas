@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, User as UserIcon } from "lucide-react";
 import type { AgendamentoAdmin, FuncionarioAdmin } from "./AppContext";
 import { COLORS, FONT } from "./ui";
@@ -18,6 +18,8 @@ interface Props {
   readSet: Set<string>;
   servicos: { id: string; nome: string }[];
   funcionarios: FuncionarioAdmin[];
+  /** Mapa temporário customer_user_id -> Signed URL da foto real do cliente. */
+  avatarMap?: Record<string, string>;
   onClose: () => void;
   onMarkAllRead: () => void;
   onOpen: (it: ActivityItem) => void;
@@ -89,7 +91,7 @@ function buildText(
 }
 
 export function AtividadeScreen({
-  activities, readSet, servicos, funcionarios, onClose, onMarkAllRead, onOpen,
+  activities, readSet, servicos, funcionarios, avatarMap, onClose, onMarkAllRead, onOpen,
 }: Props) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -126,8 +128,9 @@ export function AtividadeScreen({
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .adm-feed-item:hover { background: var(--adm-bg-elevated); }
+        .adm-feed-item:hover { background: color-mix(in srgb, var(--adm-bg-elevated) 45%, transparent); }
       `}</style>
+
 
       <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))" }}>
         <header style={{
@@ -153,19 +156,21 @@ export function AtividadeScreen({
           </button>
         </header>
 
-        <div style={{ maxWidth: 640, margin: "0 auto", padding: "10px 12px 24px", display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ maxWidth: 640, margin: "0 auto", padding: "4px 4px 24px", display: "flex", flexDirection: "column" }}>
           {activities.length === 0 ? (
             <div style={{ padding: "48px 16px", textAlign: "center", color: COLORS.textMuted, fontSize: 14 }}>
               Nenhuma atividade ainda.
             </div>
           ) : (
-            activities.map((it) => (
+            activities.map((it, idx) => (
               <FeedItem
                 key={it.id}
                 it={it}
                 unread={!readSet.has(it.id)}
                 text={buildText(it, servicos, funcionarios)}
                 tempo={tempoRelativo(it.at, now)}
+                avatarUrl={it.ag.customerUserId ? avatarMap?.[it.ag.customerUserId] : undefined}
+                showDivider={idx < activities.length - 1}
                 onOpen={onOpen}
               />
             ))
@@ -177,41 +182,57 @@ export function AtividadeScreen({
 }
 
 function FeedItem({
-  it, unread, text, tempo, onOpen,
+  it, unread, text, tempo, avatarUrl, showDivider, onOpen,
 }: {
   it: ActivityItem;
   unread: boolean;
   text: string;
   tempo: string;
+  avatarUrl?: string;
+  showDivider: boolean;
   onOpen: (it: ActivityItem) => void;
 }) {
+  const [imgFailed, setImgFailed] = useState(false);
   const badgeColor = it.kind === "canceled" ? COLORS.danger : COLORS.success;
+  const showPhoto = !!avatarUrl && !imgFailed;
   return (
     <button
       type="button"
-      className="adm-feed-item bisme-light-border"
+      className="adm-feed-item"
       onClick={() => onOpen(it)}
       style={{
+        // Item solto de feed: sem card, sem sombra, sem borda arredondada,
+        // fundo herdado da tela. Apenas uma divisória sutil entre itens.
         width: "100%", textAlign: "left",
-        background: unread ? "rgba(34,197,94,0.05)" : COLORS.bgSurface,
-        border: `1px solid ${COLORS.border}`,
-        borderRadius: 16,
-        padding: "14px 16px", cursor: "pointer", fontFamily: FONT,
+        background: "transparent",
+        border: "none",
+        borderBottom: showDivider ? `1px solid var(--adm-divider)` : "none",
+        borderRadius: 0,
+        padding: "12px 8px", cursor: "pointer", fontFamily: FONT,
         display: "flex", gap: 12, alignItems: "flex-start", color: COLORS.textPrimary,
       }}
     >
-      {/* Avatar circular + badge de status */}
+      {/* Avatar circular (foto real ou padrão) + badge de status */}
       <div style={{ position: "relative", flexShrink: 0 }}>
         <div
           aria-hidden
           style={{
             width: 44, height: 44, borderRadius: "50%",
-            background: COLORS.bgElevated, border: `1px solid ${COLORS.border}`,
+            background: COLORS.bgElevated,
             display: "flex", alignItems: "center", justifyContent: "center",
             color: COLORS.textMuted, overflow: "hidden",
           }}
         >
-          <UserIcon size={24} />
+          {showPhoto ? (
+            <img
+              src={avatarUrl}
+              alt=""
+              onError={() => setImgFailed(true)}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+          ) : (
+            <UserIcon size={24} />
+          )}
         </div>
         <span
           aria-hidden
@@ -235,3 +256,4 @@ function FeedItem({
     </button>
   );
 }
+

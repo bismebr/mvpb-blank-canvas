@@ -46,6 +46,8 @@ export interface AgendamentoAdmin {
   updatedAt?: string;
   /** Snapshot do preço do serviço no momento do agendamento (centavos). */
   precoCentsSnapshot?: number;
+  /** ID do cliente final (auth.uid) — usado para carregar a foto real. */
+  customerUserId?: string;
 }
 
 export interface BloqueioAdmin {
