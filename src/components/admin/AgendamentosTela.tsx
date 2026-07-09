@@ -104,6 +104,9 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
   const { agendamentos, servicos, funcionarios, horarios, addAgendamento, updateStatusAg, setAgendamentos, setServicos, setFuncionarios } = useApp();
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [cancelInfo, setCancelInfo] = useState<Record<string, { by: "client" | "company" | "system"; at: string }>>({});
+  // Referência para o loader das atividades/agendamentos, usada para refetch
+  // sob demanda (fallback quando o Realtime não está ativo na publicação).
+  const reloadRef = useRef<() => void>(() => {});
 
   const funcionariosEfetivos = funcionarios;
   const agendamentosEfetivos = agendamentos;
