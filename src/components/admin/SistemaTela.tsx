@@ -20,7 +20,7 @@ function sanitizeSlug(input: string): string {
 const RESERVED_SLUGS = new Set([
   "admin", "bisme", "api", "auth", "empresario", "meus-agendamentos",
   "planos", "venda", "sobre", "quem-somos", "avaliacoes",
-  "politica-privacidade", "termos-de-servico", "bisme-admin",
+  "politica-privacidade", "termos-de-uso", "bisme-admin",
 ]);
 
 async function checkSlugAvailability(

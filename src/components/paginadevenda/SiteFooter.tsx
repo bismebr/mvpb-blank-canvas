@@ -55,7 +55,7 @@ export function SiteFooter() {
             <h4 className="font-bold mb-3 text-[#5690f5] text-sm uppercase tracking-wider">Institucional</h4>
             <ul className="space-y-2 text-gray-500 text-sm">
               <li><Link to="/quem-somos" className="hover:text-[#5690f5] transition-colors">Quem somos</Link></li>
-              <li><Link to="/termos-de-servico" className="hover:text-[#5690f5] transition-colors">Termos de Uso</Link></li>
+              <li><Link to="/termos-de-uso" className="hover:text-[#5690f5] transition-colors">Termos de Uso</Link></li>
               <li><Link to="/politica-privacidade" className="hover:text-[#5690f5] transition-colors">Política de Privacidade</Link></li>
             </ul>
           </div>

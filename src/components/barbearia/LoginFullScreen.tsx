@@ -733,7 +733,7 @@ export function LoginFullScreen({
             >
               Ao {isLogin ? "entrar" : "se cadastrar"}, você concorda com os{" "}
               <Link
-                to="/termos-de-servico"
+                to="/termos-de-uso"
                 style={{ color: "#111111", textDecoration: "underline", fontWeight: 600 }}
               >
                 Termos de Uso
