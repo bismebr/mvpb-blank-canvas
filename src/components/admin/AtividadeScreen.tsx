@@ -18,6 +18,8 @@ interface Props {
   readSet: Set<string>;
   servicos: { id: string; nome: string }[];
   funcionarios: FuncionarioAdmin[];
+  /** Mapa temporário customer_user_id -> Signed URL da foto real do cliente. */
+  avatarMap?: Record<string, string>;
   onClose: () => void;
   onMarkAllRead: () => void;
   onOpen: (it: ActivityItem) => void;
