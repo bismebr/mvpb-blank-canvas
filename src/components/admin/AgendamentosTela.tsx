@@ -228,13 +228,8 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
   }, []);
 
   // Fallback de atualização: como o Realtime pode não estar ativo na publicação
-  // para as tabelas necessárias, recarregamos ao abrir a aba Atividade e quando
-  // a janela/aba volta ao foco. Isso garante que novas atividades apareçam sem
-  // reload manual da página.
-  useEffect(() => {
-    if (notifOpen) reloadRef.current();
-  }, [notifOpen]);
-
+  // para as tabelas necessárias, recarregamos quando a janela/aba volta ao foco.
+  // Isso garante que novas atividades apareçam sem reload manual da página.
   useEffect(() => {
     function onFocus() { reloadRef.current(); }
     function onVisible() { if (document.visibilityState === "visible") reloadRef.current(); }
