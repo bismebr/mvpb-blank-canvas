@@ -221,9 +221,29 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
           () => { void load(); })
         .subscribe();
     }
+    reloadRef.current = () => { void load(); };
     void load();
     return () => { cancelled = true; if (channel) supabase.removeChannel(channel); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fallback de atualização: como o Realtime pode não estar ativo na publicação
+  // para as tabelas necessárias, recarregamos ao abrir a aba Atividade e quando
+  // a janela/aba volta ao foco. Isso garante que novas atividades apareçam sem
+  // reload manual da página.
+  useEffect(() => {
+    if (notifOpen) reloadRef.current();
+  }, [notifOpen]);
+
+  useEffect(() => {
+    function onFocus() { reloadRef.current(); }
+    function onVisible() { if (document.visibilityState === "visible") reloadRef.current(); }
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
 
