@@ -308,6 +308,106 @@ export function buildTemplateCss(template: SiteTemplate): string {
   stroke: #FFFFFF !important;
 }
 
+/* =========================================================
+   Login/Cadastro do cliente final — variação escura
+   Aplica APENAS quando o modelo escuro está ativo. Puramente
+   visual — não altera fluxo, validação ou integração.
+   ========================================================= */
+.sreli-root .sreli-login-overlay {
+  background-color: #0f0f10 !important;
+}
+.sreli-root .sreli-login-close { color: #FFFFFF !important; }
+.sreli-root .sreli-login-close svg { stroke: #FFFFFF !important; }
+.sreli-root .sreli-login-overlay .sreli-login-title { color: #FFFFFF !important; }
+.sreli-root .sreli-login-overlay .sreli-login-subtitle { color: #B5B5B5 !important; }
+.sreli-root .sreli-login-overlay .sreli-field-label { color: #FFFFFF !important; }
+.sreli-root .sreli-login-overlay .sreli-field-input {
+  background: #18181b !important;
+  color: #FFFFFF !important;
+  border-color: #2a2a2f !important;
+}
+.sreli-root .sreli-login-overlay .phone-wrapper {
+  background: #18181b !important;
+  border-color: #2a2a2f !important;
+}
+.sreli-root .sreli-login-overlay .phone-input {
+  background: transparent !important;
+  color: #FFFFFF !important;
+}
+.sreli-root .sreli-login-overlay .phone-prefix {
+  color: #D4D4D8 !important;
+  border-right-color: #2a2a2f !important;
+}
+.sreli-root .sreli-login-overlay input::placeholder,
+.sreli-root .sreli-login-overlay textarea::placeholder {
+  color: #8A8A90 !important;
+}
+.sreli-root .sreli-login-overlay .sreli-toggle-password { color: #B5B5B5 !important; }
+.sreli-root .sreli-login-overlay .sreli-divider-line { background: #2a2a2f !important; }
+.sreli-root .sreli-login-overlay .sreli-divider-text { color: #B5B5B5 !important; }
+.sreli-root .sreli-login-overlay .sreli-modal-switch-row { color: #B5B5B5 !important; }
+
+/* Seletor Entrar / Cadastrar (tablist com bg inline #F3F4F6) */
+.sreli-root .sreli-login-overlay [role="tablist"] {
+  background: #18181b !important;
+}
+.sreli-root .sreli-login-overlay [role="tablist"] [role="tab"] {
+  color: #B5B5B5 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.sreli-root .sreli-login-overlay [role="tablist"] [role="tab"][aria-selected="true"] {
+  background: #2a2a2f !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.4) !important;
+}
+
+/* Caixa branca/clara de aviso de recuperação de senha */
+.sreli-root .sreli-login-overlay [style*="background: #F3F4F6"],
+.sreli-root .sreli-login-overlay [style*="background:#F3F4F6"] {
+  background: #18181b !important;
+  color: #FFFFFF !important;
+  border-color: #2a2a2f !important;
+}
+
+/* Campos e wrappers com fundo branco inline (EmailField, FloatField, país) */
+.sreli-root .sreli-login-overlay [style*="background: #FFFFFF"],
+.sreli-root .sreli-login-overlay [style*="background:#FFFFFF"],
+.sreli-root .sreli-login-overlay [style*="background: rgb(255, 255, 255)"],
+.sreli-root .sreli-login-overlay [style*="background:rgb(255, 255, 255)"] {
+  background: #18181b !important;
+  background-image: none !important;
+}
+.sreli-root .sreli-login-overlay [style*="border: 1.5px solid #E4E4E4"],
+.sreli-root .sreli-login-overlay [style*="border:1.5px solid #E4E4E4"],
+.sreli-root .sreli-login-overlay [style*="border: 1px solid #E5E7EB"],
+.sreli-root .sreli-login-overlay [style*="border:1px solid #E5E7EB"] {
+  border-color: #2a2a2f !important;
+}
+
+/* Textos escuros inline → claros dentro do login */
+.sreli-root .sreli-login-overlay [style*="color: #1A1A1A"],
+.sreli-root .sreli-login-overlay [style*="color:#1A1A1A"],
+.sreli-root .sreli-login-overlay [style*="color: #111111"],
+.sreli-root .sreli-login-overlay [style*="color:#111111"],
+.sreli-root .sreli-login-overlay [style*="color: #111"],
+.sreli-root .sreli-login-overlay [style*="color:#111"] {
+  color: #FFFFFF !important;
+}
+.sreli-root .sreli-login-overlay [style*="color: #6F6F6F"],
+.sreli-root .sreli-login-overlay [style*="color:#6F6F6F"],
+.sreli-root .sreli-login-overlay [style*="color: #888888"],
+.sreli-root .sreli-login-overlay [style*="color:#888888"] {
+  color: #B5B5B5 !important;
+}
+
+/* Inputs internos (EmailField / FloatField usam <input> nu sem classe) */
+.sreli-root .sreli-login-overlay label input,
+.sreli-root .sreli-login-overlay label textarea {
+  background: transparent !important;
+  color: #FFFFFF !important;
+}
+
 `
     : "";
 
