@@ -103,6 +103,7 @@ function segundaDaSemana(d: Date) {
 export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean; onClose: () => void; onAdd?: () => void }) {
   const { agendamentos, servicos, funcionarios, horarios, addAgendamento, updateStatusAg, setAgendamentos, setServicos, setFuncionarios } = useApp();
   const [companyId, setCompanyId] = useState<string | null>(null);
+  const [cancelInfo, setCancelInfo] = useState<Record<string, { by: "client" | "company" | "system"; at: string }>>({});
 
   const funcionariosEfetivos = funcionarios;
   const agendamentosEfetivos = agendamentos;
