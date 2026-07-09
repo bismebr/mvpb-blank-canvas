@@ -754,6 +754,7 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
           readSet={readSet}
           servicos={servicos}
           funcionarios={funcionariosEfetivos}
+          avatarMap={avatarMap}
           onClose={() => setNotifOpen(false)}
           onMarkAllRead={() => notifStore.markRead(activities.map((x) => x.id))}
           onOpen={openNotification}
