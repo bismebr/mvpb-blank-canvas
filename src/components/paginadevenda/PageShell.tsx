@@ -31,7 +31,7 @@ function HeaderMenuModal({
 
   const institucional = [
     { label: "Quem somos", to: "/quem-somos" as const },
-    { label: "Termos de uso", to: "/termos-de-servico" as const },
+    { label: "Termos de uso", to: "/termos-de-uso" as const },
     { label: "Política de privacidade", to: "/politica-privacidade" as const },
   ];
   const comercial = [

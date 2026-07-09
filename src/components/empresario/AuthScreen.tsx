@@ -184,7 +184,7 @@ function AuthScreenInner(props: Props) {
 
           <p style={agreementStyle}>
             {agreementLead}{" "}
-            <Link to="/termos-de-servico" style={linkStyle}>
+            <Link to="/termos-de-uso" style={linkStyle}>
               {t("agreement.terms")}
             </Link>{" "}
             {t("agreement.and")}{" "}

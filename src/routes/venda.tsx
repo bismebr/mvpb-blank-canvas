@@ -607,7 +607,7 @@ function Header() {
               label={t("menu.institucional")}
               items={[
                 { label: t("menu.quemsomos"), to: "/quem-somos" },
-                { label: t("menu.termos"), to: "/termos-de-servico" },
+                { label: t("menu.termos"), to: "/termos-de-uso" },
                 { label: t("menu.privacidade"), to: "/politica-privacidade" },
               ]}
               onNavigate={() => setOpen(false)}
@@ -1041,7 +1041,7 @@ function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-[#555]">
               <li><Link to="/quem-somos" className="hover:text-[color:var(--bisme-orange)]" style={{ ["--bisme-orange" as string]: ORANGE }}>{t("menu.quemsomos")}</Link></li>
-              <li><Link to="/termos-de-servico" className="hover:text-[color:var(--bisme-orange)]" style={{ ["--bisme-orange" as string]: ORANGE }}>{t("menu.termos")}</Link></li>
+              <li><Link to="/termos-de-uso" className="hover:text-[color:var(--bisme-orange)]" style={{ ["--bisme-orange" as string]: ORANGE }}>{t("menu.termos")}</Link></li>
               <li><Link to="/politica-privacidade" className="hover:text-[color:var(--bisme-orange)]" style={{ ["--bisme-orange" as string]: ORANGE }}>{t("menu.privacidade")}</Link></li>
             </ul>
           </div>
