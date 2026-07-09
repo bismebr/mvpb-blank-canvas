@@ -850,7 +850,7 @@ function EmailField({
               width: 22,
               height: 22,
               borderRadius: "50%",
-              background: "#16a34a",
+              background: "#00be70",
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
