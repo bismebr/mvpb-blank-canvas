@@ -335,6 +335,35 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
   }, [agendamentos, cancelInfo]);
   const unreadCount = activities.filter((x) => !readSet.has(x.id)).length;
 
+  // --- Fotos reais dos clientes nas Atividades -------------------------
+  // Mapa temporário customer_user_id -> Signed URL. Nunca persistido em
+  // banco nem em localStorage. Buscado via server function segura (service
+  // role só no servidor) ao abrir a aba Atividade.
+  const [avatarMap, setAvatarMap] = useState<Record<string, string>>({});
+  const fetchAvatars = useServerFn(getCompanyClientAvatars);
+  useEffect(() => {
+    if (!notifOpen) return;
+    const ids = Array.from(
+      new Set(activities.map((x) => x.ag.customerUserId).filter((v): v is string => !!v)),
+    );
+    if (ids.length === 0) return;
+    let active = true;
+    void fetchAvatars({ data: { companyId: companyId ?? undefined, customerUserIds: ids } })
+      .then((map) => {
+        if (active && map && typeof map === "object") {
+          setAvatarMap((prev) => ({ ...prev, ...map }));
+        }
+      })
+      .catch((e) => {
+        console.warn("[atividade] falha ao carregar avatars", e);
+      });
+    return () => {
+      active = false;
+    };
+  }, [notifOpen, activities, companyId, fetchAvatars]);
+
+
+
 
   // Bloquear scroll quando modais abertos
   useEffect(() => {
