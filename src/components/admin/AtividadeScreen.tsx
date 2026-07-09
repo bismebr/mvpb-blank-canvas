@@ -1,14 +1,16 @@
 import { useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, User as UserIcon } from "lucide-react";
 import type { AgendamentoAdmin, FuncionarioAdmin } from "./AppContext";
 import { COLORS, FONT } from "./ui";
 
 export type ActivityItem = {
   id: string;
   kind: "created" | "canceled";
-  /** ISO timestamp da AÇÃO (created_at / updated_at) — usado para ordenar e agrupar. */
+  /** ISO timestamp da AÇÃO (created_at do agendamento / do cancelamento). */
   at: string;
   ag: AgendamentoAdmin;
+  /** Quem cancelou (quando kind === "canceled"). */
+  canceledBy?: "client" | "company" | "system";
 };
 
 interface Props {
@@ -21,17 +23,69 @@ interface Props {
   onOpen: (it: ActivityItem) => void;
 }
 
-function startOfWeek(d: Date): Date {
-  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  x.setDate(x.getDate() - x.getDay());
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
-
 function parseAt(s: string): Date {
   const d = new Date(s);
   if (!Number.isNaN(d.getTime())) return d;
   return new Date();
+}
+
+/** Data formatada como dd/mm/aaaa a partir de "YYYY-MM-DD". */
+function fmtDataBR(data: string): string {
+  const [y, m, d] = data.split("-");
+  if (!y || !m || !d) return data;
+  return `${d}/${m}/${y}`;
+}
+
+/**
+ * Tempo relativo estilo rede social. Recalculado a cada render (ao reabrir a
+ * aba). Retorna "Agora", "há 1 minuto", "há X minutos", "há X horas",
+ * "há X dias", "há X semanas", "há X meses", "há X anos".
+ */
+function tempoRelativo(iso: string, now: Date = new Date()): string {
+  const then = parseAt(iso);
+  const diff = Math.max(0, now.getTime() - then.getTime());
+  const seg = Math.floor(diff / 1000);
+  if (seg < 60) return "Agora";
+  const min = Math.floor(seg / 60);
+  if (min < 60) return min === 1 ? "há 1 minuto" : `há ${min} minutos`;
+  const horas = Math.floor(min / 60);
+  if (horas < 24) return horas === 1 ? "há 1 hora" : `há ${horas} horas`;
+  const dias = Math.floor(horas / 24);
+  if (dias < 7) return dias === 1 ? "há 1 dia" : `há ${dias} dias`;
+  const semanas = Math.floor(dias / 7);
+  if (dias < 30) return semanas === 1 ? "há 1 semana" : `há ${semanas} semanas`;
+  const meses = Math.floor(dias / 30);
+  if (meses < 12) return meses === 1 ? "há 1 mês" : `há ${meses} meses`;
+  const anos = Math.floor(dias / 365);
+  return anos <= 1 ? "há 1 ano" : `há ${anos} anos`;
+}
+
+/** Monta o texto da atividade conforme o tipo/ator, no padrão de feed. */
+function buildText(
+  it: ActivityItem,
+  servicos: { id: string; nome: string }[],
+  funcionarios: FuncionarioAdmin[],
+): string {
+  const a = it.ag;
+  const svcNome = servicos.find((s) => s.id === a.servicoId)?.nome ?? "serviço";
+  const hora = a.horario;
+  const dia = fmtDataBR(a.data);
+
+  // Profissional só entra na mensagem quando há múltiplos profissionais
+  // visíveis/selecionáveis e o agendamento tem um profissional escolhido.
+  const podeMostrarProf = funcionarios.length >= 2;
+  const func = a.funcionarioId ? funcionarios.find((f) => f.id === a.funcionarioId) : null;
+  const comProf = podeMostrarProf && func ? ` com profissional ${func.nome}` : "";
+
+  if (it.kind === "created") {
+    return `${a.nome} reservou o serviço ${svcNome} às ${hora} no dia ${dia}${comProf}.`;
+  }
+  // canceled
+  if (it.canceledBy === "client") {
+    return `${a.nome} cancelou a reserva do serviço ${svcNome} às ${hora} no dia ${dia}${comProf}.`;
+  }
+  // company/system/desconhecido -> forma passiva (cancelado pelo estabelecimento).
+  return `A reserva de ${a.nome} do serviço ${svcNome} de ${hora} no dia ${dia}${comProf} foi cancelada.`;
 }
 
 export function AtividadeScreen({
@@ -52,21 +106,7 @@ export function AtividadeScreen({
     };
   }, []);
 
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-  const weekStart = startOfWeek(hoje);
-  const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 7);
-  const limite = new Date(hoje); limite.setDate(hoje.getDate() - 31); limite.setHours(0, 0, 0, 0);
-
-  // activities já vem ordenado por `at` desc.
-  const semana: ActivityItem[] = [];
-  const antes: ActivityItem[] = [];
-  for (const it of activities) {
-    const d = parseAt(it.at);
-    if (d >= weekStart && d < weekEnd) semana.push(it);
-    else if (d < weekStart && d >= limite) antes.push(it);
-  }
-
+  const now = new Date();
   const hasUnread = activities.some((x) => !readSet.has(x.id));
 
   return (
@@ -86,7 +126,7 @@ export function AtividadeScreen({
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .adm-atividade-item:hover { background: var(--adm-bg-elevated); }
+        .adm-feed-item:hover { background: var(--adm-bg-elevated); }
       `}</style>
 
       <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))" }}>
@@ -94,6 +134,7 @@ export function AtividadeScreen({
           display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
           padding: "12px 14px", borderBottom: `1px solid var(--adm-divider)`,
           background: COLORS.bgSurface, paddingTop: "calc(12px + env(safe-area-inset-top, 0px))",
+          position: "sticky", top: 0, zIndex: 2,
         }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, minWidth: 0 }}>
             <button
@@ -112,91 +153,85 @@ export function AtividadeScreen({
           </button>
         </header>
 
-        <div style={{ maxWidth: 720, margin: "0 auto", padding: "8px 14px 24px" }}>
-          <Section title="Esta semana" items={semana} readSet={readSet} servicos={servicos} funcionarios={funcionarios} onOpen={onOpen} emptyText="Nenhuma atividade esta semana." />
-          <Section title="Antes"        items={antes}  readSet={readSet} servicos={servicos} funcionarios={funcionarios} onOpen={onOpen} emptyText="Nenhuma atividade nos últimos 31 dias." />
+        <div style={{ maxWidth: 640, margin: "0 auto", padding: "10px 12px 24px", display: "flex", flexDirection: "column", gap: 10 }}>
+          {activities.length === 0 ? (
+            <div style={{ padding: "48px 16px", textAlign: "center", color: COLORS.textMuted, fontSize: 14 }}>
+              Nenhuma atividade ainda.
+            </div>
+          ) : (
+            activities.map((it) => (
+              <FeedItem
+                key={it.id}
+                it={it}
+                unread={!readSet.has(it.id)}
+                text={buildText(it, servicos, funcionarios)}
+                tempo={tempoRelativo(it.at, now)}
+                onOpen={onOpen}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function fmtAtDate(at: string): string {
-  const d = parseAt(at);
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const yyyy = d.getFullYear();
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mi = String(d.getMinutes()).padStart(2, "0");
-  return `${dd}/${mm}/${yyyy} · ${hh}:${mi}`;
-}
-
-function Section({
-  title, items, readSet, servicos, funcionarios, onOpen, emptyText,
+function FeedItem({
+  it, unread, text, tempo, onOpen,
 }: {
-  title: string;
-  items: ActivityItem[];
-  readSet: Set<string>;
-  servicos: { id: string; nome: string }[];
-  funcionarios: FuncionarioAdmin[];
+  it: ActivityItem;
+  unread: boolean;
+  text: string;
+  tempo: string;
   onOpen: (it: ActivityItem) => void;
-  emptyText: string;
 }) {
+  const badgeColor = it.kind === "canceled" ? COLORS.danger : COLORS.success;
   return (
-    <section style={{ marginTop: 18 }}>
-      <h2 style={{ margin: "0 4px 10px", fontSize: 13, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", color: COLORS.textMuted }}>
-        {title}
-      </h2>
-      <div
-        className="bisme-light-border"
-        style={{ background: COLORS.bgSurface, border: `1px solid ${COLORS.border}`, borderRadius: 14, overflow: "hidden" }}
-      >
-        {items.length === 0 ? (
-          <div style={{ padding: "20px 16px", textAlign: "center", color: COLORS.textMuted, fontSize: 13 }}>{emptyText}</div>
-        ) : (
-          items.map((it, idx) => {
-            const a = it.ag;
-            const isUnread = !readSet.has(it.id);
-            const func = a.funcionarioId ? funcionarios.find((f) => f.id === a.funcionarioId) : null;
-            const svc = servicos.find((s) => s.id === a.servicoId);
-            const text = it.kind === "canceled"
-              ? `Agendamento de ${a.nome} foi cancelado.`
-              : (func
-                  ? `${a.nome} agendou às ${a.horario} no seu estabelecimento com o profissional ${func.nome}.`
-                  : `${a.nome} agendou às ${a.horario} no seu estabelecimento.`);
-            return (
-              <button
-                key={it.id}
-                type="button"
-                className="adm-atividade-item"
-                onClick={() => onOpen(it)}
-                style={{
-                  width: "100%", textAlign: "left",
-                  background: isUnread ? "rgba(86, 144, 245,0.06)" : "transparent",
-                  border: "none",
-                  borderTop: idx === 0 ? "none" : `1px solid ${COLORS.border}`,
-                  padding: "14px 16px", cursor: "pointer", fontFamily: FONT,
-                  display: "flex", gap: 12, alignItems: "flex-start", color: COLORS.textPrimary,
-                }}
-              >
-                <span aria-hidden style={{
-                  width: 8, height: 8, borderRadius: "50%",
-                  background: isUnread ? (it.kind === "canceled" ? "#EF4444" : COLORS.accentLight) : "transparent",
-                  marginTop: 7, flexShrink: 0,
-                }} />
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ fontSize: 14, lineHeight: 1.45, color: isUnread ? COLORS.textPrimary : COLORS.textMuted, fontWeight: isUnread ? 600 : 500 }}>
-                    {text}
-                  </div>
-                  <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 4, fontWeight: 500 }}>
-                    {fmtAtDate(it.at)}{svc ? ` · ${svc.nome}` : ""}
-                  </div>
-                </div>
-              </button>
-            );
-          })
-        )}
+    <button
+      type="button"
+      className="adm-feed-item bisme-light-border"
+      onClick={() => onOpen(it)}
+      style={{
+        width: "100%", textAlign: "left",
+        background: unread ? "rgba(34,197,94,0.05)" : COLORS.bgSurface,
+        border: `1px solid ${COLORS.border}`,
+        borderRadius: 16,
+        padding: "14px 16px", cursor: "pointer", fontFamily: FONT,
+        display: "flex", gap: 12, alignItems: "flex-start", color: COLORS.textPrimary,
+      }}
+    >
+      {/* Avatar circular + badge de status */}
+      <div style={{ position: "relative", flexShrink: 0 }}>
+        <div
+          aria-hidden
+          style={{
+            width: 44, height: 44, borderRadius: "50%",
+            background: COLORS.bgElevated, border: `1px solid ${COLORS.border}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: COLORS.textMuted, overflow: "hidden",
+          }}
+        >
+          <UserIcon size={24} />
+        </div>
+        <span
+          aria-hidden
+          style={{
+            position: "absolute", top: -1, right: -1,
+            width: 14, height: 14, borderRadius: "50%",
+            background: badgeColor,
+            border: `2px solid ${COLORS.bgSurface}`,
+          }}
+        />
       </div>
-    </section>
+
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ fontSize: 14, lineHeight: 1.45, color: unread ? COLORS.textPrimary : COLORS.textMuted, fontWeight: unread ? 600 : 500 }}>
+          {text}
+        </div>
+        <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 5, fontWeight: 500 }}>
+          {tempo}
+        </div>
+      </div>
+    </button>
   );
 }

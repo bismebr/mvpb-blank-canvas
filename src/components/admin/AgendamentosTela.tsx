@@ -103,6 +103,10 @@ function segundaDaSemana(d: Date) {
 export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean; onClose: () => void; onAdd?: () => void }) {
   const { agendamentos, servicos, funcionarios, horarios, addAgendamento, updateStatusAg, setAgendamentos, setServicos, setFuncionarios } = useApp();
   const [companyId, setCompanyId] = useState<string | null>(null);
+  const [cancelInfo, setCancelInfo] = useState<Record<string, { by: "client" | "company" | "system"; at: string }>>({});
+  // Referência para o loader das atividades/agendamentos, usada para refetch
+  // sob demanda (fallback quando o Realtime não está ativo na publicação).
+  const reloadRef = useRef<() => void>(() => {});
 
   const funcionariosEfetivos = funcionarios;
   const agendamentosEfetivos = agendamentos;
@@ -138,16 +142,28 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
       if (!cid || cancelled) return;
       setCompanyId(cid);
 
-      const [apptsRes, servRes, profRes] = await Promise.all([
+      const [apptsRes, servRes, profRes, cancRes] = await Promise.all([
         supabase.from("appointments").select("*").eq("company_id", cid).order("starts_at", { ascending: true }),
         supabase.from("services").select("*").eq("company_id", cid).eq("is_active", true),
         supabase.from("professionals").select("*").eq("company_id", cid).eq("is_active", true).eq("is_visible", true).eq("is_default_owner", false).order("position", { ascending: true }),
+        supabase.from("appointment_cancellations").select("appointment_id, canceled_by, created_at").eq("company_id", cid),
       ]);
       if (cancelled) return;
 
       const servRows = servRes.data ?? [];
       const profRows = profRes.data ?? [];
       const apptRows = apptsRes.data ?? [];
+
+      // Mapa de cancelamentos: appointment_id -> { por quem, quando }
+      const cancInfo: Record<string, { by: "client" | "company" | "system"; at: string }> = {};
+      for (const c of cancRes.data ?? []) {
+        if (c.appointment_id) {
+          cancInfo[c.appointment_id] = {
+            by: (c.canceled_by as "client" | "company" | "system") ?? "system",
+            at: c.created_at ?? "",
+          };
+        }
+      }
 
       const servicosMapped: ServicoAdmin[] = servRows.map((s) => ({
         id: s.id, nome: s.name, preco: (s.price_cents ?? 0) / 100,
@@ -195,16 +211,34 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
       setServicos(servicosMapped);
       setFuncionarios(funcsMapped);
       setAgendamentos(agsMapped);
+      setCancelInfo(cancInfo);
 
       channel = supabase
         .channel(`admin-appts-${cid}`)
         .on("postgres_changes", { event: "*", schema: "public", table: "appointments", filter: `company_id=eq.${cid}` },
           () => { void load(); })
+        .on("postgres_changes", { event: "*", schema: "public", table: "appointment_cancellations", filter: `company_id=eq.${cid}` },
+          () => { void load(); })
         .subscribe();
     }
+    reloadRef.current = () => { void load(); };
     void load();
     return () => { cancelled = true; if (channel) supabase.removeChannel(channel); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fallback de atualização: como o Realtime pode não estar ativo na publicação
+  // para as tabelas necessárias, recarregamos quando a janela/aba volta ao foco.
+  // Isso garante que novas atividades apareçam sem reload manual da página.
+  useEffect(() => {
+    function onFocus() { reloadRef.current(); }
+    function onVisible() { if (document.visibilityState === "visible") reloadRef.current(); }
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
 
@@ -256,6 +290,12 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [notifOpen, setNotifOpen] = useState(false);
 
+  // Recarrega as atividades ao abrir a aba Atividade (recalcula tempo relativo
+  // e busca novas atividades mesmo sem Realtime ativo).
+  useEffect(() => {
+    if (notifOpen) reloadRef.current();
+  }, [notifOpen]);
+
   // --- Notificações (sininho) ----------------------------------------
   const [readVersion, setReadVersion] = useState(0);
   useEffect(() => notifStore.subscribe(() => setReadVersion((v) => v + 1)), []);
@@ -266,11 +306,14 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
     kind: "created" | "canceled";
     at: string; // ISO
     ag: AgendamentoAdmin;
+    canceledBy?: "client" | "company" | "system";
   };
 
   // Atividades: derivadas dos agendamentos do banco.
   // - "created" ordenado por appointments.created_at
-  // - "canceled" (quando status = cancelado) ordenado por appointments.updated_at
+  // - "canceled" (quando status = cancelado) ordenado pelo momento do
+  //   cancelamento (appointment_cancellations.created_at) com fallback em
+  //   appointments.updated_at.
   // Tudo ordenado por data da AÇÃO (não pela data do agendamento), do mais
   // recente para o mais antigo.
   const activities = useMemo<ActivityItem[]>(() => {
@@ -279,13 +322,14 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
       const createdAt = a.createdAt || `${a.data}T${a.horario}:00`;
       out.push({ id: a.id, kind: "created", at: createdAt, ag: a });
       if (a.status === "cancelado") {
-        const at = a.updatedAt || a.createdAt || `${a.data}T${a.horario}:00`;
-        out.push({ id: `${a.id}:cancel`, kind: "canceled", at, ag: a });
+        const info = cancelInfo[a.id];
+        const at = info?.at || a.updatedAt || a.createdAt || `${a.data}T${a.horario}:00`;
+        out.push({ id: `${a.id}:cancel`, kind: "canceled", at, ag: a, canceledBy: info?.by });
       }
     }
     out.sort((x, y) => y.at.localeCompare(x.at));
     return out;
-  }, [agendamentos]);
+  }, [agendamentos, cancelInfo]);
   const unreadCount = activities.filter((x) => !readSet.has(x.id)).length;
 
 
