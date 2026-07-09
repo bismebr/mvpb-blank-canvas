@@ -8,6 +8,8 @@ import { useApp, type AgendamentoAdmin, type StatusAg, type FuncionarioAdmin, ty
 import { COLORS, FONT, BottomSheet, Label, inputStyle, primaryBtn, secondaryBtn } from "./ui";
 import { confirmSentStore, notifStore } from "./notifyStore";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getCompanyClientAvatars } from "@/lib/client-avatars.functions";
 import { messagesStore, applyVariables } from "./messagesStore";
 import { AtividadeScreen } from "./AtividadeScreen";
 import {
