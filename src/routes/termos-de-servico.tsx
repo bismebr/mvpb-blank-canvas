@@ -5,9 +5,9 @@ import { TermsContent } from "@/components/empresario/LegalModal";
 export const Route = createFileRoute("/termos-de-servico")({
   head: () => ({
     meta: [
-      { title: "Termos de Serviço — Bisme" },
+      { title: "Termos de Uso — Bisme" },
       { name: "description", content: "Regras de uso da plataforma Bisme." },
-      { property: "og:title", content: "Termos de Serviço — Bisme" },
+      { property: "og:title", content: "Termos de Uso — Bisme" },
       { property: "og:description", content: "Regras de uso da plataforma Bisme." },
     ],
   }),
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/termos-de-servico")({
 
 function TermosDeServicoPage() {
   return (
-    <FullScreenPage title="Termos de Serviço" eyebrow="Legal">
+    <FullScreenPage title="Termos de Uso" eyebrow="Legal">
       <article className="text-[15px] leading-[1.8] text-[#1A1A1A] [&_h3]:text-[#1A1A1A] [&_h3]:mt-8 [&_h3]:mb-3 [&_p]:mb-4">
         <TermsContent />
       </article>
