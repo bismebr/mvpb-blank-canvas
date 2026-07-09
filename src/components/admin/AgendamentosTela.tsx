@@ -138,16 +138,28 @@ export function AgendamentosTela({ addOpen, onClose, onAdd }: { addOpen: boolean
       if (!cid || cancelled) return;
       setCompanyId(cid);
 
-      const [apptsRes, servRes, profRes] = await Promise.all([
+      const [apptsRes, servRes, profRes, cancRes] = await Promise.all([
         supabase.from("appointments").select("*").eq("company_id", cid).order("starts_at", { ascending: true }),
         supabase.from("services").select("*").eq("company_id", cid).eq("is_active", true),
         supabase.from("professionals").select("*").eq("company_id", cid).eq("is_active", true).eq("is_visible", true).eq("is_default_owner", false).order("position", { ascending: true }),
+        supabase.from("appointment_cancellations").select("appointment_id, canceled_by, created_at").eq("company_id", cid),
       ]);
       if (cancelled) return;
 
       const servRows = servRes.data ?? [];
       const profRows = profRes.data ?? [];
       const apptRows = apptsRes.data ?? [];
+
+      // Mapa de cancelamentos: appointment_id -> { por quem, quando }
+      const cancInfo: Record<string, { by: "client" | "company" | "system"; at: string }> = {};
+      for (const c of cancRes.data ?? []) {
+        if (c.appointment_id) {
+          cancInfo[c.appointment_id] = {
+            by: (c.canceled_by as "client" | "company" | "system") ?? "system",
+            at: c.created_at ?? "",
+          };
+        }
+      }
 
       const servicosMapped: ServicoAdmin[] = servRows.map((s) => ({
         id: s.id, nome: s.name, preco: (s.price_cents ?? 0) / 100,
